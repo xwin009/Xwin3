@@ -285,21 +285,75 @@ function openGiftBox(){
 document.getElementById("giftPopup").style.display="flex";
 }
 
-/* 🎁 REDEEM SYSTEM (LOCAL DEMO) */
-function redeemCode(){
+<script type="module">
 
-const code=document.getElementById("giftCodeInput").value;
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import {
+getFirestore,
+collection,
+query,
+where,
+getDocs,
+updateDoc,
+doc
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-if(code==="FREE100"){
-let wallet = +localStorage.getItem("wallet") || 0;
-wallet += 100;
+const firebaseConfig = {
+apiKey: "AIzaSyBx3J9aGn_98rTPgurMMKw_GR3puIMj4Ms",
+authDomain: "colourcash-ea60e.firebaseapp.com",
+projectId: "colourcash-ea60e"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+window.redeemCode = async function(){
+
+const codeInput = document.getElementById("giftCodeInput").value.trim();
+
+if(!codeInput){
+alert("Enter Gift Code");
+return;
+}
+
+const q = query(collection(db,"giftcodes"), where("code","==",codeInput));
+const snap = await getDocs(q);
+
+if(snap.empty){
+alert("Invalid Gift Code ❌");
+return;
+}
+
+snap.forEach(async(d)=>{
+
+const data = d.data();
+
+if(data.used){
+alert("Code Already Used ❌");
+return;
+}
+
+/* WALLET ADD */
+let wallet = Number(localStorage.getItem("wallet")) || 0;
+wallet += Number(data.amount);
+
 localStorage.setItem("wallet",wallet);
-alert("₹100 Added to Wallet");
-}else{
-alert("Invalid Code");
-}
+localStorage.setItem("coin_wallet",wallet);
+
+/* MARK USED */
+await updateDoc(doc(db,"giftcodes",d.id),{
+used:true
+});
+
+alert("₹"+data.amount+" Added To Wallet ✅");
+
+document.getElementById("giftPopup").style.display="none";
+
+});
 
 }
+
+</script>
 
 /* SLIDER */
 const track = document.getElementById("bannerTrack");
