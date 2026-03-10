@@ -1,7 +1,14 @@
-<!DOCTYPE html>  <html lang="en">    <head>    
-<meta charset="UTF-8">    
-<title>DraxBet</title>    
-<meta name="viewport" content="width=device-width, initial-scale=1">  <style>    /* ===== GAME CARD BASE ===== */
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<title>DraxBet</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+
+/* ===== GAME CARD BASE ===== */
 .game-card{
 min-height:140px;
 border-radius:16px;
@@ -24,16 +31,18 @@ body{margin:0;font-family:Arial;background:#ffeb3b;color:#fff}
 /* HEADER */
 .header{padding:15px;font-size:22px;font-weight:bold;text-align:center}
 
-/* 🔥 BANNER SLIDER */
+/* SLIDER */
 .banner-slider{
 margin:0 15px 10px;
 border-radius:16px;
 overflow:hidden;
 }
+
 .banner-track{
 display:flex;
 transition:transform .4s ease;
 }
+
 .banner-track img{
 width:100%;
 height:180px;
@@ -42,8 +51,12 @@ flex-shrink:0;
 }
 
 /* MENU */
-.menu{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;padding:15px}
-
+.menu{
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:14px;
+padding:15px
+}
 /* GAME COLORS */
 .wingo{background:linear-gradient(135deg,#2196f3,#21cbf3)}
 .mines{background:linear-gradient(135deg,#ff5252,#ff1744)}
@@ -66,71 +79,78 @@ flex-shrink:0;
 .hilo{background:linear-gradient(135deg,#00c6ff,#0072ff)}
 .dragontower{background:linear-gradient(135deg,#ff7a18,#ff3d00)}
 .ballooncrash{background:linear-gradient(135deg,#ff4fd8,#00c6ff)}
-
+  
 /* BOTTOM NAV */
 .bottom-nav{
-position:fixed;bottom:0;left:0;right:0;
-background:#111;display:flex;border-top:1px solid #222
+position:fixed;
+bottom:0;
+left:0;
+right:0;
+background:#111;
+display:flex;
+border-top:1px solid #222
 }
-.nav-btn{flex:1;padding:10px 0;text-align:center;font-size:12px;color:#aaa}
-.nav-btn.active{color:#4caf50;font-weight:bold}
-.nav-btn div{font-size:20px}
-.spacer{height:70px}
+
+.nav-btn{
+flex:1;
+padding:10px 0;
+text-align:center;
+font-size:12px;
+color:#aaa
+}
+
+.nav-btn.active{
+color:#4caf50;
+font-weight:bold
+}
+
+.nav-btn div{
+font-size:20px
+}
+
+.spacer{
+height:70px
+}
 
 /* SUPPORT ICON */
 #supportIcon{
-position: fixed;
-right: 16px;
-bottom: 90px;
-width: 56px;
-height: 56px;
-background: #111;
-color: #fff;
-font-size: 26px;
-border-radius: 50%;
-display: flex;
-align-items: center;
-justify-content: center;
-box-shadow: 0 6px 14px rgba(0,0,0,0.4);
-cursor: pointer;
-z-index: 9999;
-}
-
-/* 🎁 GIFT ICON */
-#giftIcon{
-position: fixed;
-right: 16px;
-bottom: 160px;
-width: 56px;
-height: 56px;
-background: #ff3b3b;
-color: #fff;
-font-size: 26px;
-border-radius: 50%;
+position:fixed;
+right:16px;
+bottom:90px;
+width:56px;
+height:56px;
+background:#111;
+color:#fff;
+font-size:26px;
+border-radius:50%;
 display:flex;
 align-items:center;
 justify-content:center;
 box-shadow:0 6px 14px rgba(0,0,0,0.4);
 cursor:pointer;
-z-index:9999;
+z-index:9999
 }
 
-/* POPUP */
-.deposit-popup{
-position:fixed;inset:0;background:rgba(0,0,0,.75);
-display:none;align-items:center;justify-content:center;z-index:99999
-}
-.deposit-box{
-width:85%;max-width:340px;
-background:linear-gradient(135deg,#ff9800,#ff5722);
-border-radius:18px;padding:22px;text-align:center
-}
-.deposit-box button{
-margin-top:14px;width:100%;padding:12px;border:none;
-border-radius:12px;background:#000;color:#fff;font-size:16px;font-weight:bold
+/* GIFT ICON */
+#giftIcon{
+position:fixed;
+right:16px;
+bottom:160px;
+width:56px;
+height:56px;
+background:#ff3b3b;
+color:#fff;
+font-size:26px;
+border-radius:50%;
+display:flex;
+align-items:center;
+justify-content:center;
+box-shadow:0 6px 14px rgba(0,0,0,0.4);
+cursor:pointer;
+z-index:9999
 }
 
-/* 🎁 GIFT POPUP */
+/* GIFT POPUP */
 .gift-popup{
 position:fixed;
 inset:0;
@@ -148,7 +168,7 @@ background:#fff;
 border-radius:16px;
 padding:20px;
 text-align:center;
-color:#000;
+color:#000
 }
 
 .gift-box input{
@@ -156,7 +176,7 @@ width:100%;
 padding:12px;
 margin-top:10px;
 border-radius:8px;
-border:1px solid #ccc;
+border:1px solid #ccc
 }
 
 .gift-box button{
@@ -167,99 +187,167 @@ border:none;
 border-radius:10px;
 background:#ff3b3b;
 color:#fff;
-font-size:16px;
+font-size:16px
 }
 
-</style>  </head>  <body>  <div class="header">🏦DraxBet🏦</div>  <!-- 🎁 GIFT ICON -->  <div id="giftIcon" onclick="openGiftBox()">🎁</div>  <!-- ✉️ SUPPORT ICON -->  <div id="supportIcon" onclick="openSupportMail()">✉️</div>  <!-- 🔥 SLIDER -->  <div class="banner-slider">
+</style>
 
-<div class="banner-track" id="bannerTrack">    
-<img src="images/file_000000001fa87208a7f51620e8c64b95.png">    
-<img src="images/file_00000000352c7208ae624a30d07574cd.png">    
-</div>    
-</div>  <!-- MENU -->  <div class="menu">  <div class="game-card wingo" onclick="openGame('wingo.html')"><div class="icon">🎨</div><h3>WIN GO</h3><p>30s Colour Trading</p></div>  <div class="game-card mines" onclick="openGame('mines.html')"><div class="icon">💣</div><h3>MINES</h3><p>Spribe Style Game</p></div>  <div class="game-card aviator" onclick="openGame('aviator.html')"><div class="icon">✈️</div><h3>AVIATOR</h3><p>Crash Multiplier</p></div>    
-<div class="game-card goddevil" onclick="openGame('dragon-tiger.html')"><div class="icon">🐉</div><h3>DRAGON • TIGER</h3><p>High Card Battle</p></div>          
-<div class="game-card roulette" onclick="openGame('roulette.html')"><div class="icon">🎡</div><h3>ROULETTE</h3><p>Classic Casino Wheel</p></div>          
-<div class="game-card aviator" onclick="openGame('aviator-game.html')"><div class="icon">✈️💯</div><h3>AVIATOR REAL WIN</h3><p>Crash Multiplier • 1000x</p></div>          
-<div class="game-card coinflip" onclick="openGame('coinflip.html')"><div class="icon">🪙</div><h3>COIN FLIP</h3><p>Head · Tail</p></div>          
-<div class="game-card treasure" onclick="openGame('treasure.html')"><div class="icon">💎</div><h3>TREASURE</h3><p>High Risk • High Reward</p></div>          
-<div class="game-card chicken" onclick="openGame('chicken-road.html')"><div class="icon">🐔</div><h3>CHICKEN ROAD</h3><p>High Risk • High Reward</p></div>          
-<div class="game-card dice" onclick="openGame('dice.html')"><div class="icon">🎲</div><h3>DICE ROLL</h3><p>Quick Win • Lucky Roll</p></div>          
-<div class="game-card plinko" onclick="openGame('plinko.html')"><div class="icon">⚪</div><h3>PLINKO</h3><p>Low • Medium • High Risk</p></div>          
-<div class="game-card draxturbo" onclick="openGame('drax-turbo-drive.html')"><img src="images/bmw.png" class="drax-logo"><h3>DRAX TURBO DRIVE</h3><p>Mercedes 5x · Audi 10x · BMW 20x</p></div>          
-<div class="game-card spinstop" onclick="openGame('spin-stop.html')"><div class="icon">⏹️</div><h3>SPIN STOP</h3><p>2x Only • Manual Stop</p></div>          
-<div class="game-card horserace" onclick="openGame('horse-race.html')"><div class="icon">🐎</div><h3>HORSE RACE</h3><p>High Risk • High Reward</p></div>          
-<div class="game-card ganeshslots" onclick="openGame('ganesh-slots.html')"><img src="images/symbols/scatter.png"><h3>GANESH SLOTS</h3><p>Lucky Lines • Multipliers</p></div>          
-<div class="game-card keno" onclick="openGame('keno.html')"><div class="icon">🔥</div><h3>KENO</h3><p>Select Numbers • Big Multipliers</p></div>          
-<div class="game-card fateshift" onclick="openGame('fate-shift.html')"><div class="icon">⚡</div><h3>FATE SHIFT</h3><p>Auto / Manual Shift • Smart Risk</p></div>          
-<div class="game-card hilo" onclick="openGame('hilo.html')"><div class="icon">⬆️⬇️</div><h3>HILO</h3><p>High / Low • Card Guess</p></div>          
-<div class="game-card dragontower" onclick="openGame('dragon-tower.html')"><div class="icon">🐲🏗️</div><h3>DRAGON TOWER</h3><p>Climb & Win • Risk Levels</p></div>          
-<div class="game-card ballooncrash" onclick="openGame('balloon-crash.html')"><div class="icon">🎈💥</div><h3>BALLOON CRASH</h3><p>Cash Out Before Pop</p></div>          
-<div class="game-card jilli all games" onclick="openGame('jilli.html')"><div class="icon">🏦💰</div><h3>JILLI GAMES</h3><p>Cash Out Before Pop</p></div>  </div>  <div class="spacer">    
-</div>  <div class="spacer"></div>  <!-- 🎁 GIFT POPUP -->  <div class="gift-popup" id="giftPopup">    
-<div class="gift-box">  <h2>🎁 Redeem Gift Code</h2>  <input type="text" id="giftCodeInput" placeholder="Enter Gift Code">  <button onclick="redeemCode()">Redeem</button>  </div>    
-</div>  <!-- DEPOSIT POPUP -->  <div class="deposit-popup" id="depositPopup">    
-<div class="deposit-box">    
-<h2>Minimum Deposit ₹100</h2>    
-<p>Play karne ke liye pehle ₹100 deposit karo</p>    
-<button onclick="location.href='wallet.html'">Deposit Now</button>    
-</div>    
-</div>  <!-- BOTTOM NAV -->  <div class="bottom-nav">    
-<div class="nav-btn active"><div>🏠</div>Home</div>    
-<div class="nav-btn" onclick="location.href='wallet.html'"><div>💰</div>Wallet</div>    
-<div class="nav-btn" onclick="location.href='promotion.html'"><div>🎁</div>Promotion</div>    
-<div class="nav-btn" onclick="location.href='account.html'"><div>👤</div>Account</div>    
-</div>  <script>    /* SUPPORT MAIL */
+</head>
+
+<body>
+
+<div class="header">🏦DraxBet🏦</div>
+
+<div id="giftIcon" onclick="openGiftBox()">🎁</div>
+
+<div id="supportIcon" onclick="openSupportMail()">✉️</div>
+
+<div class="banner-slider">
+<div class="banner-track" id="bannerTrack">
+
+<img src="images/file_000000001fa87208a7f51620e8c64b95.png">
+<img src="images/file_00000000352c7208ae624a30d07574cd.png">
+
+</div>
+</div>
+
+<div class="menu">
+
+<div class="game-card wingo" onclick="openGame('wingo.html')">
+<div class="icon">🎨</div>
+<h3>WIN GO</h3>
+<p>30s Colour Trading</p>
+</div>
+
+<div class="game-card mines" onclick="openGame('mines.html')">
+<div class="icon">💣</div>
+<h3>MINES</h3>
+<p>Spribe Style Game</p>
+</div>
+
+<div class="game-card aviator" onclick="openGame('aviator.html')">
+<div class="icon">✈️</div>
+<h3>AVIATOR</h3>
+<p>Crash Multiplier</p>
+</div>
+  <div class="game-card goddevil" onclick="openGame('dragon-tiger.html')"><div class="icon">🐉</div><h3>DRAGON • TIGER</h3><p>High Card Battle</p></div>            
+<div class="game-card roulette" onclick="openGame('roulette.html')"><div class="icon">🎡</div><h3>ROULETTE</h3><p>Classic Casino Wheel</p></div>            
+<div class="game-card aviator" onclick="openGame('aviator-game.html')"><div class="icon">✈️💯</div><h3>AVIATOR REAL WIN</h3><p>Crash Multiplier • 1000x</p></div>            
+<div class="game-card coinflip" onclick="openGame('coinflip.html')"><div class="icon">🪙</div><h3>COIN FLIP</h3><p>Head · Tail</p></div>            
+<div class="game-card treasure" onclick="openGame('treasure.html')"><div class="icon">💎</div><h3>TREASURE</h3><p>High Risk • High Reward</p></div>            
+<div class="game-card chicken" onclick="openGame('chicken-road.html')"><div class="icon">🐔</div><h3>CHICKEN ROAD</h3><p>High Risk • High Reward</p></div>            
+<div class="game-card dice" onclick="openGame('dice.html')"><div class="icon">🎲</div><h3>DICE ROLL</h3><p>Quick Win • Lucky Roll</p></div>            
+<div class="game-card plinko" onclick="openGame('plinko.html')"><div class="icon">⚪</div><h3>PLINKO</h3><p>Low • Medium • High Risk</p></div>            
+<div class="game-card draxturbo" onclick="openGame('drax-turbo-drive.html')"><img src="images/bmw.png" class="drax-logo"><h3>DRAX TURBO DRIVE</h3><p>Mercedes 5x · Audi 10x · BMW 20x</p></div>            
+<div class="game-card spinstop" onclick="openGame('spin-stop.html')"><div class="icon">⏹️</div><h3>SPIN STOP</h3><p>2x Only • Manual Stop</p></div>            
+<div class="game-card horserace" onclick="openGame('horse-race.html')"><div class="icon">🐎</div><h3>HORSE RACE</h3><p>High Risk • High Reward</p></div>            
+<div class="game-card ganeshslots" onclick="openGame('ganesh-slots.html')"><img src="images/symbols/scatter.png"><h3>GANESH SLOTS</h3><p>Lucky Lines • Multipliers</p></div>            
+<div class="game-card keno" onclick="openGame('keno.html')"><div class="icon">🔥</div><h3>KENO</h3><p>Select Numbers • Big Multipliers</p></div>            
+<div class="game-card fateshift" onclick="openGame('fate-shift.html')"><div class="icon">⚡</div><h3>FATE SHIFT</h3><p>Auto / Manual Shift • Smart Risk</p></div>            
+<div class="game-card hilo" onclick="openGame('hilo.html')"><div class="icon">⬆️⬇️</div><h3>HILO</h3><p>High / Low • Card Guess</p></div>            
+<div class="game-card dragontower" onclick="openGame('dragon-tower.html')"><div class="icon">🐲🏗️</div><h3>DRAGON TOWER</h3><p>Climb & Win • Risk Levels</p></div>            
+<div class="game-card ballooncrash" onclick="openGame('balloon-crash.html')"><div class="icon">🎈💥</div><h3>BALLOON CRASH</h3><p>Cash Out Before Pop</p></div>            
+<div class="game-card jilli all games" onclick="openGame('jilli.html')"><div class="icon">🏦💰</div><h3>JILLI GAMES</h3><p>Cash Out Before Pop</p></div>  
+
+</div>
+
+<div class="spacer"></div>
+
+<div class="gift-popup" id="giftPopup">
+
+<div class="gift-box">
+
+<h2>🎁 Redeem Gift Code</h2>
+
+<input type="text" id="giftCodeInput" placeholder="Enter Gift Code">
+
+<button onclick="redeemCode()">Redeem</button>
+
+</div>
+
+</div>
+
+<script>
+
+/* SUPPORT */
 function openSupportMail(){
 window.location.href="mailto:supirtx4@gmail.com?subject=DraxBet Support";
 }
 
-/* OPEN GAME */
-function openGame(url){
-
-let walletAmt =
-+localStorage.getItem("wallet") ||
-+localStorage.getItem("coin_wallet") ||
-0;
-
-if(walletAmt < 100){
-document.getElementById("depositPopup").style.display="flex";
-}else{
-location.href = url;
-}
-
-}
-
-/* 🎁 OPEN GIFT POPUP */
+/* OPEN POPUP */
 function openGiftBox(){
 document.getElementById("giftPopup").style.display="flex";
 }
 
-/* 🎁 REDEEM SYSTEM (LOCAL DEMO) */
-function redeemCode(){
+</script>
 
-const code=document.getElementById("giftCodeInput").value;
 
-if(code==="FREE100"){
-let wallet = +localStorage.getItem("wallet") || 0;
-wallet += 100;
-localStorage.setItem("wallet",wallet);
-alert("₹100 Added to Wallet");
-}else{
+<!-- FIREBASE SCRIPT -->
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+getFirestore,
+collection,
+getDocs,
+query,
+where,
+updateDoc,
+doc
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+apiKey: "AIzaSyBx3J9aGn_98rTPgurMMKw_GR3puIMj4Ms",
+authDomain: "colourcash-ea60e.firebaseapp.com",
+projectId: "colourcash-ea60e",
+storageBucket: "colourcash-ea60e.firebasestorage.app",
+messagingSenderId: "403688058646",
+appId: "1:403688058646:web:f1753360471528f275ea37"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+window.redeemCode = async function(){
+
+const code = document.getElementById("giftCodeInput").value.trim();
+
+const q = query(collection(db,"giftcodes"), where("code","==",code));
+const snap = await getDocs(q);
+
+if(snap.empty){
 alert("Invalid Code");
+return;
 }
 
+snap.forEach(async (d)=>{
+
+const data = d.data();
+
+if(data.used){
+alert("Code Already Used");
+return;
 }
 
-/* SLIDER */
-const track = document.getElementById("bannerTrack");
-let index = 0;
-const total = track.children.length;
+let wallet = +localStorage.getItem("wallet") || 0;
 
-setInterval(()=>{
-index = (index + 1) % total;
-track.style.transform = translateX(-${index * 100}%);
-},3000);
+wallet += Number(data.amount);
 
-</script>  </body>
+localStorage.setItem("wallet",wallet);
 
-</html>  l
+await updateDoc(doc(db,"giftcodes",d.id),{
+used:true
+});
+
+alert("₹"+data.amount+" Added to Wallet");
+
+});
+
+}
+
+</script>
+
+</body>
+</html>
