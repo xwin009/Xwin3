@@ -284,7 +284,6 @@ location.href = url;
 function openGiftBox(){
 document.getElementById("giftPopup").style.display="flex";
 }
-
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -333,6 +332,21 @@ alert("Code Already Used ❌");
 return;
 }
 
+
+/* MARK USED */
+await updateDoc(doc(db,"giftcodes",d.id),{
+used:true
+});
+
+alert("₹"+data.amount+" Added To Wallet ✅");
+
+document.getElementById("giftPopup").style.display="none";
+
+});
+
+}
+
+</script>
 /* WALLET ADD */
 let wallet = Number(localStorage.getItem("wallet")) || 0;
 wallet += Number(data.amount);
