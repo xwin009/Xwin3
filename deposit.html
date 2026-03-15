@@ -121,12 +121,12 @@ window.submitDeposit = async function(){
   localStorage.setItem("deposits",JSON.stringify(deposits));
 
   await addDoc(collection(db,"deposits"),{
-    email:localStorage.getItem("userEmail"),
-    amount:amt,
-    utr:utrVal,
-    status:"PENDING",
-    time:new Date().toLocaleString()
-  });
+  email:localStorage.getItem("userEmail"),
+  amount:amt,
+  utr:utrVal,
+  status:"PENDING",
+  time:Date.now()
+});
 
   showPopup("Success","Deposit submitted\nOrder ID: "+orderId);
   amount.value="";
