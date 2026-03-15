@@ -110,6 +110,20 @@ font-size:14px;
 <button onclick="checkUser()">Check User</button>
 
 <div id="userData"></div>
+  <hr>
+
+<h3>💰 Today Deposits</h3>
+
+<div id="depositList" style="
+background:#111;
+padding:10px;
+border-radius:10px;
+max-height:200px;
+overflow:auto;
+font-size:14px;
+">
+Loading deposits...
+</div>
 
 </div>
 
@@ -234,8 +248,43 @@ withdrawHistory += `<div class="history">₹${data.amount} - ${data.status}</div
 
 if(data.status==="APPROVED"){
 totalWithdraw += Number(data.amount);
+  
+  });
+}
+async function loadTodayDeposits(){
+
+const snap = await getDocs(collection(db,"deposits"));
+
+let today = new Date().toDateString();
+let html="";
+
+snap.forEach(d=>{
+
+let data = d.data();
+
+let date = new Date(data.time || Date.now());
+
+if(date.toDateString() === today){
+
+html += `
+<div class="history">
+👤 ${data.email}<br>
+💰 ₹${data.amount}<br>
+⏰ ${date.toLocaleTimeString()}
+</div>
+`;
+
 }
 
+});
+
+if(html==="") html="No Deposits Today";
+
+document.getElementById("depositList").innerHTML = html;
+
+}
+
+loadTodayDeposits();
 });
 
 /* SHOW DATA */
