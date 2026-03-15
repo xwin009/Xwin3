@@ -16,15 +16,50 @@ display:flex;
 align-items:center;
 justify-content:center;
 }
-  
-/* dark overlay */
-body::before{
+
+body:before{
 content:"";
 position:fixed;
 inset:0;
 background:rgba(0,0,0,0.65);
 }
 
+/* WALLET */
+.wallet{
+position:absolute;
+top:20px;
+left:50%;
+transform:translateX(-50%);
+background:#111;
+padding:10px 20px;
+border-radius:20px;
+font-size:18px;
+font-weight:bold;
+color:#00e676;
+z-index:2;
+}
+
+/* TOP TEXT */
+.top-text{
+position:absolute;
+top:70px;
+left:50%;
+transform:translateX(-50%);
+font-size:24px;
+font-weight:bold;
+color:#ffd700;
+text-shadow:0 0 15px rgba(255,215,0,0.9);
+animation:glow 2s infinite;
+z-index:2;
+}
+
+@keyframes glow{
+0%{text-shadow:0 0 10px #ffd700}
+50%{text-shadow:0 0 25px #ffd700}
+100%{text-shadow:0 0 10px #ffd700}
+}
+
+/* CARD */
 .box{
 position:relative;
 z-index:1;
@@ -54,9 +89,10 @@ margin-bottom:20px;
 background:linear-gradient(135deg,#22c55e,#4ade80);
 padding:12px;
 border-radius:12px;
-margin-bottom:18px;
+margin-bottom:10px;
 font-weight:bold;
 color:#000;
+cursor:pointer;
 }
 
 input{
@@ -79,106 +115,115 @@ color:#000;
 font-size:17px;
 font-weight:bold;
 cursor:pointer;
-transition:.2s;
-}
-
-button:hover{
-transform:scale(1.03);
-background:#16a34a;
 }
 
 .timer{
 margin-top:18px;
-font-size:20px;
-font-weight:bold;
-color:#facc15;
-}
-
-.claim{
-background:#facc15;
-margin-top:10px;
-display:none;
-}
-.top-text{
-position:absolute;
-top:80px;
-left:50%;
-transform:translateX(-50%);
 font-size:22px;
 font-weight:bold;
-color:#ffd700;
-text-shadow:0 0 12px rgba(255,215,0,0.8);
-z-index:2;
+color:#ffcc00;
 }
+
+.history{
+margin-top:15px;
+background:#111;
+padding:10px;
+border-radius:10px;
+font-size:14px;
+max-height:120px;
+overflow:auto;
+}
+
 </style>
 </head>
 
 <body>
+
+<div class="wallet">
+💰 Wallet: ₹<span id="wallet">0</span>
+</div>
+
 <div class="top-text">
 🚀 Biggest Earning Opportunity 🚀
 </div>
-  
+
 <div class="box">
 
 <div class="title">💰 Invest Game</div>
 <div class="subtitle">Earn passive reward</div>
 
-<div class="plan">
-Invest ₹1000 → Receive ₹1500 after 10 hours
+<div class="plan" onclick="selectPlan(1000,1500)">
+₹1000 → ₹1500 (10 Hours)
 </div>
 
-<input type="number" id="amount" value="1000">
+<div class="plan" onclick="selectPlan(5000,8000)">
+₹5000 → ₹8000 (10 Hours)
+</div>
+
+<div class="plan" onclick="selectPlan(10000,16000)">
+₹10000 → ₹16000 (10 Hours)
+</div>
+
+<input type="number" id="amount" placeholder="Selected Plan Amount">
 
 <button onclick="invest()">Invest</button>
 
-<div class="timer" id="timer"></div>
+<div class="timer" id="timer">--</div>
 
-<button class="claim" id="claimBtn" onclick="claim()">Claim Reward</button>
+<div class="history" id="history">
+<b>Investment History</b><br>
+</div>
 
 </div>
 
 <script>
 
+let wallet = Number(localStorage.getItem("wallet")) || 0;
+document.getElementById("wallet").innerText = wallet;
+
+let rewardValue = 0;
+
+function selectPlan(amt,reward){
+
+document.getElementById("amount").value = amt;
+rewardValue = reward;
+
+}
+
 function invest(){
 
 let amt = Number(document.getElementById("amount").value);
 
-if(amt < 100){
-alert("Minimum invest ₹100");
+if(wallet < amt){
+alert("Low Wallet Balance");
 return;
 }
 
-let unlock = Date.now() + (10 * 60 * 60 * 1000);
+wallet -= amt;
 
-localStorage.setItem("investAmount", amt);
-localStorage.setItem("unlockTime", unlock);
+localStorage.setItem("wallet",wallet);
+document.getElementById("wallet").innerText = wallet;
+
+let unlock = Date.now() + (10*60*60*1000);
+
+localStorage.setItem("investAmount",amt);
+localStorage.setItem("investReward",rewardValue);
+localStorage.setItem("unlockTime",unlock);
+
+let history = localStorage.getItem("investHistory") || "";
+history += "Invested ₹"+amt+"<br>";
+localStorage.setItem("investHistory",history);
+
+document.getElementById("history").innerHTML =
+"<b>Investment History</b><br>"+history;
 
 alert("Investment Started");
 
 }
 
-function claim(){
+function updateTimer(){
 
-let amt = Number(localStorage.getItem("investAmount")) || 0;
-let reward = Math.floor(amt * 1.5);
-
-let wallet = Number(localStorage.getItem("wallet")) || 0;
-wallet += reward;
-
-localStorage.setItem("wallet", wallet);
-
-alert("₹"+reward+" added to wallet");
-
-localStorage.removeItem("investAmount");
-localStorage.removeItem("unlockTime");
-
-location.reload();
-
-}
-
-setInterval(()=>{
-
-let unlock = localStorage.getItem("unlockTime");
+let unlock = Number(localStorage.getItem("unlockTime")) || 0;
 
 if(!unlock) return;
 
@@ -186,21 +231,36 @@ let diff = unlock - Date.now();
 
 if(diff <= 0){
 
-document.getElementById("timer").innerText="Ready to Claim 🎉";
-document.getElementById("claimBtn").style.display="block";
+let reward = Number(localStorage.getItem("investReward")) || 0;
 
-}else{
+wallet += reward;
+
+localStorage.setItem("wallet",wallet);
+
+alert("🔔 Investment Completed\n₹"+reward+" Added");
+
+localStorage.removeItem("unlockTime");
+
+location.reload();
+
+return;
+
+}
 
 let h = Math.floor(diff/3600000);
-let m = Math.floor(diff%3600000/60000);
-let s = Math.floor(diff%60000/1000);
+let m = Math.floor((diff%3600000)/60000);
+let s = Math.floor((diff%60000)/1000);
 
 document.getElementById("timer").innerText =
 h+"h "+m+"m "+s+"s";
 
 }
 
-},1000);
+setInterval(updateTimer,1000);
+
+let history = localStorage.getItem("investHistory") || "";
+document.getElementById("history").innerHTML =
+"<b>Investment History</b><br>"+history;
 
 </script>
 
