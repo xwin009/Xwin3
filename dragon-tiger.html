@@ -346,17 +346,63 @@ function startTimer(){
 
 async function showResult(){
  phase="result";
+const ref = doc(db, "settings", "houseEdge");
+const snap = await getDoc(ref);
 
- const d=CARDS[Math.floor(Math.random()*CARDS.length)];
- const t=CARDS[Math.floor(Math.random()*CARDS.length)];
- dVal.innerText=d.n; tVal.innerText=t.n;
+let chance = 50;
+if(snap.exists()){
+  chance = Number(snap.data().dragonTiger ?? 50);
+}
+  
+ 
  topDragon.classList.add("flip");
  topTiger.classList.add("flip");
 
- let win="TIE";
- if(d.v>t.v) win="DRAGON";
- else if(t.v>d.v) win="TIGER";
+  let win;
 
+// 🔴 0 = ALWAYS LOSS (user hamesha hare)
+if(chance === 0){
+  win = "NONE"; // koi bhi bet jeetega nahi
+}
+
+// 🟢 100 = ALWAYS WIN (user hamesha jeete)
+else if(chance === 100){
+  if(bets.DRAGON > 0) win = "DRAGON";
+  else if(bets.TIGER > 0) win = "TIGER";
+  else if(bets.TIE > 0) win = "TIE";
+  else win = "TIE";
+}
+
+// 🎲 RANDOM CONTROL
+else{
+  let rand = Math.random() * 100;
+
+  if(rand < chance){
+    // USER WIN
+    if(bets.DRAGON > 0) win = "DRAGON";
+    else if(bets.TIGER > 0) win = "TIGER";
+    else if(bets.TIE > 0) win = "TIE";
+    else win = "TIE";
+  }else{
+    // USER LOSS
+    if(bets.DRAGON > 0) win = "TIGER";
+    else if(bets.TIGER > 0) win = "DRAGON";
+    else win = "TIE";
+  }
+}
+ // 🔥 FORCE CARDS ACCORDING TO RESULT
+if(win === "DRAGON"){
+  dVal.innerText = "K";
+  tVal.innerText = "5";
+}
+else if(win === "TIGER"){
+  dVal.innerText = "4";
+  tVal.innerText = "Q";
+}
+else{
+  dVal.innerText = "8";
+  tVal.innerText = "8";
+  } 
  if(bets[win]>0){
   wallet+=bets[win]*MULTI[win];
   walletAmt.innerText=wallet;
