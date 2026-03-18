@@ -206,14 +206,16 @@ async function clickCell(i,el){
     el.classList.add("safe");
     el.innerText="💎";
     opened++;
-    calcMultiplier();
 
-    // ✅ AUTO CASHOUT FIX
-    const safe = 25 - mines;
+const safe = 25 - mines;
 
-    if(opened >= safe){
-      cashOut();
-    }
+// ✅ AUTO CASHOUT BEFORE MULTIPLIER BREAK
+if(opened >= safe){
+  cashOut();
+  return; // 🔥 VERY IMPORTANT
+}
+
+calcMultiplier();
   }
 
 }
