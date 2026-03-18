@@ -25,6 +25,13 @@ justify-content:center;
 .game-card p{font-size:13px;opacity:0.85}
 .icon{font-size:32px}
 
+  .game-img{
+width:60px;
+height:60px;
+object-fit:contain;
+margin:0 auto 6px;
+  }
+  
 /* BODY */
 body{margin:0;font-family:Arial;background:#ffeb3b;color:#fff}
 
@@ -204,8 +211,12 @@ font-size:16px;
 
 <div class="game-card wingo" onclick="openGame('wingo.html')"><div class="icon">🎨</div><h3>WIN GO</h3><p>30s Colour Trading</p></div>
 
-<div class="game-card mines" onclick="openGame('mines.html')"><div class="icon">💣</div><h3>MINES</h3><p>Spribe Style Game</p></div>
-
+<div class="game-card mines" onclick="openGame('mines.html')">
+  <img src="images/file_0000000042a0720884aeeacdc62f0164.png" class="game-img">
+  <h3>MINES</h3>
+  <p>Spribe Style Game</p>
+</div>
+  
 <div class="game-card aviator" onclick="openGame('aviator.html')"><div class="icon">✈️</div><h3>AVIATOR</h3><p>Crash Multiplier</p></div>
 
 <div class="game-card goddevil" onclick="openGame('dragon-tiger.html')"><div class="icon">🐉</div><h3>DRAGON • TIGER</h3><p>High Card Battle</p></div>
