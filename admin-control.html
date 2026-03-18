@@ -111,7 +111,7 @@ games.forEach(game => {
   let slider = div.querySelector("input");
   let value = div.querySelector(".value");
 
-  slider.oninput = async () => {
+  slider.onchange = async () => {
 
     value.innerText = slider.value + "%";
 
