@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>2xWin Admin Panel</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+body{
+  margin:0;
+  font-family:Arial;
+  background:#e6f0fa;
+}
+
+.header{
+  background:#ff6b6b;
+  padding:15px;
+  text-align:center;
+  color:#fff;
+  font-size:20px;
+  font-weight:bold;
+}
+
+.container{
+  padding:15px;
+}
+
+.card{
+  background:#fff;
+  border-radius:16px;
+  padding:15px;
+  box-shadow:0 4px 10px rgba(0,0,0,0.1);
+}
+
+.row{
+  margin-bottom:14px;
+}
+
+.label{
+  font-size:14px;
+  margin-bottom:5px;
+}
+
+input[type=range]{
+  width:100%;
+}
+
+.value{
+  float:right;
+  font-weight:bold;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">🎮 House Edge Control (SHOW-OFF)</div>
+
+<div class="container">
+<div class="card" id="gameList"></div>
+</div>
+
+<script>
+
+const games = [
+"WIN GO","MINES","AVIATOR","DRAGON TIGER","ROULETTE",
+"AVIATOR REAL","COIN FLIP","TREASURE","CHICKEN ROAD",
+"DICE ROLL","PLINKO","DRAX TURBO","SPIN STOP",
+"HORSE RACE","GANESH SLOTS","KENO","FATE SHIFT",
+"HILO","DRAGON TOWER","BALLOON CRASH"
+];
+
+const container = document.getElementById("gameList");
+
+games.forEach(game => {
+
+  let div = document.createElement("div");
+  div.className = "row";
+
+  div.innerHTML = `
+    <div class="label">${game} <span class="value">50%</span></div>
+    <input type="range" min="0" max="100" value="50">
+  `;
+
+  let slider = div.querySelector("input");
+  let value = div.querySelector(".value");
+
+  slider.oninput = () => {
+    value.innerText = slider.value + "%";
+  };
+
+  container.appendChild(div);
+
+});
+
+</script>
+
+</body>
+</html>
