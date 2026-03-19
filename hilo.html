@@ -136,6 +136,7 @@ body{
 </div>
 
 <!-- 🔥 FIREBASE -->
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, query, where, getDocs, doc, updateDoc, getDoc }
@@ -178,7 +179,15 @@ const cards=["2","3","4","5","6","7","8","9","10","J","Q","K","A"];
 let currentIndex=Math.floor(Math.random()*cards.length);
 let bet=10;
 let step=0;
-let multipliers=[1.10,1.25,1.45,1.70,2.00,2.40,2.90];
+
+/* 🔥 MULTIPLIER AUTO (UPTO 15x) */
+let multipliers=[];
+let m=1.10;
+while(m <= 15){
+ multipliers.push(parseFloat(m.toFixed(2)));
+ m += m*0.18; // growth speed
+}
+
 let history=[];
 
 const currentCard=document.getElementById("currentCard");
@@ -188,7 +197,7 @@ const cardInner=document.getElementById("cardInner");
 
 function render(){
  currentCard.innerText=cards[currentIndex];
- multi.innerText=multipliers[step].toFixed(2)+"x";
+ multi.innerText=multipliers[Math.min(step,multipliers.length-1)].toFixed(2)+"x";
  historyBox.innerText="History: "+(history.join(" → ")||"-");
 }
 render();
@@ -204,7 +213,7 @@ refresh.onclick=()=>{
 minus.onclick=()=>{if(bet>10){bet-=10;betText.innerText="Bet ₹"+bet;}}
 plus.onclick=()=>{bet+=10;betText.innerText="Bet ₹"+bet;}
 
-/* 🔥 CONTROLLED PLAY */
+/* PLAY */
 async function play(isHigh){
 
  if(balance<bet) return;
@@ -220,56 +229,54 @@ async function play(isHigh){
  await updateDoc(doc(db,"users",uid),{balance});
 
  let chance = await getChance();
-
  let next;
 
- // 🟢 ALWAYS WIN
  if(chance >= 100){
-   if(isHigh){
-     next = Math.floor(Math.random()*(cards.length-currentIndex-1)) + currentIndex + 1;
-   }else{
-     next = Math.floor(Math.random()*currentIndex);
-   }
+   next = isHigh
+     ? Math.floor(Math.random()*(cards.length-currentIndex-1)) + currentIndex + 1
+     : Math.floor(Math.random()*currentIndex);
  }
-
- // 🔴 ALWAYS LOSS
  else if(chance <= 0){
-   if(isHigh){
-     next = Math.floor(Math.random()*currentIndex);
-   }else{
-     next = Math.floor(Math.random()*(cards.length-currentIndex-1)) + currentIndex + 1;
-   }
+   next = isHigh
+     ? Math.floor(Math.random()*currentIndex)
+     : Math.floor(Math.random()*(cards.length-currentIndex-1)) + currentIndex + 1;
  }
-
- // 🎲 RANDOM
  else{
-   let rand = Math.random()*100;
-   let win = rand < chance;
-
+   let win = Math.random()*100 < chance;
    if(win){
-     if(isHigh){
-       next = Math.floor(Math.random()*(cards.length-currentIndex-1)) + currentIndex + 1;
-     }else{
-       next = Math.floor(Math.random()*currentIndex);
-     }
+     next = isHigh
+       ? Math.floor(Math.random()*(cards.length-currentIndex-1)) + currentIndex + 1
+       : Math.floor(Math.random()*currentIndex);
    }else{
-     if(isHigh){
-       next = Math.floor(Math.random()*currentIndex);
-     }else{
-       next = Math.floor(Math.random()*(cards.length-currentIndex-1)) + currentIndex + 1;
-     }
+     next = isHigh
+       ? Math.floor(Math.random()*currentIndex)
+       : Math.floor(Math.random()*(cards.length-currentIndex-1)) + currentIndex + 1;
    }
  }
 
  const win = isHigh ? next > currentIndex : next < currentIndex;
 
- setTimeout(()=>{
+ setTimeout(async ()=>{
   cardInner.classList.remove("flip");
 
   if(win){
     step++;
     history.push(cards[currentIndex]);
     currentIndex=next;
+
+    /* 🔥 AUTO MAX WIN (15x) */
+    if(multipliers[step] >= 15){
+      let winAmt = Math.floor(bet * multipliers[step]);
+
+      balance += winAmt;
+      bal.innerText=balance;
+      await updateDoc(doc(db,"users",uid),{balance});
+
+      showPopup("🎉 CONGRATULATIONS MAX WIN ₹"+winAmt,true);
+      reset();
+      return;
+    }
+
     render();
   }else{
     showPopup("YOU LOSE",false);
