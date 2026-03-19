@@ -1,277 +1,298 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PUBG vs Free Fire</title>
 
 <style>
 body{
   margin:0;
   font-family:Arial;
-  background:url('images/file_0000000007b071fa871e2db23466cd0b.png') no-repeat center;
-  background-size:cover;
+  background:#0b0f1a;
   color:#fff;
-}
-
-/* HEADER */
-.header{
-  background:url('images/file_00000000480471fa9e11748baef83b2f.png') no-repeat center;
-  background-size:cover;
   text-align:center;
+}
+
+.header{
   padding:10px;
+  font-size:22px;
+  font-weight:bold;
 }
 
-.title{
-  background:url('images/27677-removebg-preview.png') no-repeat center;
-  height:60px;
-  background-size:contain;
+.wallet{
+  position:absolute;
+  right:15px;
+  top:10px;
+  background:#111;
+  padding:6px 12px;
+  border-radius:10px;
 }
 
-/* TOP BG */
-.top-bg{
-  background:url('images/file_00000000fb9072088776bb496c7908c3.png') no-repeat center;
-  background-size:cover;
-  padding:20px;
+.top{
   position:relative;
+  height:200px;
+  background:url('images/file_00000000fb9072088776bb496c7908c3.png') center/cover;
 }
 
-/* CHARACTERS */
-.pubg{
+.vs-area{
   position:absolute;
-  left:10px;
+  width:100%;
   top:20px;
-  width:120px;
-  height:150px;
-  background:url('images/file_00000000df4871fa8609456fe5b59e5a.png') no-repeat center/contain;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:0 20px;
 }
 
-.freefire{
-  position:absolute;
-  right:10px;
-  top:20px;
-  width:120px;
-  height:150px;
-  background:url('images/file_00000000b47471faa0bfb3580646bb40.png') no-repeat center/contain;
+.player{ width:100px; }
+.vs{ width:80px; }
+
+.table{
+  background:url('images/27676-removebg-preview.png') center/cover;
+  padding:20px;
 }
 
-/* VS */
-.vs{
-  width:100px;
-  height:80px;
-  margin:auto;
-  background:url('images/27678-removebg-preview.png') no-repeat center/contain;
-}
-
-/* CARDS */
+/* FLIP CARD */
 .cards{
   display:flex;
   justify-content:space-around;
-  margin-top:20px;
+  margin:20px 0;
 }
 
-.card{
+.flip{
   width:80px;
-  height:120px;
+  height:110px;
+  perspective:1000px;
+}
+
+.flip-inner{
+  width:100%;
+  height:100%;
+  position:relative;
+  transform-style:preserve-3d;
+  transition:transform 0.6s;
+}
+
+.flip.flip-active .flip-inner{
+  transform:rotateY(180deg);
+}
+
+.front, .back{
+  position:absolute;
+  width:100%;
+  height:100%;
+  backface-visibility:hidden;
+  border-radius:10px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:30px;
+  font-weight:bold;
+}
+
+.front{
+  background:#444;
+}
+
+.back{
   background:#fff;
   color:#000;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  font-size:30px;
-  border-radius:10px;
-  transform:rotateY(0deg);
-  transition:0.5s;
-}
-
-/* BET AREA */
-.bet-area{
-  display:flex;
-  justify-content:space-around;
-  margin-top:30px;
-}
-
-.box{
-  width:150px;
-  height:180px;
-  position:relative;
-  text-align:center;
-}
-
-.pubg-box{
-  background:url('images/file_00000000119871fab85c60ccc87fd0ee.png') no-repeat center/contain;
-}
-
-.freefire-box{
-  background:url('images/file_0000000067f871fa8ab3c7b0ee53094c.png') no-repeat center/contain;
-}
-
-.amount{
-  position:absolute;
-  bottom:10px;
-  width:100%;
-  font-weight:bold;
-}
-
-/* COINS */
-.coins{
-  display:flex;
-  justify-content:center;
-  gap:10px;
-  margin-top:20px;
-}
-
-.coin{
-  width:50px;
-  height:50px;
-  background:gold;
-  border-radius:50%;
-  text-align:center;
-  line-height:50px;
-  color:#000;
-  font-weight:bold;
-  cursor:pointer;
-}
-
-/* TIMER */
-.timer{
-  text-align:center;
-  font-size:20px;
-  margin-top:10px;
+  transform:rotateY(180deg);
 }
 
 /* HISTORY */
 .history{
   display:flex;
-  overflow:hidden;
-  width:200px;
-  margin:auto;
+  overflow-x:auto;
   gap:5px;
+  padding:10px;
 }
 
-.dot{
-  width:20px;
-  height:20px;
+.history div{
+  min-width:30px;
+  height:30px;
   border-radius:50%;
-  text-align:center;
-  font-size:12px;
-  line-height:20px;
+  background:#333;
+  display:flex;
+  align-items:center;
+  justify-content:center;
 }
 
-.D{background:blue;}
-.T{background:red;}
+/* BET */
+.bets{
+  display:flex;
+}
 
+.bet{
+  flex:1;
+  padding:20px;
+  margin:5px;
+  border-radius:10px;
+  background:#222;
+  cursor:pointer;
+}
+
+/* CHIPS */
+.chips{
+  display:flex;
+  justify-content:center;
+  gap:10px;
+  margin-top:15px;
+}
+
+.chip{
+  padding:10px;
+  background:#333;
+  border-radius:50%;
+  cursor:pointer;
+}
+
+.timer{
+  font-size:20px;
+  margin-top:10px;
+}
 </style>
 </head>
 
 <body>
 
-<div class="header">
-  <div class="title"></div>
-</div>
+<div class="header">PUBG & FREE FIRE</div>
+<div class="wallet">₹ <span id="wallet">1000</span></div>
 
-<div class="top-bg">
-  <div class="pubg"></div>
-  <div class="freefire"></div>
-  <div class="vs"></div>
-
-  <div class="cards">
-    <div class="card" id="card1">?</div>
-    <div class="card" id="card2">?</div>
+<div class="top">
+  <div class="vs-area">
+    <img src="images/27826-removebg-preview.png" class="player">
+    <img src="images/27679-removebg-preview.png" class="vs">
+    <img src="images/27825-removebg-preview.png" class="player">
   </div>
 </div>
 
-<div class="timer" id="timer">15</div>
+<div class="table">
 
+<!-- CARDS -->
+<div class="cards">
+  <div class="flip" id="pubgFlip">
+    <div class="flip-inner">
+      <div class="front">?</div>
+      <div class="back" id="pubgCard">K</div>
+    </div>
+  </div>
+
+  <div class="flip" id="ffFlip">
+    <div class="flip-inner">
+      <div class="front">?</div>
+      <div class="back" id="ffCard">10</div>
+    </div>
+  </div>
+</div>
+
+<!-- HISTORY -->
 <div class="history" id="history"></div>
 
-<div class="bet-area">
-  <div class="box pubg-box" onclick="bet('P')">
-    <div class="amount" id="pubgAmount">0</div>
-  </div>
-
-  <div class="box freefire-box" onclick="bet('F')">
-    <div class="amount" id="freeAmount">0</div>
-  </div>
+<!-- BET -->
+<div class="bets">
+  <div class="bet" onclick="placeBet('PUBG')">PUBG</div>
+  <div class="bet" onclick="placeBet('TIE')">TIE</div>
+  <div class="bet" onclick="placeBet('FREE')">FREE FIRE</div>
 </div>
 
-<div class="coins">
-  <div class="coin" onclick="setCoin(10)">10</div>
-  <div class="coin" onclick="setCoin(50)">50</div>
-  <div class="coin" onclick="setCoin(100)">100</div>
+<!-- CHIPS -->
+<div class="chips">
+  <div class="chip" onclick="setAmount(10)">10</div>
+  <div class="chip" onclick="setAmount(50)">50</div>
+  <div class="chip" onclick="setAmount(100)">100</div>
+  <div class="chip" onclick="setAmount(500)">500</div>
+</div>
+
+<div class="timer">Time: <span id="time">20</span></div>
+
 </div>
 
 <script>
-let selectedCoin = 10;
-let pubgBet = 0;
-let freeBet = 0;
-let timer = 15;
-let locked = false;
-let historyArr = [];
 
-function setCoin(val){
-  selectedCoin = val;
+let wallet = localStorage.getItem("wallet") || 1000;
+let betChoice = "";
+let betAmount = 0;
+let time = 20;
+
+document.getElementById("wallet").innerText = wallet;
+
+/* CHIP */
+function setAmount(a){
+  betAmount = a;
 }
 
-function bet(side){
-  if(locked) return;
-
-  if(side==='P'){
-    pubgBet += selectedCoin;
-    document.getElementById("pubgAmount").innerText = pubgBet;
-  }else{
-    freeBet += selectedCoin;
-    document.getElementById("freeAmount").innerText = freeBet;
+/* BET */
+function placeBet(choice){
+  if(time <= 3){
+    alert("Bet Closed");
+    return;
   }
+  betChoice = choice;
 }
 
-/* TIMER */
+/* RANDOM CARD */
+function randomCard(){
+  let cards = ["A","K","Q","J","10","9"];
+  return cards[Math.floor(Math.random()*cards.length)];
+}
+
+/* RESULT LOGIC */
+function getWinner(p, f){
+  let order = ["A","K","Q","J","10","9"];
+  if(order.indexOf(p) < order.indexOf(f)) return "PUBG";
+  if(order.indexOf(p) > order.indexOf(f)) return "FREE";
+  return "TIE";
+}
+
+/* GAME LOOP */
 setInterval(()=>{
-  timer--;
-  document.getElementById("timer").innerText = timer;
+  time--;
+  document.getElementById("time").innerText = time;
 
-  if(timer<=5) locked=true;
+  if(time == 0){
 
-  if(timer<=0){
-    playGame();
-    timer=15;
-    locked=false;
+    // RESET FLIP
+    document.getElementById("pubgFlip").classList.remove("flip-active");
+    document.getElementById("ffFlip").classList.remove("flip-active");
+
+    setTimeout(()=>{
+
+      let pCard = randomCard();
+      let fCard = randomCard();
+
+      document.getElementById("pubgCard").innerText = pCard;
+      document.getElementById("ffCard").innerText = fCard;
+
+      // FLIP ANIMATION
+      document.getElementById("pubgFlip").classList.add("flip-active");
+      document.getElementById("ffFlip").classList.add("flip-active");
+
+      let result = getWinner(pCard, fCard);
+
+      // HISTORY
+      let h = document.createElement("div");
+      h.innerText = result[0];
+      document.getElementById("history").prepend(h);
+
+      // WIN
+      if(betChoice == result){
+        wallet = Number(wallet) + betAmount*2;
+      }else{
+        wallet = Number(wallet) - betAmount;
+      }
+
+      localStorage.setItem("wallet",wallet);
+      document.getElementById("wallet").innerText = wallet;
+
+      betChoice = "";
+
+    },500);
+
+    time = 20;
   }
 
 },1000);
-
-/* GAME LOGIC */
-function playGame(){
-
-  let pubgCard = Math.floor(Math.random()*13)+1;
-  let freeCard = Math.floor(Math.random()*13)+1;
-
-  document.getElementById("card1").innerText = pubgCard;
-  document.getElementById("card2").innerText = freeCard;
-
-  let result = pubgCard > freeCard ? 'D' : 'T';
-
-  addHistory(result);
-
-  pubgBet = 0;
-  freeBet = 0;
-
-  document.getElementById("pubgAmount").innerText = 0;
-  document.getElementById("freeAmount").innerText = 0;
-}
-
-/* HISTORY */
-function addHistory(res){
-  historyArr.unshift(res);
-  if(historyArr.length>10) historyArr.pop();
-
-  let html='';
-  historyArr.forEach(r=>{
-    html += `<div class="dot ${r}">${r}</div>`;
-  });
-
-  document.getElementById("history").innerHTML = html;
-}
 
 </script>
 
