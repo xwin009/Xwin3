@@ -235,12 +235,10 @@ let pubg = 0;
 let free = 0;
 
 let time = 20;
-let gameRunning = true;
 
 /* CHIP SELECT */
 window.setAmt = (a, el) => {
   chip = a;
-
   document.querySelectorAll(".chips div").forEach(e=>e.classList.remove("active"));
   el.classList.add("active");
 };
@@ -265,7 +263,7 @@ window.betPlace = (type) => {
   }
 };
 
-/* RANDOM CARD */
+/* RANDOM */
 function rand(){
   const arr=["A","K","Q","J","10","9"];
   return arr[Math.floor(Math.random()*arr.length)];
@@ -279,11 +277,17 @@ function result(p,f){
   return "TIE";
 }
 
-/* ROUND FUNCTION */
+/* MAIN LOOP */
 function startRound(){
 
   time = 20;
-  gameRunning = true;
+
+  // RESET CARDS TO HIDDEN
+  document.getElementById("pFlip").classList.remove("active");
+  document.getElementById("fFlip").classList.remove("active");
+
+  document.getElementById("pCard").innerText = "?";
+  document.getElementById("fCard").innerText = "?";
 
   const timer = setInterval(()=>{
 
@@ -295,48 +299,49 @@ function startRound(){
 
       clearInterval(timer);
 
-      // CARD FLIP RESET
-      document.getElementById("pFlip").classList.remove("active");
-      document.getElementById("fFlip").classList.remove("active");
+      // GENERATE RESULT
+      const p = rand();
+      const f = rand();
 
+      document.getElementById("pCard").innerText = p;
+      document.getElementById("fCard").innerText = f;
+
+      // FLIP SHOW RESULT
+      document.getElementById("pFlip").classList.add("active");
+      document.getElementById("fFlip").classList.add("active");
+
+      const r = result(p,f);
+
+      // HISTORY
+      const h = document.createElement("div");
+      h.innerText = r[0];
+      document.getElementById("history").prepend(h);
+
+      // WIN
+      if(r=="PUBG") wallet += pubg * 2;
+      if(r=="FREE") wallet += free * 2;
+
+      document.getElementById("wallet").innerText = wallet;
+
+      // RESET BET
+      pubg = 0;
+      free = 0;
+
+      document.getElementById("pubgAmt").innerText = 0;
+      document.getElementById("freeAmt").innerText = 0;
+
+      // SHOW RESULT 2 SEC → THEN HIDE + NEXT ROUND
       setTimeout(()=>{
 
-        const p = rand();
-        const f = rand();
+        // FLIP BACK (HIDE)
+        document.getElementById("pFlip").classList.remove("active");
+        document.getElementById("fFlip").classList.remove("active");
 
-        document.getElementById("pCard").innerText = p;
-        document.getElementById("fCard").innerText = f;
-
-        // FLIP
-        document.getElementById("pFlip").classList.add("active");
-        document.getElementById("fFlip").classList.add("active");
-
-        const r = result(p,f);
-
-        // HISTORY
-        const h = document.createElement("div");
-        h.innerText = r[0];
-        document.getElementById("history").prepend(h);
-
-        // WIN CALC
-        if(r=="PUBG") wallet += pubg * 2;
-        if(r=="FREE") wallet += free * 2;
-
-        document.getElementById("wallet").innerText = wallet;
-
-        // RESET BET
-        pubg = 0;
-        free = 0;
-
-        document.getElementById("pubgAmt").innerText = 0;
-        document.getElementById("freeAmt").innerText = 0;
-
-        // NEXT ROUND AUTO 🔥
         setTimeout(()=>{
-          startRound();
-        },1500);
+          startRound(); // NEXT ROUND 🔥
+        },600);
 
-      },400);
+      },2000);
     }
 
   },1000);
@@ -345,7 +350,7 @@ function startRound(){
 /* START GAME */
 startRound();
 
-                             </script>
+</script>
 
 </body>
 </html>
