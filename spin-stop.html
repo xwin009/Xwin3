@@ -180,27 +180,20 @@ async function saveWallet(){
   await updateDoc(doc(db,"users",uid), { balance: wallet });
 }
 
-/* 🔥 HOUSE EDGE (FIXED + SAFE) */
+/* 🔥 HOUSE EDGE */
 async function getChance(){
   try{
     const ref = doc(db,"settings","houseEdge");
     const snap = await getDoc(ref);
 
     if(snap.exists()){
-      let val = snap.data().spin;
-
-      if(val === undefined) return 50;
-
-      val = Number(val);
-
-      console.log("SPIN CHANCE:", val); // DEBUG
-
+      let val = Number(snap.data().spin ?? 50);
+      console.log("SPIN CHANCE:", val);
       return val;
     }
-
     return 50;
   }catch(e){
-    console.log("ERROR:", e);
+    console.log(e);
     return 50;
   }
 }
@@ -224,7 +217,6 @@ let spinning = false;
 
 spinBtn.onclick = async ()=>{
   const bet = Number(document.getElementById("bet").value);
-
   if(bet<=0 || bet>wallet) return alert("Low balance");
 
   wallet -= bet;
@@ -234,6 +226,8 @@ spinBtn.onclick = async ()=>{
   spinBtn.disabled = true;
   stopBtn.disabled = false;
   spinning = true;
+
+  spinner.style.transition = "none";
 
   spinInt = setInterval(()=>{
     angle += 15;
@@ -252,29 +246,42 @@ stopBtn.onclick = async ()=>{
   const bet = Number(document.getElementById("bet").value);
 
   let chance = await getChance();
-  let win = false;
+  let win;
 
-  // 🔴 ALWAYS LOSS
-  if(chance <= 0){
-    win = false;
-  }
-
-  // 🟢 ALWAYS WIN
-  else if(chance >= 100){
+  // 🎯 RESULT LOGIC
+  if(chance >= 100){
     win = true;
   }
-
-  // 🎲 RANDOM
+  else if(chance <= 0){
+    win = false;
+  }
   else{
     let rand = Math.random()*100;
     win = rand < chance;
   }
 
+  // 🔥 SPINNER FIX
+  let finalAngle;
+
+  if(win){
+    // GREEN
+    finalAngle = Math.random() < 0.5 
+      ? Math.random()*90 
+      : 180 + Math.random()*90;
+  }else{
+    // RED
+    finalAngle = Math.random() < 0.5 
+      ? 90 + Math.random()*90 
+      : 270 + Math.random()*90;
+  }
+
+  spinner.style.transition = "transform 1s ease-out";
+  spinner.style.transform = `rotate(${angle + finalAngle}deg)`;
+
   let resultText="";
 
   if(win){
     const winAmt = bet * 2;
-
     wallet += winAmt;
     await saveWallet();
 
@@ -287,9 +294,11 @@ stopBtn.onclick = async ()=>{
 
   renderWallet();
 
-  popupText.innerText = resultText;
-  popup.style.display="flex";
-  setTimeout(()=>popup.style.display="none",1500);
+  setTimeout(()=>{
+    popupText.innerText = resultText;
+    popup.style.display="flex";
+    setTimeout(()=>popup.style.display="none",1500);
+  },1000);
 };
 
 /* HISTORY */
@@ -306,7 +315,7 @@ function addHistory(type,amt){
 }
 
 loadWallet();
-</script>
+                   </script>
 
 </body>
 </html>
