@@ -148,7 +148,7 @@ button{
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, getDocs, collection, query, where, doc, updateDoc }
+import { getFirestore, getDocs, collection, query, where, doc, updateDoc, getDoc }
 from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 /* FIREBASE */
@@ -162,11 +162,6 @@ const db = getFirestore(app);
 const userEmail = localStorage.getItem("userEmail");
 let wallet = 0;
 let uid = "";
-  
-let dailyWin = parseInt(localStorage.getItem("dailyWin") || "0");
-
-/* GAME COUNT (NEW USER LOGIC) */
-let spinCount = Number(localStorage.getItem("spin_count") || 0);
 
 /* LOAD WALLET */
 async function loadWallet(){
@@ -185,6 +180,20 @@ async function saveWallet(){
   await updateDoc(doc(db,"users",uid), { balance: wallet });
 }
 
+/* 🔥 HOUSE EDGE */
+async function getChance(){
+  const ref = doc(db,"settings","houseEdge");
+  const snap = await getDoc(ref);
+
+  let chance = 50;
+  if(snap.exists()){
+    chance = Number(snap.data().spin ?? 50);
+  }
+
+  console.log("SPIN CHANCE:", chance);
+  return chance;
+}
+
 /* UI */
 const spinner = document.getElementById("spinner");
 const spinBtn = document.getElementById("spinBtn");
@@ -195,13 +204,6 @@ const historyBox = document.getElementById("history");
 
 function renderWallet(){
   document.getElementById("wallet").innerText = wallet;
-}
-
-/* HOUSE EDGE */
-function normalWinLogic(bet){
-  let lossChance = 0.65;
-  if(bet > wallet*0.3) lossChance = 0.8;
-  return Math.random() > lossChance;
 }
 
 /* SPIN ENGINE */
@@ -235,41 +237,45 @@ stopBtn.onclick = async ()=>{
   spinBtn.disabled = false;
   stopBtn.disabled = true;
 
-  spinCount++;
-  localStorage.setItem("spin_count", spinCount);
-
   const bet = Number(document.getElementById("bet").value);
 
-  /* 🎯 GUARANTEED WIN LOGIC */
+  let chance = await getChance();
   let win = false;
-  if((spinCount === 1 || spinCount === 3) && bet <= 200){
+
+  // 🔴 ALWAYS LOSS
+  if(chance <= 0){
+    win = false;
+  }
+
+  // 🟢 ALWAYS WIN
+  else if(chance >= 100){
     win = true;
-  }else{
-    win = normalWinLogic(bet);
+  }
+
+  // 🎲 RANDOM CONTROL
+  else{
+    let rand = Math.random()*100;
+    win = rand < chance;
   }
 
   let resultText="";
-if(win && dailyWin < 100){
 
-  const winAmt = bet * 2;
+  if(win){
+    const winAmt = bet * 2;
 
-  dailyWin += winAmt;
-  localStorage.setItem("dailyWin", dailyWin);
+    wallet += winAmt;
+    await saveWallet();
 
-  wallet += winAmt;
-  await saveWallet();
+    resultText = `🎉 YOU WIN ₹${winAmt}`;
+    addHistory("WIN", winAmt);
 
-  resultText = `🎉 YOU WIN ₹${winAmt}`;
-  addHistory("WIN", winAmt);
-
-}else{
-
-  resultText = "❌ YOU LOST";
-  addHistory("LOSE", bet);
-
-}
+  }else{
+    resultText = "❌ YOU LOST";
+    addHistory("LOSE", bet);
+  }
 
   renderWallet();
+
   popupText.innerText = resultText;
   popup.style.display="flex";
   setTimeout(()=>popup.style.display="none",1500);
