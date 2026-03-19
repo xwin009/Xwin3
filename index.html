@@ -66,6 +66,32 @@ flex-shrink:0;
 
 /* GAME COLORS */
 .wingo{background:linear-gradient(135deg,#2196f3,#21cbf3)}
+  .wingo-card{
+  background: url(images/27725-removebg-preview.png) no-repeat center;
+  background-size: contain;
+  background-color: #21cbf3;
+  position: relative;
+  overflow: hidden;
+}
+
+.wingo-card .overlay{
+  position:absolute;
+  bottom:0;
+  width:100%;
+  padding:10px;
+  background:linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+  border-radius:0 0 16px 16px;
+}
+
+.wingo-card h3{
+  margin:0;
+  font-size:18px;
+}
+
+.wingo-card p{
+  font-size:12px;
+  opacity:0.9;
+}
 .mines{background:linear-gradient(135deg,#ff5252,#ff1744)}
   .mines-card{
 background: url(images/27503-removebg-preview.png) no-repeat center;
@@ -241,10 +267,11 @@ font-size:16px;
 <!-- MENU -->
 <div class="menu">
 
-<div class="game-card wingo" onclick="openGame('wingo.html')">
-<img src="images/27725-removebg-preview.png" class="game-img">
-<h3>WIN GO</h3>
-<p>30s Colour Trading</p>
+<div class="game-card wingo-card" onclick="openGame('wingo.html')">
+  <div class="overlay">
+    <h3>WIN GO</h3>
+    <p>30s Colour Trading</p>
+  </div>
 </div>
   
 <div class="game-card mines-card" onclick="openGame('mines.html')">
