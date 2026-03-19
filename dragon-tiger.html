@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>PUBG & FREE FIRE</title>
+<title>PUBG vs FREE FIRE</title>
 
 <style>
 body{
@@ -14,10 +14,20 @@ body{
   color:#fff;
 }
 
-/* TOP */
-.top{
+/* CONTAINER */
+.app{
+  max-width:420px;
+  margin:auto;
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+}
+
+/* HEADER */
+.header{
   text-align:center;
-  padding:8px;
+  padding:10px;
   background:#111827;
   position:relative;
 }
@@ -25,28 +35,28 @@ body{
 .wallet{
   position:absolute;
   right:10px;
-  top:8px;
-  font-size:14px;
+  top:10px;
 }
 
 /* CARDS */
 .cards{
   display:flex;
   justify-content:center;
-  gap:10px;
-  margin-top:8px;
+  align-items:center;
+  gap:15px;
+  margin-top:10px;
 }
 
 .card{
-  width:60px;
-  height:80px;
+  width:70px;
+  height:90px;
   background:#fff;
   color:#000;
   border-radius:10px;
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:22px;
+  font-size:24px;
 }
 
 /* HISTORY */
@@ -60,8 +70,8 @@ body{
 .history div{
   width:22px;
   height:22px;
-  border-radius:50%;
   background:#333;
+  border-radius:50%;
   display:flex;
   align-items:center;
   justify-content:center;
@@ -72,27 +82,27 @@ body{
 .tie{
   background:#3cd070;
   text-align:center;
-  padding:8px;
-  margin:8px;
+  padding:10px;
+  margin:10px;
   border-radius:8px;
 }
 
 /* BET AREA */
 .bet{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
+  display:flex;
+  justify-content:space-around;
   padding:10px;
 }
 
 .box{
-  height:140px;
+  width:40%;
+  height:130px;
   background:#1f2937;
   border-radius:10px;
-  position:relative;
   display:flex;
   align-items:flex-end;
   justify-content:center;
+  position:relative;
   padding-bottom:8px;
 }
 
@@ -111,64 +121,73 @@ body{
   display:flex;
   justify-content:center;
   gap:10px;
-  margin-top:10px;
+  margin-bottom:10px;
 }
 
 .chips div{
   background:#333;
   padding:10px;
   border-radius:50%;
+  cursor:pointer;
 }
 
 /* TIMER */
 .timer{
   text-align:center;
-  margin-top:5px;
+  margin-bottom:10px;
 }
 </style>
 </head>
 
 <body>
 
-<div class="top">
-  <b>PUBG & FREE FIRE</b>
-  <div class="wallet">₹ <span id="wallet">1000</span></div>
+<div class="app">
 
-  <div class="cards">
-    <div class="card" id="pCard">?</div>
-    <div>VS</div>
-    <div class="card" id="fCard">?</div>
-  </div>
-</div>
+  <!-- HEADER -->
+  <div class="header">
+    <b>PUBG & FREE FIRE</b>
+    <div class="wallet">₹ <span id="wallet">1000</span></div>
 
-<div class="history" id="history"></div>
-
-<div class="tie">Tie</div>
-
-<div class="bet">
-
-  <div class="box" onclick="betPlace('PUBG')">
-    <div class="amount" id="pubgAmt">0</div>
-    PUBG
+    <div class="cards">
+      <div class="card" id="pCard">?</div>
+      <div>VS</div>
+      <div class="card" id="fCard">?</div>
+    </div>
   </div>
 
-  <div class="box" onclick="betPlace('FREE')">
-    <div class="amount" id="freeAmt">0</div>
-    FREE FIRE
+  <!-- HISTORY -->
+  <div class="history" id="history"></div>
+
+  <!-- TIE -->
+  <div class="tie">Tie (9x)</div>
+
+  <!-- BET -->
+  <div class="bet">
+
+    <div class="box" onclick="betPlace('PUBG')">
+      <div class="amount" id="pubgAmt">0</div>
+      PUBG
+    </div>
+
+    <div class="box" onclick="betPlace('FREE')">
+      <div class="amount" id="freeAmt">0</div>
+      FREE FIRE
+    </div>
+
   </div>
 
-</div>
+  <!-- CHIPS -->
+  <div class="chips">
+    <div onclick="setAmt(10)">10</div>
+    <div onclick="setAmt(50)">50</div>
+    <div onclick="setAmt(100)">100</div>
+    <div onclick="setAmt(500)">500</div>
+    <div onclick="setAmt(1000)">1000</div>
+  </div>
 
-<!-- CHIPS -->
-<div class="chips">
-  <div onclick="setAmt(10)">10</div>
-  <div onclick="setAmt(50)">50</div>
-  <div onclick="setAmt(100)">100</div>
-  <div onclick="setAmt(500)">500</div>
-  <div onclick="setAmt(1000)">1000</div>
-</div>
+  <div class="timer">Time: <span id="time">20</span></div>
 
-<div class="timer">Time: <span id="time">20</span></div>
+</div>
 
 <script>
 
@@ -249,6 +268,7 @@ setInterval(()=>{
     // WIN LOGIC
     if(r=="PUBG") wallet+=pubg*2;
     if(r=="FREE") wallet+=free*2;
+    if(r=="TIE") wallet+=(pubg+free)*0 + (0); // optional
 
     document.getElementById("wallet").innerText=wallet;
 
