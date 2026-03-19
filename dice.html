@@ -143,7 +143,7 @@ button{
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, getDocs, collection, query, where, doc, updateDoc }
+import { getFirestore, getDocs, collection, query, where, doc, updateDoc, getDoc }
 from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 /* 🔥 FIREBASE */
@@ -175,13 +175,16 @@ async function saveWallet(){
   await updateDoc(doc(db,"users",uid), { balance: wallet });
 }
 
-/* 🎯 HOUSE EDGE CONTROL */
-function getWinChance(bet){
-  if(bet <= 50)  return 0.40;
-  if(bet <= 200) return 0.32;
-  if(bet <= 500) return 0.25;
-  if(bet <= 1000) return 0.18;
-  return 0.12;
+/* 🔥 HOUSE EDGE (FIREBASE CONTROL) */
+async function getChance(){
+  const ref = doc(db,"settings","houseEdge");
+  const snap = await getDoc(ref);
+
+  let chance = 50; // default
+  if(snap.exists()){
+    chance = Number(snap.data().dice ?? 50);
+  }
+  return chance;
 }
 
 /* GAME */
@@ -206,9 +209,10 @@ evenBtn.onclick=()=>{
   oddBtn.classList.remove("active");
 };
 
-/* ROLL */
+/* 🎲 ROLL WITH HOUSE EDGE */
 rollBtn.onclick = async ()=>{
   const bet = Number(betInp.value);
+
   if(!selectedOE) return alert("Select ODD or EVEN");
   if(bet<=0 || bet>wallet) return alert("Low balance");
 
@@ -221,8 +225,25 @@ rollBtn.onclick = async ()=>{
   setTimeout(async ()=>{
     dice.classList.remove("roll");
 
-    const winChance = getWinChance(bet);
-    const willWin = Math.random() < winChance;
+    let chance = await getChance(); // 🔥 FIREBASE
+
+    let willWin;
+
+    // 🔴 ALWAYS LOSS
+    if(chance === 0){
+      willWin = false;
+    }
+
+    // 🟢 ALWAYS WIN
+    else if(chance === 100){
+      willWin = true;
+    }
+
+    // 🎲 RANDOM CONTROL
+    else{
+      let rand = Math.random()*100;
+      willWin = rand < chance;
+    }
 
     let num, win=false;
 
@@ -238,6 +259,7 @@ rollBtn.onclick = async ()=>{
     }
 
     let winAmt=0;
+
     if(win){
       winAmt = bet*2;
       wallet += winAmt;
@@ -249,8 +271,10 @@ rollBtn.onclick = async ()=>{
 
     updateWallet();
     addHistory(num,bet,selectedOE,win,winAmt);
+
     popup.style.display="flex";
     setTimeout(()=>popup.style.display="none",1500);
+
   },600);
 };
 
