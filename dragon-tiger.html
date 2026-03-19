@@ -205,7 +205,40 @@ body{
   background:url("images/27879-removebg-preview.png") no-repeat center;
   background-size:cover;
 }
-  
+  .popup{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.6);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  opacity:0;
+  pointer-events:none;
+  transition:0.3s;
+}
+
+.popup.show{
+  opacity:1;
+  pointer-events:auto;
+}
+
+.popup-box{
+  background:#111827;
+  padding:20px 30px;
+  border-radius:12px;
+  color:#fff;
+  font-size:16px;
+  box-shadow:0 0 20px #00ffcc;
+  animation:pop 0.3s ease;
+}
+
+@keyframes pop{
+  from{transform:scale(0.7);}
+  to{transform:scale(1);}
+}
 /* TIMER TEXT */
 .timer{
   text-align:center;
@@ -298,6 +331,16 @@ let free = 0;
 let tie = 0;
 
 let time = 20;
+  
+  function showPopup(msg){
+  const p = document.getElementById("popup");
+  document.getElementById("popupText").innerText = msg;
+  p.classList.add("show");
+
+  setTimeout(()=>{
+    p.classList.remove("show");
+  },1500);
+}
 
 /* CHIP */
 window.setAmt = (a, el) => {
@@ -416,6 +459,12 @@ document.getElementById("fCard").innerText = "";
 startRound();
 
 </script>
-
+  
+<div id="popup" class="popup">
+  <div class="popup-box">
+    <span id="popupText">Message</span>
+  </div>
+</div>
+  
 </body>
 </html>
