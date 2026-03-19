@@ -1,204 +1,281 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dragon Tiger Game</title><style>
+<title>PUBG vs FREE FIRE</title>
+
+<style>
 body{
   margin:0;
   font-family:Arial;
-  background:#0b1220;
+  background:#0b0f1a;
   color:#fff;
-  text-align:center;
 }
 
+/* HEADER */
 .header{
-  padding:15px;
-  background:#111827;
+  text-align:center;
+  padding:10px;
+  font-size:22px;
+  font-weight:bold;
 }
 
 .wallet{
-  font-size:18px;
+  position:absolute;
+  right:10px;
+  top:10px;
+  background:#111;
+  padding:6px 12px;
+  border-radius:10px;
 }
 
-.game{
-  margin-top:20px;
+/* TOP BG */
+.top{
+  height:180px;
+  background:url('images/file_00000000fb9072088776bb496c7908c3.png') center/cover;
+  position:relative;
 }
 
-.cards{
+/* VS AREA */
+.vs-area{
+  position:absolute;
+  bottom:-40px;
+  width:100%;
   display:flex;
   justify-content:center;
-  gap:40px;
-  margin:20px;
+  align-items:center;
+  gap:30px;
 }
 
 .card{
-  width:100px;
-  height:140px;
-  background:#1f2937;
+  width:70px;
+  height:90px;
+  background:#fff;
+  color:#000;
+  border-radius:10px;
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:30px;
+  font-size:28px;
+  font-weight:bold;
+}
+
+.vs{
+  font-size:22px;
+  font-weight:bold;
+}
+
+/* TABLE */
+.table{
+  margin-top:60px;
+  background:url('images/27676-removebg-preview.png') center/cover;
+  padding:15px;
+  border-radius:20px 20px 0 0;
+}
+
+/* HISTORY */
+.history{
+  display:flex;
+  overflow-x:auto;
+  gap:6px;
+  margin:10px 0;
+}
+
+.history div{
+  min-width:28px;
+  height:28px;
+  border-radius:50%;
+  background:#333;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+/* TIE */
+.tie{
+  background:#2ecc71;
+  padding:12px;
   border-radius:10px;
-  transition:0.6s;
+  text-align:center;
+  margin-bottom:10px;
+  font-weight:bold;
 }
 
-.flip{
-  transform:rotateY(180deg);
+/* BET BOX GRID */
+.bet-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
 }
 
-.bets{
+/* TEAM BOX */
+.team{
+  position:relative;
+  height:140px;
+  border-radius:12px;
+  overflow:hidden;
+  cursor:pointer;
+}
+
+.team img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+.team span{
+  position:absolute;
+  bottom:0;
+  width:100%;
+  background:rgba(0,0,0,0.6);
+  text-align:center;
+  padding:6px;
+  font-weight:bold;
+}
+
+/* CHIPS */
+.chips{
   display:flex;
   justify-content:center;
-  gap:30px;
-  margin-top:20px;
-}
-
-.bet-box{
-  padding:20px;
-  border-radius:10px;
-  cursor:pointer;
-}
-
-.dragon{background:#ef4444;}
-.tiger{background:#3b82f6;}
-
-.chips{
-  margin-top:20px;
-}
-
-.chip{
-  padding:10px 15px;
-  margin:5px;
-  background:#10b981;
-  border:none;
-  border-radius:5px;
-  cursor:pointer;
-}
-
-.timer{
-  font-size:22px;
+  gap:10px;
   margin-top:10px;
 }
 
-.result{
-  margin-top:15px;
-  font-size:20px;
+.chips div{
+  background:#333;
+  padding:10px;
+  border-radius:50%;
+  cursor:pointer;
 }
 
-.lock{
-  opacity:0.5;
-  pointer-events:none;
+/* TIMER */
+.timer{
+  text-align:center;
+  margin-top:10px;
 }
-</style></head><body><div class="header">
-  <div class="wallet">Wallet: ₹<span id="wallet">5000</span></div>
-</div><div class="game"><div class="timer">Time: <span id="time">20</span></div><div class="cards">
-  <div class="card" id="dragonCard">?</div>
-  <div class="card" id="tigerCard">?</div>
-</div><div class="bets">
-  <div class="bet-box dragon" onclick="placeBet('dragon')">DRAGON</div>
-  <div class="bet-box tiger" onclick="placeBet('tiger')">TIGER</div>
-</div><div class="chips">
-  <button class="chip" onclick="selectChip(10)">10</button>
-  <button class="chip" onclick="selectChip(50)">50</button>
-  <button class="chip" onclick="selectChip(100)">100</button>
-  <button class="chip" onclick="selectChip(200)">200</button>
-  <button class="chip" onclick="selectChip(500)">500</button>
-  <button class="chip" onclick="selectChip(1000)">1000</button>
-</div><div class="result" id="result"></div></div><script>
-let wallet = 5000;
-let selectedChip = 0;
-let bets = {dragon:0, tiger:0};
+</style>
+</head>
+
+<body>
+
+<div class="header">PUBG & FREE FIRE</div>
+<div class="wallet">₹ <span id="wallet">1000</span></div>
+
+<div class="top">
+  <div class="vs-area">
+    <div class="card" id="pubgCard">?</div>
+    <div class="vs">VS</div>
+    <div class="card" id="ffCard">?</div>
+  </div>
+</div>
+
+<div class="table">
+
+<!-- HISTORY -->
+<div class="history" id="history"></div>
+
+<!-- TIE -->
+<div class="tie" onclick="placeBet('TIE')">
+  Tie (8:1)
+</div>
+
+<!-- BET -->
+<div class="bet-grid">
+
+  <div class="team" onclick="placeBet('PUBG')">
+    <img src="images/27826-removebg-preview.png">
+    <span>PUBG</span>
+  </div>
+
+  <div class="team" onclick="placeBet('FREE')">
+    <img src="images/27825-removebg-preview.png">
+    <span>FREE FIRE</span>
+  </div>
+
+</div>
+
+<!-- CHIPS -->
+<div class="chips">
+  <div onclick="setAmount(10)">10</div>
+  <div onclick="setAmount(50)">50</div>
+  <div onclick="setAmount(100)">100</div>
+  <div onclick="setAmount(500)">500</div>
+</div>
+
+<div class="timer">Time: <span id="time">20</span></div>
+
+</div>
+
+<script>
+
+let wallet = localStorage.getItem("wallet") || 1000;
+let bet = "";
+let amount = 0;
 let time = 20;
-let locked = false;
 
-function selectChip(amount){
-  selectedChip = amount;
+document.getElementById("wallet").innerText = wallet;
+
+function setAmount(a){
+  amount = a;
 }
 
-function placeBet(type){
-  if(locked) return;
-  if(selectedChip === 0) return alert("Select chip first");
-  if(wallet < selectedChip) return alert("Low balance");
-
-  wallet -= selectedChip;
-  bets[type] += selectedChip;
-
-  updateWallet();
+function placeBet(b){
+  if(time <= 3){
+    alert("Bet Closed");
+    return;
+  }
+  bet = b;
 }
 
-function updateWallet(){
-  document.getElementById("wallet").innerText = wallet;
+/* RANDOM CARD */
+function card(){
+  let arr=["A","K","Q","J","10","9"];
+  return arr[Math.floor(Math.random()*arr.length)];
 }
 
-function randomCard(){
-  return Math.floor(Math.random()*13)+1;
-}
-
-function showResult(){
-  let d = randomCard();
-  let t = randomCard();
-
-  let dragonCard = document.getElementById("dragonCard");
-  let tigerCard = document.getElementById("tigerCard");
-
-  dragonCard.classList.add("flip");
-  tigerCard.classList.add("flip");
-
-  setTimeout(()=>{
-    dragonCard.innerText = d;
-    tigerCard.innerText = t;
-
-    let resultText = "";
-
-    if(d > t){
-      resultText = "Dragon Wins";
-      wallet += bets.dragon * 2;
-    } else if(t > d){
-      resultText = "Tiger Wins";
-      wallet += bets.tiger * 2;
-    } else {
-      resultText = "Tie";
-      wallet += bets.dragon + bets.tiger;
-    }
-
-    document.getElementById("result").innerText = resultText;
-    updateWallet();
-
-    bets = {dragon:0, tiger:0};
-    resetGame();
-
-  },600);
-}
-
-function resetGame(){
-  setTimeout(()=>{
-    document.getElementById("dragonCard").innerText = "?";
-    document.getElementById("tigerCard").innerText = "?";
-
-    document.getElementById("dragonCard").classList.remove("flip");
-    document.getElementById("tigerCard").classList.remove("flip");
-
-    time = 20;
-    locked = false;
-  },3000);
+/* RESULT */
+function result(p,f){
+  let order=["A","K","Q","J","10","9"];
+  if(order.indexOf(p)<order.indexOf(f)) return "PUBG";
+  if(order.indexOf(p)>order.indexOf(f)) return "FREE";
+  return "TIE";
 }
 
 setInterval(()=>{
-  if(time > 0){
-    time--;
-    document.getElementById("time").innerText = time;
 
-    if(time <= 3){
-      locked = true;
-      document.querySelectorAll('.bet-box').forEach(b=>b.classList.add('lock'));
+  time--;
+  document.getElementById("time").innerText=time;
+
+  if(time==0){
+
+    let p=card();
+    let f=card();
+
+    document.getElementById("pubgCard").innerText=p;
+    document.getElementById("ffCard").innerText=f;
+
+    let r=result(p,f);
+
+    let h=document.createElement("div");
+    h.innerText=r[0];
+    document.getElementById("history").prepend(h);
+
+    if(bet==r){
+      wallet = Number(wallet) + amount*2;
+    }else{
+      wallet = Number(wallet) - amount;
     }
 
-  } else {
-    document.querySelectorAll('.bet-box').forEach(b=>b.classList.remove('lock'));
-    showResult();
+    localStorage.setItem("wallet",wallet);
+    document.getElementById("wallet").innerText=wallet;
+
+    bet="";
+    time=20;
   }
+
 },1000);
 
-</script></body>
+</script>
+
+</body>
 </html>
