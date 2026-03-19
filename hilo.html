@@ -138,16 +138,13 @@ body{
 <!-- 🔥 FIREBASE -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, query, where, getDocs, doc, updateDoc }
+import { getFirestore, collection, query, where, getDocs, doc, updateDoc, getDoc }
 from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const app = initializeApp({
  apiKey:"AIzaSyBx3J9aGn_98rTPgurMMKw_GR3puIMj4Ms",
  authDomain:"colourcash-ea60e.firebaseapp.com",
- projectId:"colourcash-ea60e",
- storageBucket:"colourcash-ea60e.firebasestorage.app",
- messagingSenderId:"403688058646",
- appId:"1:403688058646:web:f1753360471528f275ea37"
+ projectId:"colourcash-ea60e"
 });
 const db = getFirestore(app);
 
@@ -163,6 +160,18 @@ async function loadWallet(){
  bal.innerText=balance;
 }
 loadWallet();
+
+/* 🔥 HOUSE EDGE */
+async function getChance(){
+ try{
+   const ref = doc(db,"settings","houseEdge");
+   const snap = await getDoc(ref);
+   if(snap.exists()){
+     return Number(snap.data().hilo ?? 50);
+   }
+ }catch(e){}
+ return 50;
+}
 
 /* GAME */
 const cards=["2","3","4","5","6","7","8","9","10","J","Q","K","A"];
@@ -195,8 +204,9 @@ refresh.onclick=()=>{
 minus.onclick=()=>{if(bet>10){bet-=10;betText.innerText="Bet ₹"+bet;}}
 plus.onclick=()=>{bet+=10;betText.innerText="Bet ₹"+bet;}
 
-/* PLAY */
+/* 🔥 CONTROLLED PLAY */
 async function play(isHigh){
+
  if(balance<bet) return;
 
  high.classList.remove("active");
@@ -209,17 +219,63 @@ async function play(isHigh){
  bal.innerText=balance;
  await updateDoc(doc(db,"users",uid),{balance});
 
- const next=Math.floor(Math.random()*cards.length);
- const win=isHigh?next>currentIndex:next<currentIndex;
+ let chance = await getChance();
+
+ let next;
+
+ // 🟢 ALWAYS WIN
+ if(chance >= 100){
+   if(isHigh){
+     next = Math.floor(Math.random()*(cards.length-currentIndex-1)) + currentIndex + 1;
+   }else{
+     next = Math.floor(Math.random()*currentIndex);
+   }
+ }
+
+ // 🔴 ALWAYS LOSS
+ else if(chance <= 0){
+   if(isHigh){
+     next = Math.floor(Math.random()*currentIndex);
+   }else{
+     next = Math.floor(Math.random()*(cards.length-currentIndex-1)) + currentIndex + 1;
+   }
+ }
+
+ // 🎲 RANDOM
+ else{
+   let rand = Math.random()*100;
+   let win = rand < chance;
+
+   if(win){
+     if(isHigh){
+       next = Math.floor(Math.random()*(cards.length-currentIndex-1)) + currentIndex + 1;
+     }else{
+       next = Math.floor(Math.random()*currentIndex);
+     }
+   }else{
+     if(isHigh){
+       next = Math.floor(Math.random()*currentIndex);
+     }else{
+       next = Math.floor(Math.random()*(cards.length-currentIndex-1)) + currentIndex + 1;
+     }
+   }
+ }
+
+ const win = isHigh ? next > currentIndex : next < currentIndex;
 
  setTimeout(()=>{
   cardInner.classList.remove("flip");
+
   if(win){
-    step++;history.push(cards[currentIndex]);
-    currentIndex=next;render();
+    step++;
+    history.push(cards[currentIndex]);
+    currentIndex=next;
+    render();
   }else{
-    showPopup("YOU LOSE",false);reset();
+    showPopup("YOU LOSE",false);
+    reset();
   }
+
  },150);
 }
 
