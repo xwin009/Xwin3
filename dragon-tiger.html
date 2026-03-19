@@ -2,469 +2,277 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Dragon Tiger</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PUBG vs Free Fire</title>
+
 <style>
 body{
   margin:0;
-  font-family:Arial, sans-serif;
-  background:radial-gradient(circle at top,#0b1c2d,#030b14);
+  font-family:Arial;
+  background:url('images/file_0000000007b071fa871e2db23466cd0b.png') no-repeat center;
+  background-size:cover;
   color:#fff;
 }
 
-/* ===== HEADER ===== */
-.game-header{
-background:linear-gradient(180deg,#2b1c3a,#1a1025);
-padding:14px 10px 10px;
-}
-.header-arena{
-display:flex;
-align-items:center;
-justify-content:space-between;
-}
-.header-arena img{height:80px}
-.center-cards{display:flex;align-items:center;gap:10px}
-
-/* ===== TOP CARDS ===== */
-.play-card{width:46px;height:62px;perspective:800px}
-.play-card .inner{
-width:100%;height:100%;
-transform-style:preserve-3d;
-transition:.6s;
-}
-.play-card.flip .inner{transform:rotateY(180deg)}
-.play-card .front,
-.play-card .back{
-position:absolute;inset:0;
-backface-visibility:hidden;
-border-radius:8px;
-display:flex;
-align-items:center;
-justify-content:center;
-font-weight:bold;
-}
-.play-card .front{background:linear-gradient(135deg,#ffb85c,#ff8c1a)}
-.play-card .back{background:#fff;color:#000;transform:rotateY(180deg)}
-
-.bet-btn{
-margin:10px auto 6px;
-width:220px;
-padding:12px 0;
-text-align:center;
-border-radius:30px;
-background:linear-gradient(135deg,#ffcf6a,#ff9f1a);
-color:#000;
-font-weight:bold;
-font-size:18px;
+/* HEADER */
+.header{
+  background:url('images/file_00000000480471fa9e11748baef83b2f.png') no-repeat center;
+  background-size:cover;
+  text-align:center;
+  padding:10px;
 }
 
-/* ===== TABLE ===== */
-.table-wrap{display:flex;justify-content:center;margin-top:20px}
-.table{
-width:360px;
-background:linear-gradient(#1a2f4a,#0b1c2d);
-border-radius:18px;
-padding:18px;
+.title{
+  background:url('images/27677-removebg-preview.png') no-repeat center;
+  height:60px;
+  background-size:contain;
 }
-.cards{display:flex;justify-content:space-between;align-items:center}
 
-.card,.tie{
-position:relative;
-font-weight:bold;
-cursor:pointer;
+/* TOP BG */
+.top-bg{
+  background:url('images/file_00000000fb9072088776bb496c7908c3.png') no-repeat center;
+  background-size:cover;
+  padding:20px;
+  position:relative;
 }
+
+/* CHARACTERS */
+.pubg{
+  position:absolute;
+  left:10px;
+  top:20px;
+  width:120px;
+  height:150px;
+  background:url('images/file_00000000df4871fa8609456fe5b59e5a.png') no-repeat center/contain;
+}
+
+.freefire{
+  position:absolute;
+  right:10px;
+  top:20px;
+  width:120px;
+  height:150px;
+  background:url('images/file_00000000b47471faa0bfb3580646bb40.png') no-repeat center/contain;
+}
+
+/* VS */
+.vs{
+  width:100px;
+  height:80px;
+  margin:auto;
+  background:url('images/27678-removebg-preview.png') no-repeat center/contain;
+}
+
+/* CARDS */
+.cards{
+  display:flex;
+  justify-content:space-around;
+  margin-top:20px;
+}
+
 .card{
-width:135px;height:95px;
-border-radius:16px;
-display:flex;
-align-items:center;
-justify-content:center;
-flex-direction:column;
-gap:4px;
-}
-.dragon{background:#4a5fe0}
-.tiger{background:#ff8c1a}
-.tie{
-margin:14px auto 0;
-width:200px;height:70px;
-border-radius:16px;
-background:#2ecc71;
-display:flex;align-items:center;justify-content:center;
+  width:80px;
+  height:120px;
+  background:#fff;
+  color:#000;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-size:30px;
+  border-radius:10px;
+  transform:rotateY(0deg);
+  transition:0.5s;
 }
 
-.bet-amt{
-position:absolute;
-top:6px;right:8px;
-background:rgba(0,0,0,.6);
-padding:3px 8px;
-border-radius:12px;
-font-size:13px;
-display:none;
+/* BET AREA */
+.bet-area{
+  display:flex;
+  justify-content:space-around;
+  margin-top:30px;
 }
 
-.card.active,.tie.active{
-box-shadow:0 0 18px gold;
-transform:scale(1.03);
+.box{
+  width:150px;
+  height:180px;
+  position:relative;
+  text-align:center;
 }
 
-/* ===== DRAGON TIGER CARD IMAGE (ADDED) ===== */
-.card img{
-width:38px;
-height:38px;
-object-fit:contain;
+.pubg-box{
+  background:url('images/file_00000000119871fab85c60ccc87fd0ee.png') no-repeat center/contain;
 }
 
-/* ===== CHIPS ===== */
-.chips{display:flex;justify-content:center;gap:10px;margin:18px auto}
-.chip{
-width:46px;height:46px;
-border-radius:50%;
-background:#ffd56a;
-display:flex;align-items:center;justify-content:center;
-color:#000;font-weight:bold;
-cursor:pointer;
-}
-.chip.active{outline:3px solid #fff}
-.locked{pointer-events:none;opacity:.4}
-
-/* ===== POPUP ===== */
-.popup{
-position:fixed;inset:0;
-background:rgba(0,0,0,.6);
-display:none;
-align-items:center;justify-content:center;
-}
-.popup-box{
-background:linear-gradient(135deg,#ffd56a,#ff9f1a);
-color:#000;
-padding:30px 50px;
-border-radius:20px;
-font-size:26px;
-font-weight:bold;
+.freefire-box{
+  background:url('images/file_0000000067f871fa8ab3c7b0ee53094c.png') no-repeat center/contain;
 }
 
-/* ===== WALLET ===== */
-#walletBox{
-position:fixed;
-bottom:0;
-right:12px;
-background:#000;
-padding:10px 18px;
-border-radius:22px;
-font-weight:bold;
-font-size:18px;
-z-index:9999;
+.amount{
+  position:absolute;
+  bottom:10px;
+  width:100%;
+  font-weight:bold;
+}
 
-/* 👇 YAHI MAGIC HAI */
-transform: translateY(-65px);
+/* COINS */
+.coins{
+  display:flex;
+  justify-content:center;
+  gap:10px;
+  margin-top:20px;
 }
-/* ===== RESULT HISTORY ===== */
-.history-wrap{
-width:360px;
-margin:12px auto;
-background:#071421;
-padding:12px;
-border-radius:14px;
+
+.coin{
+  width:50px;
+  height:50px;
+  background:gold;
+  border-radius:50%;
+  text-align:center;
+  line-height:50px;
+  color:#000;
+  font-weight:bold;
+  cursor:pointer;
 }
-.history-title{
-text-align:center;
-margin-bottom:8px;
-font-weight:bold;
-color:#ffd56a;
+
+/* TIMER */
+.timer{
+  text-align:center;
+  font-size:20px;
+  margin-top:10px;
 }
+
+/* HISTORY */
 .history{
-display:flex;
-gap:6px;
-justify-content:center;
-flex-wrap:wrap;
+  display:flex;
+  overflow:hidden;
+  width:200px;
+  margin:auto;
+  gap:5px;
 }
-.h-item{
-width:34px;
-height:34px;
-border-radius:50%;
-display:flex;
-align-items:center;
-justify-content:center;
-font-size:12px;
-font-weight:bold;
+
+.dot{
+  width:20px;
+  height:20px;
+  border-radius:50%;
+  text-align:center;
+  font-size:12px;
+  line-height:20px;
 }
-.h-dragon{background:#4a5fe0}
-.h-tiger{background:#ff8c1a}
-.h-tie{background:#2ecc71}
+
+.D{background:blue;}
+.T{background:red;}
+
 </style>
 </head>
 
 <body>
 
-<div id="walletBox">💰 ₹<span id="walletAmt">0</span></div>
-
-<div class="game-header">
-  <div class="header-arena">
-    <img src="images/dragon.png">
-    <div class="center-cards">
-      <div class="play-card" id="topDragon">
-        <div class="inner">
-          <div class="front"></div>
-          <div class="back" id="dVal"></div>
-        </div>
-      </div>
-      <div>VS</div>
-      <div class="play-card" id="topTiger">
-        <div class="inner">
-          <div class="front"></div>
-          <div class="back" id="tVal"></div>
-        </div>
-      </div>
-    </div>
-    <img src="images/tiger.png">
-  </div>
-  <div class="bet-btn" id="betStatus">START BETTING</div>
+<div class="header">
+  <div class="title"></div>
 </div>
 
-<div class="table-wrap">
-  <div class="table">
-    <div class="cards">
-      <div class="card dragon" id="dragon">
-        <img src="images/dragon.png">
-        DRAGON
-        <span class="bet-amt" id="bet-dragon"></span>
-      </div>
-      <div>VS</div>
-      <div class="card tiger" id="tiger">
-        <img src="images/tiger.png">
-        TIGER
-        <span class="bet-amt" id="bet-tiger"></span>
-      </div>
-    </div>
-    <div class="tie" id="tie">TIE <span class="bet-amt" id="bet-tie"></span></div>
+<div class="top-bg">
+  <div class="pubg"></div>
+  <div class="freefire"></div>
+  <div class="vs"></div>
+
+  <div class="cards">
+    <div class="card" id="card1">?</div>
+    <div class="card" id="card2">?</div>
   </div>
 </div>
 
-<div class="history-wrap">
-  <div class="history-title">LAST RESULTS</div>
-  <div class="history" id="history"></div>
+<div class="timer" id="timer">15</div>
+
+<div class="history" id="history"></div>
+
+<div class="bet-area">
+  <div class="box pubg-box" onclick="bet('P')">
+    <div class="amount" id="pubgAmount">0</div>
+  </div>
+
+  <div class="box freefire-box" onclick="bet('F')">
+    <div class="amount" id="freeAmount">0</div>
+  </div>
 </div>
 
-<div class="chips">
-  <div class="chip">10</div>
-  <div class="chip">50</div>
-  <div class="chip">100</div>
-  <div class="chip">500</div>
-  <div class="chip">1000</div>
+<div class="coins">
+  <div class="coin" onclick="setCoin(10)">10</div>
+  <div class="coin" onclick="setCoin(50)">50</div>
+  <div class="coin" onclick="setCoin(100)">100</div>
 </div>
 
-<div class="popup" id="popup">
-  <div class="popup-box" id="popupText"></div>
-</div>
+<script>
+let selectedCoin = 10;
+let pubgBet = 0;
+let freeBet = 0;
+let timer = 15;
+let locked = false;
+let historyArr = [];
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, getDocs, collection, query, where, doc, updateDoc }
-from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-const app = initializeApp({
-  apiKey:"AIzaSyBx3J9aGn_98rTPgurMMKw_GR3puIMj4Ms",
-  authDomain:"colourcash-ea60e.firebaseapp.com",
-  projectId:"colourcash-ea60e"
-});
-const db = getFirestore(app);
-
-const email = localStorage.getItem("userEmail");
-let uid="", wallet=0;
-
-async function loadWallet(){
- const q=query(collection(db,"users"),where("email","==",email));
- const s=await getDocs(q);
- s.forEach(d=>{uid=d.id;wallet=Number(d.data().balance||0);});
- walletAmt.innerText=wallet;
-}
-function userRef(){return doc(db,"users",uid);}
-loadWallet();
-
-/* ===== GAME LOGIC ===== */
-let selectedChip=0;
-let phase="bet";
-let timer=15;
-let bets={DRAGON:0,TIGER:0,TIE:0};
-let intervalId;
-const CARDS=[
-{n:"A",v:14},{n:"K",v:13},{n:"Q",v:12},{n:"J",v:11},
-{n:"10",v:10},{n:"9",v:9},{n:"8",v:8},{n:"7",v:7},
-{n:"6",v:6},{n:"5",v:5},{n:"4",v:4},{n:"3",v:3},{n:"2",v:2}
-];
-const MULTI={DRAGON:2,TIGER:2,TIE:13};
-
-document.querySelectorAll(".chip").forEach(c=>{
- c.onclick=()=>{
-  if(phase!=="bet")return;
-  document.querySelectorAll(".chip").forEach(x=>x.classList.remove("active"));
-  c.classList.add("active");
-  selectedChip=parseInt(c.innerText);
- };
-});
-
-["dragon","tiger","tie"].forEach(id=>{
- const el=document.getElementById(id);
- el.onclick=async ()=>{
-  if(phase!=="bet"||!selectedChip||wallet<selectedChip)return;
-
-  wallet-=selectedChip;
-  walletAmt.innerText=wallet;
-  await updateDoc(userRef(),{balance:wallet});
-
-  bets[id.toUpperCase()]+=selectedChip;
-  const b=document.getElementById("bet-"+id);
-  b.innerText="₹"+bets[id.toUpperCase()];
-  b.style.display="block";
-
-  document.querySelectorAll(".card,.tie").forEach(x=>x.classList.remove("active"));
-  el.classList.add("active");
- };
-});
-
-function startTimer(){
-
-  clearInterval(intervalId); // 🔥 PURANA TIMER BAND
-
-  betStatus.innerText="START BETTING (10)";
-  timer=15;
-  phase="bet";
-
-  // chips unlock kar
-  document.querySelectorAll(".chip").forEach(c=>c.classList.remove("locked"));
-
-  intervalId = setInterval(()=>{
-    timer--;
-
-    if(timer>5){
-      phase="bet";
-      betStatus.innerText="START BETTING ("+(timer-5)+")";
-    }
-    else if(timer>0){
-      phase="lock";
-      betStatus.innerText="BET LOCK ("+timer+")";
-      document.querySelectorAll(".chip").forEach(c=>c.classList.add("locked"));
-    }
-    else{
-      clearInterval(intervalId); // 🔥 IMPORTANT
-      showResult();
-    }
-
-  },1000);
+function setCoin(val){
+  selectedCoin = val;
 }
 
-async function showResult(){
- phase="result";
-const ref = doc(db, "settings", "houseEdge");
-const snap = await getDoc(ref);
+function bet(side){
+  if(locked) return;
 
-let chance = 50;
-if(snap.exists()){
-  chance = Number(snap.data().dragonTiger ?? 50);
-}
-  
- 
- topDragon.classList.add("flip");
- topTiger.classList.add("flip");
-
-  let win;
-
-// 🔴 0 = ALWAYS LOSS (user hamesha hare)
-if(chance === 0){
-  win = "NONE"; // koi bhi bet jeetega nahi
-}
-
-// 🟢 100 = ALWAYS WIN (user hamesha jeete)
-else if(chance === 100){
-  if(bets.DRAGON > 0) win = "DRAGON";
-  else if(bets.TIGER > 0) win = "TIGER";
-  else if(bets.TIE > 0) win = "TIE";
-  else win = "TIE";
-}
-
-// 🎲 RANDOM CONTROL
-else{
-  let rand = Math.random() * 100;
-
-  if(rand < chance){
-    // USER WIN
-    if(bets.DRAGON > 0) win = "DRAGON";
-    else if(bets.TIGER > 0) win = "TIGER";
-    else if(bets.TIE > 0) win = "TIE";
-    else win = "TIE";
+  if(side==='P'){
+    pubgBet += selectedCoin;
+    document.getElementById("pubgAmount").innerText = pubgBet;
   }else{
-    // USER LOSS
-    if(bets.DRAGON > 0) win = "TIGER";
-    else if(bets.TIGER > 0) win = "DRAGON";
-    else win = "TIE";
+    freeBet += selectedCoin;
+    document.getElementById("freeAmount").innerText = freeBet;
   }
 }
- // 🔥 FORCE CARDS ACCORDING TO RESULT
-if(win === "DRAGON"){
-  dVal.innerText = "K";
-  tVal.innerText = "5";
+
+/* TIMER */
+setInterval(()=>{
+  timer--;
+  document.getElementById("timer").innerText = timer;
+
+  if(timer<=5) locked=true;
+
+  if(timer<=0){
+    playGame();
+    timer=15;
+    locked=false;
+  }
+
+},1000);
+
+/* GAME LOGIC */
+function playGame(){
+
+  let pubgCard = Math.floor(Math.random()*13)+1;
+  let freeCard = Math.floor(Math.random()*13)+1;
+
+  document.getElementById("card1").innerText = pubgCard;
+  document.getElementById("card2").innerText = freeCard;
+
+  let result = pubgCard > freeCard ? 'D' : 'T';
+
+  addHistory(result);
+
+  pubgBet = 0;
+  freeBet = 0;
+
+  document.getElementById("pubgAmount").innerText = 0;
+  document.getElementById("freeAmount").innerText = 0;
 }
-else if(win === "TIGER"){
-  dVal.innerText = "4";
-  tVal.innerText = "Q";
-}
-else{
-  dVal.innerText = "8";
-  tVal.innerText = "8";
-  } 
- if(bets[win]>0){
-  wallet+=bets[win]*MULTI[win];
-  walletAmt.innerText=wallet;
-  await updateDoc(userRef(),{balance:wallet});
- }
 
- popupText.innerText=win+" WINS";
- popup.style.display="flex";
+/* HISTORY */
+function addHistory(res){
+  historyArr.unshift(res);
+  if(historyArr.length>10) historyArr.pop();
 
- saveHistory(win);
-
- setTimeout(()=>resetGame(),2500);
-}
-function resetGame(){
-  clearInterval(intervalId); // ✅ YAHA ADD KAR
-  bets = {DRAGON:0,TIGER:0,TIE:0};
-
-  document.querySelectorAll(".bet-amt").forEach(b=>{
-    b.style.display="none";
-    b.innerText="";
+  let html='';
+  historyArr.forEach(r=>{
+    html += `<div class="dot ${r}">${r}</div>`;
   });
 
-  document.querySelectorAll(".card,.tie").forEach(x=>x.classList.remove("active"));
-
-  topDragon.classList.remove("flip");
-  topTiger.classList.remove("flip");
-
-  popup.style.display="none";
-
-  startTimer(); // 🔁 restart timer
+  document.getElementById("history").innerHTML = html;
 }
-/* ===== RESULT HISTORY JS ===== */
-function saveHistory(result){
- let h=JSON.parse(localStorage.getItem("dt_history")||"[]");
- h.unshift(result);
- if(h.length>10)h.pop();
- localStorage.setItem("dt_history",JSON.stringify(h));
-}
-function loadHistory(){
- const box=document.getElementById("history");
- if(!box)return;
- box.innerHTML="";
- let h=JSON.parse(localStorage.getItem("dt_history")||"[]");
- h.forEach(r=>{
-  const d=document.createElement("div");
-  d.className="h-item h-"+r.toLowerCase();
-  d.innerText=r[0];
-  box.appendChild(d);
- });
-}
-loadHistory();
 
-startTimer();
 </script>
 
 </body>
