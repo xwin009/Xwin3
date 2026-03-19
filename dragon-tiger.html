@@ -226,114 +226,126 @@ body{
 
 </div>
 
-<script>
+<script type="module">
 
-let wallet=1000;
-let chip=0;
+let wallet = 2000;
+let chip = 0;
 
-let pubg=0;
-let free=0;
+let pubg = 0;
+let free = 0;
 
-let time=20;
+let time = 20;
+let gameRunning = true;
 
 /* CHIP SELECT */
-function setAmt(a,el){
-  chip=a;
+window.setAmt = (a, el) => {
+  chip = a;
 
   document.querySelectorAll(".chips div").forEach(e=>e.classList.remove("active"));
   el.classList.add("active");
-}
+};
 
 /* BET */
-function betPlace(type){
+window.betPlace = (type) => {
 
-  if(time<=3){
-    alert("Bet Closed");
-    return;
-  }
+  if(time <= 3) return alert("Bet Closed");
+  if(wallet < chip) return alert("Low Balance");
 
-  if(wallet<chip){
-    alert("Low Balance");
-    return;
-  }
-
-  wallet-=chip;
-  document.getElementById("wallet").innerText=wallet;
+  wallet -= chip;
+  document.getElementById("wallet").innerText = wallet;
 
   if(type=="PUBG"){
-    pubg+=chip;
-    document.getElementById("pubgAmt").innerText=pubg;
+    pubg += chip;
+    document.getElementById("pubgAmt").innerText = pubg;
   }
 
   if(type=="FREE"){
-    free+=chip;
-    document.getElementById("freeAmt").innerText=free;
+    free += chip;
+    document.getElementById("freeAmt").innerText = free;
   }
-}
+};
 
-/* CARD RANDOM */
+/* RANDOM CARD */
 function rand(){
-  let arr=["A","K","Q","J","10","9"];
+  const arr=["A","K","Q","J","10","9"];
   return arr[Math.floor(Math.random()*arr.length)];
 }
 
 /* RESULT */
-function res(p,f){
-  let order=["A","K","Q","J","10","9"];
-  if(order.indexOf(p)<order.indexOf(f)) return "PUBG";
-  if(order.indexOf(p)>order.indexOf(f)) return "FREE";
+function result(p,f){
+  const order=["A","K","Q","J","10","9"];
+  if(order.indexOf(p) < order.indexOf(f)) return "PUBG";
+  if(order.indexOf(p) > order.indexOf(f)) return "FREE";
   return "TIE";
 }
 
-/* GAME LOOP */
-setInterval(()=>{
+/* ROUND FUNCTION */
+function startRound(){
 
-  time--;
-  document.getElementById("time").innerText=time;
+  time = 20;
+  gameRunning = true;
 
-  if(time==0){
+  const timer = setInterval(()=>{
 
-    document.getElementById("pFlip").classList.remove("active");
-    document.getElementById("fFlip").classList.remove("active");
+    document.getElementById("time").innerText = time;
 
-    setTimeout(()=>{
+    time--;
 
-      let p=rand();
-      let f=rand();
+    if(time < 0){
 
-      document.getElementById("pCard").innerText=p;
-      document.getElementById("fCard").innerText=f;
+      clearInterval(timer);
 
-      document.getElementById("pFlip").classList.add("active");
-      document.getElementById("fFlip").classList.add("active");
+      // CARD FLIP RESET
+      document.getElementById("pFlip").classList.remove("active");
+      document.getElementById("fFlip").classList.remove("active");
 
-      let r=res(p,f);
+      setTimeout(()=>{
 
-      let h=document.createElement("div");
-      h.innerText=r[0];
-      document.getElementById("history").prepend(h);
+        const p = rand();
+        const f = rand();
 
-      // WIN
-      if(r=="PUBG") wallet+=pubg*2;
-      if(r=="FREE") wallet+=free*2;
+        document.getElementById("pCard").innerText = p;
+        document.getElementById("fCard").innerText = f;
 
-      document.getElementById("wallet").innerText=wallet;
+        // FLIP
+        document.getElementById("pFlip").classList.add("active");
+        document.getElementById("fFlip").classList.add("active");
 
-      // RESET
-      pubg=0;
-      free=0;
+        const r = result(p,f);
 
-      document.getElementById("pubgAmt").innerText=0;
-      document.getElementById("freeAmt").innerText=0;
+        // HISTORY
+        const h = document.createElement("div");
+        h.innerText = r[0];
+        document.getElementById("history").prepend(h);
 
-    },400);
+        // WIN CALC
+        if(r=="PUBG") wallet += pubg * 2;
+        if(r=="FREE") wallet += free * 2;
 
-    time=20;
-  }
+        document.getElementById("wallet").innerText = wallet;
 
-},1000);
+        // RESET BET
+        pubg = 0;
+        free = 0;
 
-</script>
+        document.getElementById("pubgAmt").innerText = 0;
+        document.getElementById("freeAmt").innerText = 0;
+
+        // NEXT ROUND AUTO 🔥
+        setTimeout(()=>{
+          startRound();
+        },1500);
+
+      },400);
+    }
+
+  },1000);
+}
+
+/* START GAME */
+startRound();
+
+                             </script>
 
 </body>
 </html>
