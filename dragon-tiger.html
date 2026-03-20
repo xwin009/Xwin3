@@ -381,7 +381,11 @@ if(localStorage.getItem("history")){
 if(localStorage.getItem("time")){
   time = parseInt(localStorage.getItem("time"));
 }
-  
+ // 🔥 scroll to latest after load
+setTimeout(()=>{
+  const hist = document.getElementById("history");
+  hist.scrollLeft = hist.scrollWidth;
+},100); 
   
   function showPopup(msg){
   const p = document.getElementById("popup");
