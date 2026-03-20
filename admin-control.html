@@ -52,10 +52,10 @@ input[type=range]{
 <div class="card" id="gameList"></div>
 </div>
 
-<script type="module">
+  <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const app = initializeApp({
   apiKey:"AIzaSyBx3J9aGn_98rTPgurMMKw_GR3puIMj4Ms",
@@ -98,6 +98,19 @@ const gameKeys = {
 
 const container = document.getElementById("gameList");
 
+/* 🔥 ONE TIME FIREBASE LOAD */
+let houseData = {};
+
+async function loadAll(){
+  const snap = await getDoc(doc(db,"settings","houseEdge"));
+  if(snap.exists()){
+    houseData = snap.data();
+  }
+}
+
+await loadAll();
+
+/* 🔥 UI BUILD */
 games.forEach(game => {
 
   let div = document.createElement("div");
@@ -111,15 +124,22 @@ games.forEach(game => {
   let slider = div.querySelector("input");
   let value = div.querySelector(".value");
 
-  slider.onchange = async () => {
+  const key = gameKeys[game];
+
+  // 🔥 SET SAVED VALUE (FIX)
+  if(houseData[key] !== undefined){
+    slider.value = houseData[key];
+    value.innerText = houseData[key] + "%";
+  }
+
+  // 🔥 SAVE (no auto overwrite)
+  slider.oninput = async () => {
 
     value.innerText = slider.value + "%";
 
-    const key = gameKeys[game];
-
-    await setDoc(doc(db, "settings", "houseEdge"), {
+    await setDoc(doc(db,"settings","houseEdge"),{
       [key]: Number(slider.value)
-    }, { merge: true });
+    },{ merge:true });
 
   };
 
@@ -127,7 +147,8 @@ games.forEach(game => {
 
 });
 
-</script>
+  </script>
+  
 
 </body>
 </html>
