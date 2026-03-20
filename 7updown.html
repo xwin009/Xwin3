@@ -9,94 +9,101 @@
 body{
   margin:0;
   font-family:Arial;
-  background:url("images/28096-removebg-preview.png") no-repeat center;
+  background:url("images/bg.jpg") no-repeat center;
   background-size:cover;
-  color:#fff;
-  text-align:center;
+  height:100vh;
+  overflow:hidden;
 }
 
-/* MAIN */
+/* FULL SCREEN */
 .app{
-  max-width:420px;
-  margin:auto;
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  align-items:center;
 }
 
-/* HEADER */
-.header{
-  padding:10px;
+/* TOP AREA */
+.top{
+  width:100%;
+  text-align:center;
+  color:#fff;
+  margin-top:10px;
+}
+
+.title{
   font-size:22px;
   font-weight:bold;
 }
 
-/* TIMER */
 .timer{
-  margin:10px;
-  font-size:18px;
+  font-size:20px;
   color:#ffd700;
 }
 
+/* TABLE IMAGE */
+.table{
+  position:relative;
+  width:100%;
+  height:60vh;
+  background:url("images/table.png") no-repeat center;
+  background-size:contain;
+}
 
-/* BET AREAS (invisible clickable) */
+/* CLICK ZONES */
 .zone{
   position:absolute;
-  cursor:pointer;
 }
 
-/* LEFT = BELOW */
+/* BELOW 7 */
 .low{
-  left:5%;
+  left:8%;
   top:20%;
-  width:30%;
-  height:60%;
+  width:28%;
+  height:55%;
 }
 
-/* RIGHT = ABOVE */
+/* ABOVE 7 */
 .high{
-  right:5%;
+  right:8%;
   top:20%;
-  width:30%;
-  height:60%;
+  width:28%;
+  height:55%;
 }
 
-/* CENTER = EXACT */
+/* EXACT 7 */
 .mid{
-  left:35%;
-  top:45%;
-  width:30%;
-  height:30%;
+  left:36%;
+  top:48%;
+  width:28%;
+  height:25%;
 }
 
-/* ACTIVE GLOW */
+/* ACTIVE EFFECT */
 .active{
-  box-shadow:0 0 15px #ffd700 inset;
+  box-shadow:0 0 20px #ffd700 inset;
   border-radius:10px;
 }
 
 /* DICE */
 .dice{
-  margin:15px;
-  font-size:24px;
-}
-
-/* RESULT */
-.result{
-  font-size:18px;
-  margin:10px;
+  font-size:22px;
+  color:#fff;
 }
 
 /* CHIPS */
 .chips{
   display:flex;
-  justify-content:center;
   gap:10px;
-  margin:15px;
+  margin-bottom:10px;
 }
 
 .chips div{
-  background:#444;
+  background:#555;
   padding:12px;
   border-radius:50%;
-  cursor:pointer;
+  color:#fff;
 }
 
 .active-chip{
@@ -106,11 +113,13 @@ body{
 
 /* BUTTON */
 .btn{
-  margin:15px;
-  padding:12px;
+  width:80%;
+  padding:14px;
   background:#222;
-  border-radius:12px;
-  cursor:pointer;
+  border-radius:20px;
+  text-align:center;
+  color:#fff;
+  margin-bottom:20px;
 }
 </style>
 </head>
@@ -119,11 +128,12 @@ body{
 
 <div class="app">
 
-<div class="header">7 UP DOWN</div>
+<div class="top">
+  <div class="title">7 UP DOWN</div>
+  <div class="timer">Time: <span id="time">15</span></div>
+</div>
 
-<div class="timer">Time: <span id="time">15</span></div>
-
-<!-- 🎯 TABLE -->
+<!-- TABLE -->
 <div class="table">
 
   <div class="zone low" onclick="selectBet('LOW',this)"></div>
@@ -134,9 +144,6 @@ body{
 
 <div class="dice" id="dice">🎲 🎲</div>
 
-<div class="result" id="result">Place Bet</div>
-
-<!-- 💰 CHIPS -->
 <div class="chips">
   <div onclick="setChip(10,this)">10</div>
   <div onclick="setChip(50,this)">50</div>
@@ -151,44 +158,29 @@ body{
 
 <script>
 
-let chip = 0;
-let betType = "";
+let chip=0;
+let betType="";
 let interval;
 
-// 🎯 CHIP
-function setChip(val,el){
-  chip = val;
-  document.querySelectorAll(".chips div").forEach(e=>e.classList.remove("active-chip"));
-  el.classList.add("active-chip");
+// CHIP
+function setChip(v,e){
+  chip=v;
+  document.querySelectorAll(".chips div").forEach(el=>el.classList.remove("active-chip"));
+  e.classList.add("active-chip");
 }
 
-// 🎯 BET
+// BET
 function selectBet(type,el){
-  betType = type;
-  document.querySelectorAll(".zone").forEach(e=>e.classList.remove("active"));
+  betType=type;
+  document.querySelectorAll(".zone").forEach(z=>z.classList.remove("active"));
   el.classList.add("active");
 }
 
-// 🎲 ANIMATION
-function rollAnim(cb){
-  let i=0;
-  let anim=setInterval(()=>{
-    let r1=Math.floor(Math.random()*6)+1;
-    let r2=Math.floor(Math.random()*6)+1;
-    document.getElementById("dice").innerText="🎲 "+r1+" 🎲 "+r2;
-    i++;
-    if(i>10){
-      clearInterval(anim);
-      cb();
-    }
-  },100);
-}
-
-// 🚀 START
+// TIMER + GAME
 function startGame(){
 
-  if(!chip) return alert("Select Chip");
-  if(!betType) return alert("Select Bet");
+  if(!chip) return alert("Select chip");
+  if(!betType) return alert("Select bet");
 
   let t=15;
 
@@ -198,14 +190,14 @@ function startGame(){
 
     if(t<0){
       clearInterval(interval);
-      rollAnim(finalResult);
+      result();
     }
 
   },1000);
 }
 
-// 🎯 RESULT
-function finalResult(){
+// RESULT
+function result(){
 
   let d1=Math.floor(Math.random()*6)+1;
   let d2=Math.floor(Math.random()*6)+1;
@@ -213,21 +205,17 @@ function finalResult(){
 
   document.getElementById("dice").innerText="🎲 "+d1+" 🎲 "+d2;
 
-  let resultType;
+  let type;
 
-  if(total<7) resultType="LOW";
-  else if(total>7) resultType="HIGH";
-  else resultType="MID";
+  if(total<7) type="LOW";
+  else if(total>7) type="HIGH";
+  else type="MID";
 
-  let msg="Total: "+total+" → ";
-
-  if(resultType===betType){
-    msg += resultType==="MID" ? "WIN 5x 🎉" : "WIN 2x 🎉";
+  if(type===betType){
+    alert(type==="MID" ? "WIN 5x" : "WIN 2x");
   }else{
-    msg += "LOSS ❌";
+    alert("LOSS");
   }
-
-  document.getElementById("result").innerText=msg;
 }
 
 </script>
