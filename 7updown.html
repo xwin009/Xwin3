@@ -91,9 +91,7 @@ body{
   left:50%;
   transform:translateX(-50%);
   text-align:center;
-  opacity:0;
-  transition:0.3s;
-}
+ }
 
 .result-box.show{
   opacity:1;
@@ -257,7 +255,12 @@ body{
 </div>
 
 <script>
+window.onload = function(){
 
+  document.getElementById("cover").style.display="block";
+  document.getElementById("diceArea").style.display="none";
+
+}
 let chip=0;
 let bets={LOW:0,HIGH:0,MID:0};
 let wallet=10000;
@@ -315,31 +318,21 @@ function result(){
 
   let total=d1+d2;
 
-  let box=document.getElementById("resultBox");
   let cover=document.getElementById("cover");
   let dice=document.getElementById("diceArea");
 
   let d1El=document.getElementById("d1");
   let d2El=document.getElementById("d2");
 
-  // STEP 1: SHOW BOX
-  box.classList.add("show");
-  cover.style.display="block";
-  dice.classList.remove("show");
+  // 🎁 STEP 1: BOX OPEN
+  cover.style.display="none";
 
-  // STEP 2: BOX OPEN
-  setTimeout(()=>{
-    cover.style.display="none";
+  d1El.innerText="🎲 "+d1;
+  d2El.innerText="🎲 "+d2;
 
-    // SHOW DICE
-    d1El.innerText="🎲 "+d1;
-    d2El.innerText="🎲 "+d2;
+  dice.style.display="flex";
 
-    dice.classList.add("show");
-
-  },800);
-
-  // STEP 3: RESULT
+  // 🎯 STEP 2: RESULT
   setTimeout(()=>{
 
     let winType;
@@ -363,11 +356,12 @@ function result(){
 
     updateHistory(winType);
 
-    // HIDE
-    setTimeout(()=>{
-      box.classList.remove("show");
-    },1000);
+  },1000);
 
+  // 🔄 STEP 3: NEXT ROUND RESET
+  setTimeout(()=>{
+    cover.style.display="block";
+    dice.style.display="none";
   },2000);
 }
   
