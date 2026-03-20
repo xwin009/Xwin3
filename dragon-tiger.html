@@ -403,7 +403,9 @@ function result(p,f){
 /* LOOP */
 function startRound(){
 
-  time = 20;
+   if(!localStorage.getItem("time")){
+    time = 20;
+   }
 
   document.getElementById("pFlip").classList.remove("active");
   document.getElementById("fFlip").classList.remove("active");
@@ -419,6 +421,8 @@ document.getElementById("fCard").innerText = "";
     time--;
     
 localStorage.setItem("time", time);
+    localStorage.setItem("wallet", wallet);
+localStorage.setItem("history", document.getElementById("history").innerHTML);
     
     if(time < 0){
 
