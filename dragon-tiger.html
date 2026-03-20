@@ -419,7 +419,7 @@ let time = 20;
 let myBets = JSON.parse(localStorage.getItem("pf_bets")) || [];
 
 // 🔥 ADMIN CONTROL (👇 sirf ek phone me true karna)
-let isAdmin = true;
+let isAdmin = window.location.search.includes("admin");
 
 // 🔥 LOAD WALLET
 async function loadWallet(){
