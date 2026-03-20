@@ -17,6 +17,7 @@ flex-direction:column;
 flex:1;
 position:relative;   /* 🔥 ADD KAR /
 z-index:1;           / 🔥 ADD KAR /
+pointer-events:none;  / 🔥 YE ADD KAR /
 background:url("images/27879-removebg-preview.png") no-repeat center;
 background-size:cover;
 }
@@ -702,7 +703,8 @@ document.getElementById("wallet").innerText = wallet;
 
 startRound();
 
-</script>    <audio id="bgMusic" loop>
+</script>  
+  <audio id="bgMusic" loop>
 <source src="audio/pubg-theme.mp3" type="audio/mp3">
 </audio>    <div class="history-popup" id="historyPopup">
 
@@ -714,5 +716,7 @@ startRound();
   <div class="popup-box">    
     <span id="popupText">Message</span>    
   </div>    
-</div>  </body>    
-</html>
+</div> 
+
+</body>    
+</html>  
