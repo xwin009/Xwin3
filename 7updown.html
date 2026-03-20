@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>7 UP DOWN</title>
+
+<style>
+body{
+  margin:0;
+  font-family:Arial;
+  background:#1a0f2e;
+  color:#fff;
+  text-align:center;
+}
+
+.app{
+  max-width:420px;
+  margin:auto;
+}
+
+/* HEADER */
+.header{
+  padding:12px;
+  font-size:20px;
+  font-weight:bold;
+}
+
+/* TIMER */
+.timer{
+  margin:10px;
+  font-size:18px;
+  color:#ffd700;
+}
+
+/* TABLE */
+.table{
+  background:#14532d;
+  border-radius:20px;
+  padding:15px;
+  margin:10px;
+}
+
+/* BET BOX */
+.bet-area{
+  display:flex;
+  gap:10px;
+}
+
+.box{
+  flex:1;
+  padding:20px 10px;
+  border-radius:10px;
+  font-weight:bold;
+  cursor:pointer;
+  border:2px solid transparent;
+}
+
+.low{ background:#7f1d1d; }
+.high{ background:#166534; }
+.mid{ background:#1e3a8a; margin-top:10px; }
+
+.active-box{
+  border:2px solid #ffd700;
+}
+
+/* DICE */
+.dice-area{
+  margin:15px;
+  font-size:22px;
+}
+
+/* RESULT */
+.result{
+  font-size:20px;
+  margin:10px;
+}
+
+/* CHIPS */
+.chips{
+  display:flex;
+  justify-content:center;
+  gap:10px;
+  margin:10px;
+}
+
+.chips div{
+  background:#333;
+  padding:12px;
+  border-radius:50%;
+  cursor:pointer;
+}
+
+.active-chip{
+  background:#ffd700;
+  color:#000;
+}
+
+/* BUTTON */
+.btn{
+  margin:10px;
+  padding:12px;
+  background:#444;
+  border-radius:10px;
+  cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<div class="header">7 UP DOWN</div>
+
+<div class="timer">Time: <span id="time">15</span></div>
+
+<div class="table">
+
+  <div class="bet-area">
+    <div class="box low" onclick="selectBet('LOW',this)">BELOW 7</div>
+    <div class="box high" onclick="selectBet('HIGH',this)">ABOVE 7</div>
+  </div>
+
+  <div class="box mid" onclick="selectBet('MID',this)">EXACT 7 (5x)</div>
+
+</div>
+
+<div class="dice-area" id="dice">🎲 🎲</div>
+
+<div class="result" id="result">Place Bet</div>
+
+<div class="chips">
+  <div onclick="setChip(10,this)">10</div>
+  <div onclick="setChip(50,this)">50</div>
+  <div onclick="setChip(100,this)">100</div>
+  <div onclick="setChip(500,this)">500</div>
+  <div onclick="setChip(1000,this)">1000</div>
+</div>
+
+<div class="btn" onclick="startGame()">REBET</div>
+
+</div>
+
+<script>
+
+let chip = 0;
+let betType = "";
+let time = 15;
+let interval;
+
+// 🎯 CHIP SELECT
+function setChip(val,el){
+  chip = val;
+  document.querySelectorAll(".chips div").forEach(e=>e.classList.remove("active-chip"));
+  el.classList.add("active-chip");
+}
+
+// 🎯 BET SELECT
+function selectBet(type,el){
+  betType = type;
+  document.querySelectorAll(".box").forEach(e=>e.classList.remove("active-box"));
+  el.classList.add("active-box");
+}
+
+// 🎲 DICE ROLL ANIMATION
+function rollAnimation(callback){
+  let i = 0;
+  let anim = setInterval(()=>{
+    let r1 = Math.floor(Math.random()*6)+1;
+    let r2 = Math.floor(Math.random()*6)+1;
+    document.getElementById("dice").innerText = "🎲 "+r1+"   🎲 "+r2;
+    i++;
+    if(i>10){
+      clearInterval(anim);
+      callback();
+    }
+  },100);
+}
+
+// 🚀 GAME START
+function startGame(){
+
+  if(!chip) return alert("Select Chip");
+  if(!betType) return alert("Select Bet");
+
+  let t = 15;
+  document.getElementById("result").innerText = "Betting...";
+
+  clearInterval(interval);
+
+  interval = setInterval(()=>{
+    document.getElementById("time").innerText = t;
+    t--;
+
+    if(t <= 0){
+      clearInterval(interval);
+
+      // 🎲 roll
+      rollAnimation(finalResult);
+    }
+
+  },1000);
+}
+
+// 🎯 FINAL RESULT
+function finalResult(){
+
+  let d1 = Math.floor(Math.random()*6)+1;
+  let d2 = Math.floor(Math.random()*6)+1;
+  let total = d1 + d2;
+
+  document.getElementById("dice").innerText = "🎲 "+d1+"   🎲 "+d2;
+
+  let resultType;
+
+  if(total < 7) resultType = "LOW";
+  else if(total > 7) resultType = "HIGH";
+  else resultType = "MID";
+
+  let msg = "Total: " + total + " → ";
+
+  if(resultType === betType){
+    if(resultType === "MID"){
+      msg += "WIN 5x 🎉";
+    }else{
+      msg += "WIN 2x 🎉";
+    }
+  }else{
+    msg += "LOSS ❌";
+  }
+
+  document.getElementById("result").innerText = msg;
+
+}
+
+</script>
+
+</body>
+</html>
