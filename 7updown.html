@@ -87,9 +87,10 @@ body{
 }
 .result-box{
   position:absolute;
-  top:8%;
+  top:10%;
   left:50%;
   transform:translateX(-50%);
+  text-align:center;
 }
 
 #dome{
@@ -233,16 +234,11 @@ body{
 
   <!-- 🟡 GLASS DOME -->
   <div id="resultBox" class="result-box">
-
-  <!-- 🟡 DOME IMAGE -->
-  <img src="images/28198-removebg-preview.png" id="dome">
-
-  <!-- 🎲 DICE -->
+  <div id="cover">🎁</div>
   <div id="diceArea">
-    <div id="dice1" class="dice">🎲</div>
-    <div id="dice2" class="dice">🎲</div>
+    <span id="d1">🎲</span>
+    <span id="d2">🎲</span>
   </div>
-
   </div>
     
     <div class="box low" onclick="bet('LOW',this)">
@@ -339,31 +335,21 @@ function result(){
 
   let total=d1+d2;
 
-  let diceArea=document.getElementById("diceArea");
-  let d1El=document.getElementById("dice1");
-  let d2El=document.getElementById("dice2");
+  let cover=document.getElementById("cover");
+  let dice=document.getElementById("diceArea");
 
-  // 🎯 STEP 1: SHAKE
-  diceArea.classList.add("shake");
+  let d1El=document.getElementById("d1");
+  let d2El=document.getElementById("d2");
 
-  // 🎲 STEP 2: RANDOM ROLL EFFECT
-  let roll=setInterval(()=>{
-    d1El.innerText = Math.floor(Math.random()*6)+1;
-    d2El.innerText = Math.floor(Math.random()*6)+1;
-  },100);
+  // 🎁 STEP 1: BOX OPEN
+  cover.style.display="none";
 
-  // 🎯 STEP 3: STOP + FINAL RESULT
-  setTimeout(()=>{
-    clearInterval(roll);
+  d1El.innerText="🎲 "+d1;
+  d2El.innerText="🎲 "+d2;
 
-    diceArea.classList.remove("shake");
+  dice.style.display="flex";
 
-    d1El.innerText = d1;
-    d2El.innerText = d2;
-
-  },1200);
-
-  // 💰 STEP 4: RESULT LOGIC
+  // 🎯 STEP 2: RESULT
   setTimeout(()=>{
 
     let winType;
@@ -387,8 +373,8 @@ function result(){
 
     updateHistory(winType);
 
-  },1500);
-}
+  },1000);
+  
   // 🔄 STEP 3: NEXT ROUND RESET
   setTimeout(()=>{
     cover.style.display="block";
