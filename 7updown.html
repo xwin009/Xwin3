@@ -9,101 +9,108 @@
 body{
   margin:0;
   font-family:Arial;
-  background:url("images/bg.jpg") no-repeat center;
-  background-size:cover;
+  background:linear-gradient(180deg,#2b0f3a,#14081d);
   height:100vh;
-  overflow:hidden;
+  color:#fff;
 }
 
-/* FULL SCREEN */
+/* APP */
 .app{
   height:100vh;
   display:flex;
   flex-direction:column;
-  justify-content:space-between;
-  align-items:center;
 }
 
-/* TOP AREA */
+/* TOP */
 .top{
-  width:100%;
   text-align:center;
-  color:#fff;
-  margin-top:10px;
-}
-
-.title{
-  font-size:22px;
-  font-weight:bold;
+  padding:10px;
 }
 
 .timer{
-  font-size:20px;
+  font-size:22px;
   color:#ffd700;
 }
 
-/* TABLE IMAGE */
+/* TABLE */
+.table-wrapper{
+  flex:1;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
 .table{
-  position:relative;
-  width:100%;
+  width:90%;
   height:60vh;
-  background:url("images/table.png") no-repeat center;
-  background-size:contain;
+  background:linear-gradient(180deg,#14532d,#0f3a23);
+  border-radius:30px;
+  border:3px solid #caa85c;
+  position:relative;
+  box-shadow:0 0 30px rgba(0,0,0,0.6);
 }
 
-/* CLICK ZONES */
-.zone{
+/* BOXES */
+.box{
   position:absolute;
+  border-radius:20px;
+  border:2px solid rgba(255,255,255,0.2);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-size:18px;
+  font-weight:bold;
 }
 
-/* BELOW 7 */
+/* BELOW */
 .low{
-  left:8%;
-  top:20%;
-  width:28%;
-  height:55%;
+  left:5%;
+  top:15%;
+  width:30%;
+  height:60%;
 }
 
-/* ABOVE 7 */
+/* ABOVE */
 .high{
-  right:8%;
-  top:20%;
-  width:28%;
-  height:55%;
+  right:5%;
+  top:15%;
+  width:30%;
+  height:60%;
 }
 
-/* EXACT 7 */
+/* EXACT */
 .mid{
-  left:36%;
-  top:48%;
-  width:28%;
-  height:25%;
+  left:35%;
+  bottom:10%;
+  width:30%;
+  height:30%;
 }
 
-/* ACTIVE EFFECT */
+/* ACTIVE */
 .active{
   box-shadow:0 0 20px #ffd700 inset;
-  border-radius:10px;
+  border:2px solid #ffd700;
 }
 
 /* DICE */
 .dice{
+  text-align:center;
   font-size:22px;
-  color:#fff;
+  margin:5px;
 }
 
 /* CHIPS */
 .chips{
   display:flex;
+  justify-content:center;
   gap:10px;
-  margin-bottom:10px;
+  margin-top:10px;
 }
 
 .chips div{
-  background:#555;
+  background:#444;
   padding:12px;
   border-radius:50%;
-  color:#fff;
 }
 
 .active-chip{
@@ -113,13 +120,11 @@ body{
 
 /* BUTTON */
 .btn{
-  width:80%;
+  margin:15px;
   padding:14px;
   background:#222;
   border-radius:20px;
   text-align:center;
-  color:#fff;
-  margin-bottom:20px;
 }
 </style>
 </head>
@@ -129,16 +134,18 @@ body{
 <div class="app">
 
 <div class="top">
-  <div class="title">7 UP DOWN</div>
   <div class="timer">Time: <span id="time">15</span></div>
 </div>
 
-<!-- TABLE -->
-<div class="table">
+<div class="table-wrapper">
 
-  <div class="zone low" onclick="selectBet('LOW',this)"></div>
-  <div class="zone high" onclick="selectBet('HIGH',this)"></div>
-  <div class="zone mid" onclick="selectBet('MID',this)"></div>
+  <div class="table">
+
+    <div class="box low" onclick="selectBet('LOW',this)">BELOW 7</div>
+    <div class="box high" onclick="selectBet('HIGH',this)">ABOVE 7</div>
+    <div class="box mid" onclick="selectBet('MID',this)">EXACT 7</div>
+
+  </div>
 
 </div>
 
@@ -172,11 +179,11 @@ function setChip(v,e){
 // BET
 function selectBet(type,el){
   betType=type;
-  document.querySelectorAll(".zone").forEach(z=>z.classList.remove("active"));
+  document.querySelectorAll(".box").forEach(b=>b.classList.remove("active"));
   el.classList.add("active");
 }
 
-// TIMER + GAME
+// GAME
 function startGame(){
 
   if(!chip) return alert("Select chip");
@@ -201,12 +208,12 @@ function result(){
 
   let d1=Math.floor(Math.random()*6)+1;
   let d2=Math.floor(Math.random()*6)+1;
-  let total=d1+d2;
 
   document.getElementById("dice").innerText="🎲 "+d1+" 🎲 "+d2;
 
-  let type;
+  let total=d1+d2;
 
+  let type;
   if(total<7) type="LOW";
   else if(total>7) type="HIGH";
   else type="MID";
