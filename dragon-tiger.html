@@ -242,7 +242,74 @@ background-repeat:no-repeat;
   color:#000;
   font-weight:bold;
 }
-  
+  .history-btn{
+  position:absolute;
+  left:10px;
+  top:10px;
+  background:#111;
+  padding:6px 12px;
+  border-radius:8px;
+  font-size:12px;
+}
+
+.history-popup{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.7);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:999;
+}
+
+.history-box{
+  width:90%;
+  max-width:350px;
+  background:linear-gradient(145deg,#0f172a,#020617);
+  border-radius:16px;
+  padding:15px;
+  box-shadow:0 0 25px #00ffcc;
+  animation:pop 0.3s ease;
+}
+
+.history-header{
+  display:flex;
+  justify-content:space-between;
+  margin-bottom:10px;
+  font-weight:bold;
+}
+
+#historyList{
+  max-height:300px;
+  overflow-y:auto;
+}
+
+/* 🔥 ITEM DESIGN */
+.history-item{
+  padding:10px;
+  border-radius:10px;
+  margin-bottom:8px;
+  display:flex;
+  justify-content:space-between;
+  font-size:13px;
+}
+
+/* 🟢 WIN STYLE */
+.win{
+  background:rgba(0,255,150,0.1);
+  border:1px solid #00ff99;
+  box-shadow:0 0 10px #00ff99;
+}
+
+/* 🔴 LOSS STYLE */
+.loss{
+  background:rgba(255,0,80,0.1);
+  border:1px solid #ff0055;
+  box-shadow:0 0 10px #ff0055;
+}
 .table-bg{
   background:url("images/27879-removebg-preview.png") no-repeat center;
   background-size:cover;
@@ -295,6 +362,9 @@ background-repeat:no-repeat;
 
   <div class="header">
     <b>PUBG & FREE FIRE</b>
+    
+    <div onclick="openHistory()" class="history-btn">📜 History</div>
+    
     <div class="wallet">₹ <span id="wallet">2000</span></div>
 
   <div class="cards">
@@ -536,6 +606,34 @@ function result(p,f){
 }
 
 // 🔥 GAME LOOP
+    function openHistory(){
+  document.getElementById("historyPopup").style.display = "flex";
+  renderPopupHistory();
+}
+
+function closeHistory(){
+  document.getElementById("historyPopup").style.display = "none";
+}
+
+function renderPopupHistory(){
+  const list = document.getElementById("historyList");
+  list.innerHTML = "";
+
+  myBets.forEach(b=>{
+
+    let div = document.createElement("div");
+
+    div.className = "history-item " + (b.status === "WIN" ? "win" : "loss");
+
+    div.innerHTML = `
+      <span>${b.type}</span>
+      <span>₹${b.amount}</span>
+      <span>${b.time}</span>
+    `;
+
+    list.appendChild(div);
+  });
+}
 function startRound(){
 
   clearInterval(gameInterval);
@@ -623,6 +721,19 @@ startRound();
   <audio id="bgMusic" loop>
   <source src="audio/pubg-theme.mp3" type="audio/mp3">
   </audio>
+
+  <div class="history-popup" id="historyPopup">
+  <div class="history-box">
+    
+    <div class="history-header">
+      <span>My Betting History</span>
+      <span onclick="closeHistory()">✖</span>
+    </div>
+
+    <div id="historyList"></div>
+
+  </div>
+</div>
   
 <div id="popup" class="popup">
   <div class="popup-box">
