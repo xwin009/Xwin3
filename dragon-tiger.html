@@ -336,7 +336,15 @@ font-size:16px;
 box-shadow:0 0 20px #00ffcc;
 animation:pop 0.3s ease;
 }
+.win-popup{
+  color:#00ff99;
+  font-weight:bold;
+}
 
+.loss-popup{
+  color:#ff4d4d;
+  font-weight:bold;
+}
 @keyframes pop{
 from{transform:scale(0.7);}
 to{transform:scale(1);}
@@ -424,7 +432,11 @@ let free = 0;
 let tie = 0;
 let time = 20;
 let gameInterval;
+const cards = ["A","K","Q","J","10","9","8","7","6","5","4","3","2"];
 
+  function getRandomCard(){
+  return cards[Math.floor(Math.random() * cards.length)];
+}
 // 🔥 LOAD WALLET
 async function loadWallet(){
 const snap = await getDocs(
@@ -467,13 +479,23 @@ hist.scrollLeft = hist.scrollWidth;
 },100);
 
 // 🔥 POPUP
-function showPopup(msg){
+function showPopup(msg, win){
+
 const p = document.getElementById("popup");
-document.getElementById("popupText").innerText = msg;
+const box = document.getElementById("popupText");
+
+box.innerText = msg;
+
+if(win){
+  box.className = "popup-box win-popup";
+}else{
+  box.className = "popup-box loss-popup";
+}
+
 p.classList.add("show");
 
 setTimeout(()=>{
-p.classList.remove("show");
+  p.classList.remove("show");
 },1500);
 }
 
@@ -617,13 +639,14 @@ if(time < 0){
 
   const win = controlledResult();    
 
-  let p,f;    
+  let p = getRandomCard();
+let f = getRandomCard();
 
-  if(win=="PUBG"){    
-    p="K"; f="10";    
-  }else{    
-    p="10"; f="K";    
-  }    
+// 🔥 ensure win logic follow ho
+while(result(p,f) !== win){
+  p = getRandomCard();
+  f = getRandomCard();
+}
 
   document.getElementById("pCard").innerText = p;    
   document.getElementById("fCard").innerText = f;    
@@ -641,9 +664,32 @@ if(time < 0){
   const hist = document.getElementById("history");    
   hist.scrollLeft = hist.scrollWidth;    
 
-  if(r=="PUBG") wallet += pubg * 2;    
-  if(r=="FREE") wallet += free * 2;    
-  if(r=="TIE") wallet += tie * 9;    
+  let winAmount = 0;
+let lossAmount = 0;
+
+// WIN / LOSS CALCULATION
+if(r=="PUBG"){
+  winAmount = pubg * 2;
+  wallet += winAmount;
+  lossAmount = free + tie;
+}
+else if(r=="FREE"){
+  winAmount = free * 2;
+  wallet += winAmount;
+  lossAmount = pubg + tie;
+}
+else{
+  winAmount = tie * 9;
+  wallet += winAmount;
+  lossAmount = pubg + free;
+}
+
+// 🔥 POPUP SHOW
+if(winAmount > 0){
+  showPopup("WIN +₹" + winAmount, true);
+}else{
+  showPopup("LOSS -₹" + lossAmount, false);
+}
 
   // 🔥 SAVE BET HISTORY
 
