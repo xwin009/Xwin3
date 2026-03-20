@@ -85,26 +85,36 @@ body{
   border:4px solid gold;
   position:relative;
 }
-  .result-box{
+ .result-box{
   position:absolute;
   top:10%;
   left:50%;
   transform:translateX(-50%);
-  font-size:40px;
-  font-weight:bold;
-  color:#fff;
-
+  text-align:center;
   opacity:0;
   transition:0.3s;
-
-  text-shadow:0 0 15px #fff;
 }
 
 .result-box.show{
   opacity:1;
-  transform:translateX(-50%) scale(1.2);
 }
 
+/* 🎁 COVER */
+#cover{
+  font-size:40px;
+}
+
+/* 🎲 DICE AREA */
+#diceArea{
+  display:none;
+  font-size:30px;
+  gap:10px;
+}
+
+#diceArea.show{
+  display:flex;
+  justify-content:center;
+}
 /* BOX */
 .box{
   position:absolute;
@@ -208,7 +218,13 @@ body{
 <div class="table-wrap">
   <div class="table">
     
-<div id="resultBox" class="result-box">?</div>
+<div id="resultBox" class="result-box">
+  <div id="cover">🎁</div>
+  <div id="diceArea">
+    <span id="d1">🎲</span>
+    <span id="d2">🎲</span>
+  </div>
+</div>
     
     <div class="box low" onclick="bet('LOW',this)">
       BELOW 7 <span>(B)</span>
@@ -300,28 +316,32 @@ function result(){
   let total=d1+d2;
 
   let box=document.getElementById("resultBox");
+  let cover=document.getElementById("cover");
+  let dice=document.getElementById("diceArea");
 
-  // 🎯 STEP 1: SHOW ROLLING EFFECT
+  let d1El=document.getElementById("d1");
+  let d2El=document.getElementById("d2");
+
+  // STEP 1: SHOW BOX
   box.classList.add("show");
-  box.innerText="🎲";
+  cover.style.display="block";
+  dice.classList.remove("show");
 
+  // STEP 2: BOX OPEN
+  setTimeout(()=>{
+    cover.style.display="none";
+
+    // SHOW DICE
+    d1El.innerText="🎲 "+d1;
+    d2El.innerText="🎲 "+d2;
+
+    dice.classList.add("show");
+
+  },800);
+
+  // STEP 3: RESULT
   setTimeout(()=>{
 
-    // 🎯 STEP 2: SHOW FINAL RESULT
-    box.innerText = d1 + " + " + d2;
-
-  },500);
-
-  setTimeout(()=>{
-
-    // 🎯 STEP 3: SHOW TOTAL
-    box.innerText = total;
-
-  },1000);
-
-  setTimeout(()=>{
-
-    // 🎯 FINAL RESULT LOGIC
     let winType;
 
     if(total<7) winType="LOW";
@@ -343,14 +363,14 @@ function result(){
 
     updateHistory(winType);
 
-    // 🔥 hide result
+    // HIDE
     setTimeout(()=>{
       box.classList.remove("show");
     },1000);
 
-  },1500);
+  },2000);
 }
-
+  
 function updateHistory(type){
 
   let h=document.getElementById("history");
