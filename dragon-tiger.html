@@ -468,10 +468,13 @@ function startRound(){
       const h = document.createElement("div");
       h.innerText = r[0];
       h.classList.add(r[0]); // 🔥 ye add kar
-      document.getElementById("history").prepend(h);
-      const hist = document.getElementById("history");
-hist.scrollLeft = hist.scrollWidth;
-
+      document.getElementById("history").appendChild(h);
+      setTimeout(()=>{
+  h.scrollIntoView({
+    behavior: "smooth",
+    inline: "center"
+  });
+});
       if(r=="PUBG") wallet += pubg * 2;
       if(r=="FREE") wallet += free * 2;
       if(r=="TIE") wallet += tie * 9;
