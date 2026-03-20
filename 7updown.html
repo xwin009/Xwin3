@@ -141,19 +141,23 @@ body{
 /* POPUP */
 .popup{
   position:fixed;
+  top:0;
+  left:0;
   width:100%;
   height:100%;
   display:flex;
   justify-content:center;
   align-items:center;
   background:rgba(0,0,0,0.6);
+
+  visibility:hidden;   /* 🔥 important */
   opacity:0;
-  pointer-events:none;
+  transition:0.3s;
 }
 
 .popup.show{
+  visibility:visible;
   opacity:1;
-  pointer-events:auto;
 }
 
 .popup-box{
@@ -226,9 +230,9 @@ setInterval(()=>{
 
   document.getElementById("timer").innerText=time;
 
-  if(time==5){
-    bettingOpen=false;
-    showPopup("BET LOCK",null,true);
+  if(time===5){
+  bettingOpen=false;
+  showPopup("BET LOCK",null,true);
   }
 
   time--;
@@ -334,7 +338,9 @@ function showPopup(msg,win,lock=false){
 
   p.classList.add("show");
 
-  setTimeout(()=>p.classList.remove("show"),2000);
+  setTimeout(()=>{
+    p.classList.remove("show");
+  },2000);
 }
 
 </script>
