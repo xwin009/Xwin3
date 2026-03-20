@@ -183,16 +183,27 @@ body{
 .box{
   width:45%;
   height:180px;
-  background:#1f2937;
   border-radius:14px;
-  display:flex;
-  align-items:flex-end;
-  justify-content:center;
   position:relative;
   font-size:16px;
   padding-bottom:10px;
+
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+
+  /* 🔥 IMAGE SETTINGS */
+  background-size:contain;   /* 👈 important */
+  background-position:center;
+  background-repeat:no-repeat;
+}
+.pubg-box{
+  background-image:url("images/27826-removebg-preview.png");
 }
 
+.free-box{
+  background-image:url("images/27825-removebg-preview.png");
+}
 .amount{
   position:absolute;
   top:6px;
@@ -320,15 +331,15 @@ body{
   </div>
 
   <div class="bet">
-    <div class="box" onclick="betPlace('PUBG')">
-      <div class="amount" id="pubgAmt">0</div>
-      PUBG
-    </div>
+    <div class="box pubg-box" onclick="betPlace('PUBG')">
+  <div class="amount" id="pubgAmt">0</div>
+  PUBG
+</div>
 
-    <div class="box" onclick="betPlace('FREE')">
-      <div class="amount" id="freeAmt">0</div>
-      FREE FIRE
-    </div>
+<div class="box free-box" onclick="betPlace('FREE')">
+  <div class="amount" id="freeAmt">0</div>
+  FREE FIRE
+</div>
   </div>
 
   <div class="chips" id="chips">
