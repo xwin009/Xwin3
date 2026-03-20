@@ -7,7 +7,6 @@
 <style>
 body{
   margin:0;
-  height:100vh;
   font-family:Arial;
   background:linear-gradient(180deg,#3b0d4f,#1a0826);
   color:#fff;
@@ -21,35 +20,24 @@ body{
   margin-top:10px;
 }
 
-/* TABLE WRAP */
+/* TABLE */
 .table-wrap{
-  height:70vh;
+  height:65vh;
   display:flex;
   justify-content:center;
   align-items:center;
 }
 
-/* 🎰 CASINO TABLE */
 .table{
   width:90%;
-  height:85%;
-  position:relative;
-
-  /* 🎯 SHAPE */
+  height:90%;
   border-radius:40px 40px 80px 80px;
-
-  /* 🎯 GREEN */
-  background:radial-gradient(circle at center,#166534,#0f3a23);
-
-  /* 🎯 GOLD BORDER */
-  border:4px solid #d4af37;
-
-  box-shadow:
-    inset 0 0 30px rgba(0,0,0,0.6),
-    0 0 20px rgba(0,0,0,0.8);
+  background:radial-gradient(circle,#166534,#0f3a23);
+  border:4px solid gold;
+  position:relative;
+  box-shadow:0 0 30px #000 inset;
 }
 
-/* 🎯 INNER LINE (table design) */
 .table::before{
   content:"";
   position:absolute;
@@ -61,7 +49,7 @@ body{
   border:2px solid rgba(255,255,255,0.2);
 }
 
-/* BOX COMMON */
+/* BET BOX */
 .box{
   position:absolute;
   border-radius:20px;
@@ -69,38 +57,28 @@ body{
   display:flex;
   justify-content:center;
   align-items:center;
-  font-size:18px;
   font-weight:bold;
+  font-size:18px;
+  flex-direction:column;
+  transition:0.2s;
 }
 
-/* BELOW */
-.low{
-  left:8%;
-  top:15%;
-  width:28%;
-  height:60%;
-}
+/* POSITIONS */
+.low{ left:8%; top:15%; width:28%; height:60%; }
+.high{ right:8%; top:15%; width:28%; height:60%; }
+.mid{ left:36%; bottom:8%; width:28%; height:30%; }
 
-/* ABOVE */
-.high{
-  right:8%;
-  top:15%;
-  width:28%;
-  height:60%;
-}
-
-/* EXACT */
-.mid{
-  left:36%;
-  bottom:8%;
-  width:28%;
-  height:30%;
-}
-
-/* ACTIVE EFFECT */
-.active{
+/* HOVER GLOW */
+.box.active{
   border:2px solid #ffd700;
-  box-shadow:0 0 20px #ffd700 inset;
+  box-shadow:0 0 20px #ffd700 inset, 0 0 20px #ffd700;
+}
+
+/* BET AMOUNT */
+.amount{
+  margin-top:6px;
+  font-size:14px;
+  color:#ffd700;
 }
 
 /* DICE */
@@ -110,32 +88,79 @@ body{
   margin-top:10px;
 }
 
-/* CHIPS */
+/* 🎯 CHIPS DESIGN */
 .chips{
   display:flex;
   justify-content:center;
-  gap:10px;
-  margin-top:10px;
+  gap:12px;
+  margin-top:15px;
 }
 
-.chips div{
-  background:#444;
-  padding:12px;
+.chip{
+  width:55px;
+  height:55px;
   border-radius:50%;
+  background:radial-gradient(circle,#666,#222);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-weight:bold;
+  cursor:pointer;
+  box-shadow:0 0 10px #000;
+  transition:0.2s;
 }
 
-.active-chip{
-  background:#ffd700;
+.chip.active{
+  background:gold;
   color:#000;
+  box-shadow:0 0 15px gold;
 }
 
-/* BUTTON */
-.btn{
-  margin:15px;
-  padding:14px;
-  background:#222;
-  border-radius:20px;
+/* POPUP */
+.popup{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:rgba(0,0,0,0.6);
+  opacity:0;
+  pointer-events:none;
+  transition:0.3s;
+}
+
+.popup.show{
+  opacity:1;
+  pointer-events:auto;
+}
+
+.popup-box{
+  padding:20px 30px;
+  border-radius:15px;
+  font-size:20px;
+  font-weight:bold;
   text-align:center;
+  animation:pop 0.3s;
+}
+
+.win{
+  background:#065f46;
+  color:#00ff99;
+  box-shadow:0 0 20px #00ff99;
+}
+
+.loss{
+  background:#7f1d1d;
+  color:#ff4d4d;
+  box-shadow:0 0 20px #ff4d4d;
+}
+
+@keyframes pop{
+  from{transform:scale(0.5);}
+  to{transform:scale(1);}
 }
 </style>
 </head>
@@ -145,66 +170,79 @@ body{
 <div class="timer">Time: <span id="time">15</span></div>
 
 <div class="table-wrap">
-
   <div class="table">
 
-    <div class="box low" onclick="selectBet('LOW',this)">BELOW 7</div>
-    <div class="box high" onclick="selectBet('HIGH',this)">ABOVE 7</div>
-    <div class="box mid" onclick="selectBet('MID',this)">EXACT 7</div>
+    <div class="box low" onclick="bet('LOW',this)">
+      BELOW 7
+      <div class="amount" id="lowAmt">0</div>
+    </div>
+
+    <div class="box high" onclick="bet('HIGH',this)">
+      ABOVE 7
+      <div class="amount" id="highAmt">0</div>
+    </div>
+
+    <div class="box mid" onclick="bet('MID',this)">
+      EXACT 7
+      <div class="amount" id="midAmt">0</div>
+    </div>
 
   </div>
-
 </div>
 
 <div class="dice" id="dice">🎲 🎲</div>
 
 <div class="chips">
-  <div onclick="setChip(10,this)">10</div>
-  <div onclick="setChip(50,this)">50</div>
-  <div onclick="setChip(100,this)">100</div>
-  <div onclick="setChip(500,this)">500</div>
-  <div onclick="setChip(1000,this)">1000</div>
+  <div class="chip" onclick="setChip(10,this)">10</div>
+  <div class="chip" onclick="setChip(50,this)">50</div>
+  <div class="chip" onclick="setChip(100,this)">100</div>
+  <div class="chip" onclick="setChip(500,this)">500</div>
+  <div class="chip" onclick="setChip(1000,this)">1000</div>
 </div>
 
-<div class="btn" onclick="startGame()">REBET</div>
+<!-- POPUP -->
+<div class="popup" id="popup">
+  <div class="popup-box" id="popupText"></div>
+</div>
 
 <script>
 
 let chip=0;
-let betType="";
-let interval;
+let bets={LOW:0,HIGH:0,MID:0};
 
+// CHIP SELECT
 function setChip(v,e){
   chip=v;
-  document.querySelectorAll(".chips div").forEach(el=>el.classList.remove("active-chip"));
-  e.classList.add("active-chip");
+  document.querySelectorAll(".chip").forEach(c=>c.classList.remove("active"));
+  e.classList.add("active");
 }
 
-function selectBet(type,el){
-  betType=type;
-  document.querySelectorAll(".box").forEach(b=>b.classList.remove("active"));
+// PLACE BET (MULTIPLE)
+function bet(type,el){
+  if(!chip) return;
+
+  bets[type]+=chip;
+
+  document.getElementById(type.toLowerCase()+"Amt").innerText=bets[type];
+
   el.classList.add("active");
 }
 
-function startGame(){
+// GAME LOOP
+let t=15;
+setInterval(()=>{
+  document.getElementById("time").innerText=t;
+  t--;
 
-  if(!chip) return alert("Select chip");
-  if(!betType) return alert("Select bet");
+  if(t<0){
+    result();
+    t=15;
+    reset();
+  }
 
-  let t=15;
+},1000);
 
-  interval=setInterval(()=>{
-    document.getElementById("time").innerText=t;
-    t--;
-
-    if(t<0){
-      clearInterval(interval);
-      result();
-    }
-
-  },1000);
-}
-
+// RESULT
 function result(){
 
   let d1=Math.floor(Math.random()*6)+1;
@@ -214,16 +252,45 @@ function result(){
 
   let total=d1+d2;
 
-  let type;
-  if(total<7) type="LOW";
-  else if(total>7) type="HIGH";
-  else type="MID";
+  let winType;
+  if(total<7) winType="LOW";
+  else if(total>7) winType="HIGH";
+  else winType="MID";
 
-  if(type===betType){
-    alert(type==="MID" ? "WIN 5x" : "WIN 2x");
+  let winAmount=0;
+
+  if(bets[winType]>0){
+    winAmount = winType=="MID" ? bets[winType]*5 : bets[winType]*2;
+    showPopup("WIN ₹"+winAmount,true);
   }else{
-    alert("LOSS");
+    showPopup("LOSS",false);
   }
+}
+
+// RESET
+function reset(){
+  bets={LOW:0,HIGH:0,MID:0};
+  document.getElementById("lowAmt").innerText=0;
+  document.getElementById("highAmt").innerText=0;
+  document.getElementById("midAmt").innerText=0;
+
+  document.querySelectorAll(".box").forEach(b=>b.classList.remove("active"));
+}
+
+// POPUP
+function showPopup(msg,win){
+
+  const p=document.getElementById("popup");
+  const box=document.getElementById("popupText");
+
+  box.innerText=msg;
+  box.className="popup-box "+(win?"win":"loss");
+
+  p.classList.add("show");
+
+  setTimeout(()=>{
+    p.classList.remove("show");
+  },2000);
 }
 
 </script>
