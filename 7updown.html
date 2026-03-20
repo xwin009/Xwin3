@@ -85,33 +85,46 @@ body{
   border:4px solid gold;
   position:relative;
 }
- .result-box{
+.result-box{
   position:absolute;
-  top:10%;
+  top:8%;
   left:50%;
   transform:translateX(-50%);
-  text-align:center;
- }
-
-.result-box.show{
-  opacity:1;
 }
 
-/* 🎁 COVER */
-#cover{
-  font-size:40px;
+#dome{
+  width:140px;
 }
 
-/* 🎲 DICE AREA */
+/* 🎲 Dice inside dome */
 #diceArea{
-  display:none;
-  font-size:30px;
+  position:absolute;
+  top:55%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  display:flex;
   gap:10px;
 }
 
-#diceArea.show{
-  display:flex;
-  justify-content:center;
+.dice{
+  font-size:28px;
+  background:#fff;
+  color:#000;
+  padding:8px;
+  border-radius:8px;
+}
+
+/* 🔥 REAL SHAKE */
+@keyframes shake{
+  0%{transform:translate(-50%,-50%) translateX(0);}
+  25%{transform:translate(-50%,-50%) translateX(-8px);}
+  50%{transform:translate(-50%,-50%) translateX(8px);}
+  75%{transform:translate(-50%,-50%) translateX(-8px);}
+  100%{transform:translate(-50%,-50%) translateX(0);}
+}
+
+.shake{
+  animation:shake
 }
 /* BOX */
 .box{
@@ -217,12 +230,20 @@ body{
   <div class="table">
     
 <div id="resultBox" class="result-box">
-  <div id="cover">🎁</div>
+
+  <!-- 🟡 GLASS DOME -->
+  <div id="resultBox" class="result-box">
+
+  <!-- 🟡 DOME IMAGE -->
+  <img src="images/28198-removebg-preview.png" id="dome">
+
+  <!-- 🎲 DICE -->
   <div id="diceArea">
-    <span id="d1">🎲</span>
-    <span id="d2">🎲</span>
+    <div id="dice1" class="dice">🎲</div>
+    <div id="dice2" class="dice">🎲</div>
   </div>
-</div>
+
+  </div>
     
     <div class="box low" onclick="bet('LOW',this)">
       BELOW 7 <span>(B)</span>
@@ -318,21 +339,31 @@ function result(){
 
   let total=d1+d2;
 
-  let cover=document.getElementById("cover");
-  let dice=document.getElementById("diceArea");
+  let diceArea=document.getElementById("diceArea");
+  let d1El=document.getElementById("dice1");
+  let d2El=document.getElementById("dice2");
 
-  let d1El=document.getElementById("d1");
-  let d2El=document.getElementById("d2");
+  // 🎯 STEP 1: SHAKE
+  diceArea.classList.add("shake");
 
-  // 🎁 STEP 1: BOX OPEN
-  cover.style.display="none";
+  // 🎲 STEP 2: RANDOM ROLL EFFECT
+  let roll=setInterval(()=>{
+    d1El.innerText = Math.floor(Math.random()*6)+1;
+    d2El.innerText = Math.floor(Math.random()*6)+1;
+  },100);
 
-  d1El.innerText="🎲 "+d1;
-  d2El.innerText="🎲 "+d2;
+  // 🎯 STEP 3: STOP + FINAL RESULT
+  setTimeout(()=>{
+    clearInterval(roll);
 
-  dice.style.display="flex";
+    diceArea.classList.remove("shake");
 
-  // 🎯 STEP 2: RESULT
+    d1El.innerText = d1;
+    d2El.innerText = d2;
+
+  },1200);
+
+  // 💰 STEP 4: RESULT LOGIC
   setTimeout(()=>{
 
     let winType;
@@ -356,8 +387,8 @@ function result(){
 
     updateHistory(winType);
 
-  },1000);
-
+  },1500);
+}
   // 🔄 STEP 3: NEXT ROUND RESET
   setTimeout(()=>{
     cover.style.display="block";
