@@ -243,14 +243,15 @@ background-repeat:no-repeat;
   font-weight:bold;
 }
   .history-btn{
-  position:absolute;
-  left:10px;
-  top:10px;
+  margin:12px auto;
+  width:120px;
+  text-align:center;
   background:#111;
-  padding:6px 12px;
-  border-radius:8px;
-  font-size:12px;
-}
+  padding:10px;
+  border-radius:10px;
+  font-size:14px;
+  box-shadow:0 0 10px #00ffcc;
+  }
 
 .history-popup{
   position:fixed;
@@ -363,7 +364,6 @@ background-repeat:no-repeat;
   <div class="header">
     <b>PUBG & FREE FIRE</b>
     
-    <div onclick="openHistory()" class="history-btn">📜 History</div>
     
     <div class="wallet">₹ <span id="wallet">2000</span></div>
 
@@ -426,7 +426,7 @@ background-repeat:no-repeat;
     <div onclick="setAmt(500,this)">500</div>
     <div onclick="setAmt(1000,this)">1000</div>
   </div>
-
+<div onclick="openHistory()" class="history-btn">📜 History</div>
 </div>
 
 </div>
