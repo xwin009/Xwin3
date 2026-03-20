@@ -361,10 +361,11 @@ background-repeat:no-repeat;
 
 </div>
 
+  
   <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, getDocs, collection, query, where, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, getDocs, collection, query, where, doc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // 🔥 FIREBASE INIT
 const app = initializeApp({
@@ -379,6 +380,16 @@ const db = getFirestore(app);
 const userEmail = localStorage.getItem("userEmail");
 let userDocId = "";
 
+// 🔥 HOUSE EDGE (Dragon Tiger slider)
+let houseEdge = 50;
+
+async function loadEdge(){
+  const snap = await getDoc(doc(db,"settings","house"));
+  if(snap.exists()){
+    houseEdge = snap.data().dragonTiger || 50;
+  }
+}
+
 // 🔥 GAME VARS
 let wallet = 0;
 let chip = 0;
@@ -389,7 +400,7 @@ let tie = 0;
 let time = 20;
 let gameInterval;
 
-// 🔥 LOAD WALLET FROM FIREBASE
+// 🔥 LOAD WALLET
 async function loadWallet(){
   const snap = await getDocs(
     query(collection(db,"users"), where("email","==",userEmail))
@@ -403,7 +414,8 @@ async function loadWallet(){
   document.getElementById("wallet").innerText = wallet;
 }
 
-loadWallet();
+await loadWallet();
+await loadEdge();
 
 // 🔥 MUSIC
 document.addEventListener("click", ()=>{
@@ -447,7 +459,7 @@ window.setAmt = (a, el) => {
   el.classList.add("active");
 };
 
-// 🔥 BET (FIREBASE CONNECTED)
+// 🔥 BET
 window.betPlace = async (type) => {
 
   if(time <= 3) return showPopup("Bet Closed");
@@ -477,13 +489,27 @@ window.betPlace = async (type) => {
   }
 };
 
-// 🔥 RANDOM
-function rand(){
-  const arr=["A","K","Q","J","10","9"];
-  return arr[Math.floor(Math.random()*arr.length)];
+// 🔥 CONTROLLED RESULT (HOUSE EDGE)
+function controlledResult(){
+
+  let winSide;
+
+  if(Math.random()*100 < houseEdge){
+    // 🟢 USER WIN
+    if(pubg > free) winSide = "PUBG";
+    else if(free > pubg) winSide = "FREE";
+    else winSide = Math.random()<0.5?"PUBG":"FREE";
+  }else{
+    // 🔴 USER LOSS
+    if(pubg > free) winSide = "FREE";
+    else if(free > pubg) winSide = "PUBG";
+    else winSide = Math.random()<0.5?"PUBG":"FREE";
+  }
+
+  return winSide;
 }
 
-// 🔥 RESULT
+// 🔥 RESULT LOGIC SAME
 function result(p,f){
   const order=["A","K","Q","J","10","9"];
   if(order.indexOf(p) < order.indexOf(f)) return "PUBG";
@@ -519,8 +545,18 @@ function startRound(){
 
       clearInterval(gameInterval);
 
-      const p = rand();
-      const f = rand();
+      // 🔥 LOAD EDGE EVERY ROUND
+      await loadEdge();
+
+      const win = controlledResult();
+
+      let p,f;
+
+      if(win=="PUBG"){
+        p="K"; f="10";
+      }else{
+        p="10"; f="K";
+      }
 
       document.getElementById("pCard").innerText = p;
       document.getElementById("fCard").innerText = f;
@@ -538,14 +574,12 @@ function startRound(){
       const hist = document.getElementById("history");
       hist.scrollLeft = hist.scrollWidth;
 
-      // 🔥 WIN CALC
       if(r=="PUBG") wallet += pubg * 2;
       if(r=="FREE") wallet += free * 2;
       if(r=="TIE") wallet += tie * 9;
 
       document.getElementById("wallet").innerText = wallet;
 
-      // 🔥 UPDATE FIREBASE AFTER RESULT
       await updateDoc(doc(db,"users",userDocId),{
         balance: wallet
       });
@@ -569,7 +603,7 @@ function startRound(){
 
 startRound();
 
-  </script>
+  </script>      
   
   <audio id="bgMusic" loop>
   <source src="audio/pubg-theme.mp3" type="audio/mp3">
