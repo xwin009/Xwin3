@@ -85,6 +85,25 @@ body{
   border:4px solid gold;
   position:relative;
 }
+  .result-box{
+  position:absolute;
+  top:10%;
+  left:50%;
+  transform:translateX(-50%);
+  font-size:40px;
+  font-weight:bold;
+  color:#fff;
+
+  opacity:0;
+  transition:0.3s;
+
+  text-shadow:0 0 15px #fff;
+}
+
+.result-box.show{
+  opacity:1;
+  transform:translateX(-50%) scale(1.2);
+}
 
 /* BOX */
 .box{
@@ -188,7 +207,9 @@ body{
 
 <div class="table-wrap">
   <div class="table">
-
+    
+<div id="resultBox" class="result-box">?</div>
+    
     <div class="box low" onclick="bet('LOW',this)">
       BELOW 7 <span>(B)</span>
       <div class="amount" id="lowAmt">0</div>
@@ -278,25 +299,56 @@ function result(){
 
   let total=d1+d2;
 
-  let winType;
-  if(total<7) winType="LOW";
-  else if(total>7) winType="HIGH";
-  else winType="MID";
+  let box=document.getElementById("resultBox");
 
-  if(bets[winType]>0){
+  // 🎯 STEP 1: SHOW ROLLING EFFECT
+  box.classList.add("show");
+  box.innerText="🎲";
 
-    let winAmount = winType=="MID" ? bets[winType]*5 : bets[winType]*2;
+  setTimeout(()=>{
 
-    wallet += winAmount;
-    document.getElementById("wallet").innerText=wallet;
+    // 🎯 STEP 2: SHOW FINAL RESULT
+    box.innerText = d1 + " + " + d2;
 
-    showPopup("WIN ₹"+winAmount,true);
+  },500);
 
-  }else{
-    showPopup("LOSS",false);
-  }
+  setTimeout(()=>{
 
-  updateHistory(winType);
+    // 🎯 STEP 3: SHOW TOTAL
+    box.innerText = total;
+
+  },1000);
+
+  setTimeout(()=>{
+
+    // 🎯 FINAL RESULT LOGIC
+    let winType;
+
+    if(total<7) winType="LOW";
+    else if(total>7) winType="HIGH";
+    else winType="MID";
+
+    if(bets[winType]>0){
+
+      let winAmount = winType=="MID" ? bets[winType]*5 : bets[winType]*2;
+
+      wallet += winAmount;
+      document.getElementById("wallet").innerText=wallet;
+
+      showPopup("WIN ₹"+winAmount,true);
+
+    }else{
+      showPopup("LOSS",false);
+    }
+
+    updateHistory(winType);
+
+    // 🔥 hide result
+    setTimeout(()=>{
+      box.classList.remove("show");
+    },1000);
+
+  },1500);
 }
 
 function updateHistory(type){
