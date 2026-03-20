@@ -393,7 +393,7 @@ background-repeat:no-repeat;
   <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, getDocs, collection, query, where, doc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, getDocs, collection, query, where, doc, updateDoc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // 🔥 FIREBASE INIT
 const app = initializeApp({
@@ -515,7 +515,6 @@ function renderPopupHistory(){
 // 🔥 FIREBASE REF
 const gameRef = doc(db, "game", "dragonTiger");
 
-// 🔥 ADMIN TIMER (ONLY 1 USER)
 if(isAdmin){
 
   let roundId = 1;
@@ -526,10 +525,10 @@ if(isAdmin){
 
     const timer = setInterval(async ()=>{
 
-      await updateDoc(gameRef,{
+      await setDoc(gameRef,{
         time: t,
         roundId: roundId
-      });
+      },{ merge:true });
 
       t--;
 
@@ -539,9 +538,9 @@ if(isAdmin){
 
         let result = Math.random() < 0.5 ? "PUBG" : "FREE";
 
-        await updateDoc(gameRef,{
+        await setDoc(gameRef,{
           result: result
-        });
+        },{ merge:true });
 
         roundId++;
 
