@@ -330,6 +330,8 @@ let pubg = 0;
 let free = 0;
 let tie = 0;
 let time = 20;
+  let gameInterval;
+  
   // 🔥 LOAD SAVED DATA
 if(localStorage.getItem("wallet")){
   wallet = parseInt(localStorage.getItem("wallet"));
@@ -403,30 +405,32 @@ function result(p,f){
 /* LOOP */
 function startRound(){
 
-   if(!localStorage.getItem("time")){
+  // ❌ old interval band kar
+  clearInterval(gameInterval);
+
+  if(!localStorage.getItem("time")){
     time = 20;
-   }
+  }
 
   document.getElementById("pFlip").classList.remove("active");
   document.getElementById("fFlip").classList.remove("active");
 
   document.getElementById("pCard").innerText = "";
-document.getElementById("fCard").innerText = "";
-  
-  const timer = setInterval(()=>{
+  document.getElementById("fCard").innerText = "";
+
+  gameInterval = setInterval(()=>{
 
     document.getElementById("time").innerText = time;
-    
 
     time--;
-    
-localStorage.setItem("time", time);
+
+    localStorage.setItem("time", time);
     localStorage.setItem("wallet", wallet);
-localStorage.setItem("history", document.getElementById("history").innerHTML);
-    
+    localStorage.setItem("history", document.getElementById("history").innerHTML);
+
     if(time < 0){
 
-      clearInterval(timer);
+      clearInterval(gameInterval);
 
       const p = rand();
       const f = rand();
@@ -439,21 +443,16 @@ localStorage.setItem("history", document.getElementById("history").innerHTML);
 
       const r = result(p,f);
 
-      // HISTORY
       const h = document.createElement("div");
       h.innerText = r[0];
       document.getElementById("history").prepend(h);
 
-      // WIN
       if(r=="PUBG") wallet += pubg * 2;
       if(r=="FREE") wallet += free * 2;
       if(r=="TIE") wallet += tie * 9;
 
       document.getElementById("wallet").innerText = wallet;
-      
-localStorage.setItem("wallet", wallet);
-localStorage.setItem("history", document.getElementById("history").innerHTML);
-      // RESET
+
       pubg = 0;
       free = 0;
       tie = 0;
@@ -463,13 +462,8 @@ localStorage.setItem("history", document.getElementById("history").innerHTML);
       document.getElementById("tieAmt").innerText = 0;
 
       setTimeout(()=>{
-        document.getElementById("pFlip").classList.remove("active");
-        document.getElementById("fFlip").classList.remove("active");
-
-        setTimeout(()=>{
-          startRound();
-        },600);
-
+        localStorage.removeItem("time"); // 🔥 reset next round
+        startRound(); // clean restart
       },2000);
     }
 
