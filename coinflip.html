@@ -109,7 +109,7 @@ body{margin:0;font-family:Arial;background:#081c2f;color:#fff}
   <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, query, where, getDocs, doc, updateDoc, getDoc }
+import { getFirestore, collection, query, where, getDocs, doc, updateDoc, onSnapshot }
 from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 /* 🔥 FIREBASE */
@@ -125,7 +125,7 @@ let wallet = +localStorage.getItem("coin_wallet") || 1000;
 let coinHistory = JSON.parse(localStorage.getItem("coin_history")||"[]");
 let bets = JSON.parse(localStorage.getItem("coin_bets")||"[]");
 
-let COIN_EDGE = 50; // 🔥 % me
+let COIN_EDGE = 50; // %
 
 const walletEl = document.getElementById("wallet");
 const coin = document.getElementById("coin");
@@ -137,6 +137,16 @@ const popup = document.getElementById("popup");
 const email = localStorage.getItem("userEmail");
 let uid = "";
 let lastWallet = wallet;
+
+/* 🔥 LIVE EDGE CONTROL */
+function liveCoinEdge(){
+  onSnapshot(doc(db,"settings","houseEdge"), (snap)=>{
+    if(snap.exists()){
+      COIN_EDGE = snap.data().coinFlip ?? 50;
+      console.log("🔥 LIVE COIN EDGE:", COIN_EDGE);
+    }
+  });
+}
 
 /* 🔥 LOAD WALLET */
 async function loadWallet(){
@@ -153,26 +163,17 @@ async function loadWallet(){
   });
 }
 
-/* 🔥 LOAD EDGE */
-async function loadCoinEdge(){
-  const snap = await getDoc(doc(db,"settings","houseEdge"));
-  if(snap.exists()){
-    COIN_EDGE = snap.data().coinFlip ?? 50;
-    console.log("COIN EDGE =", COIN_EDGE);
-  }
-}
-
 /* 🔥 RESULT CONTROL */
 function decideCoinResult(choice){
 
-  let chance = COIN_EDGE / 100; // % → decimal
-
-  if(chance === 0){
-    return choice==="HEAD"?"TAIL":"HEAD"; // always lose
-  }
+  let chance = COIN_EDGE / 100;
 
   if(chance === 1){
     return choice; // always win
+  }
+
+  if(chance === 0){
+    return choice==="HEAD"?"TAIL":"HEAD"; // always lose
   }
 
   return Math.random() < chance
@@ -200,23 +201,21 @@ window.play = async function(choice){
 
   coin.classList.add("flip");
 
-  setTimeout(async ()=>{
+  setTimeout(()=>{
 
     coin.classList.remove("flip");
-
-    await loadCoinEdge(); // 🔥 har round fresh value
 
     let result = decideCoinResult(choice);
 
     coin.innerText = result==="HEAD"?"🙂":"🪙";
 
-    // 🔥 HISTORY
+    // HISTORY
     coinHistory.unshift(result);
     coinHistory = coinHistory.slice(0,10);
     renderHistory();
     localStorage.setItem("coin_history", JSON.stringify(coinHistory));
 
-    // 🔥 WIN/LOSS
+    // WIN / LOSS
     if(result === choice){
       wallet += amt * 2;
       showPopup("You Win ₹"+amt*2,"win");
@@ -224,7 +223,7 @@ window.play = async function(choice){
       showPopup("You Lose","loss");
     }
 
-    // 🔥 BET HISTORY
+    // BET HISTORY
     bets.unshift({
       time: new Date().toLocaleTimeString(),
       choice,
@@ -268,7 +267,7 @@ renderHistory();
 renderBets();
 
 await loadWallet();
-await loadCoinEdge();
+liveCoinEdge(); // 🔥 REAL-TIME START
 
 /* 🔥 AUTO FIREBASE SYNC */
 setInterval(async ()=>{
