@@ -124,19 +124,41 @@ body{
 /* HISTORY */
 .history{
   display:flex;
-  justify-content:center;
-  gap:5px;
-  margin:5px;
+  gap:6px;
+  margin:8px 10px;
+  overflow-x:auto;
+  padding:6px;
+  border:1px solid #333;
+  border-radius:10px;
+  background:#0f172a;
+}
+
+.history::-webkit-scrollbar{
+  display:none;
 }
 
 .history div{
-  width:22px;
-  height:22px;
+  min-width:26px;
+  height:26px;
   border-radius:50%;
-  background:#333;
   display:flex;
   align-items:center;
   justify-content:center;
+  font-size:12px;
+  font-weight:bold;
+  color:#fff;
+}
+
+.history .P{
+  background:#2563eb;
+}
+
+.history .F{
+  background:#dc2626;
+}
+
+.history .T{
+  background:#22c55e;
 }
 
 /* TIE */
@@ -445,7 +467,10 @@ function startRound(){
 
       const h = document.createElement("div");
       h.innerText = r[0];
+      h.classList.add(r[0]); // 🔥 ye add kar
       document.getElementById("history").prepend(h);
+      const hist = document.getElementById("history");
+hist.scrollLeft = hist.scrollWidth;
 
       if(r=="PUBG") wallet += pubg * 2;
       if(r=="FREE") wallet += free * 2;
