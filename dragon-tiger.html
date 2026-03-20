@@ -582,11 +582,11 @@ function renderPopupHistory(){
   
     div.className = "history-item " + (b.status === "WIN" ? "win" : "loss");  
   
-    div.innerHTML = `  
-      <span>${b.type}</span>  
-      <span>₹${b.amount}</span>  
-      <span style="font-size:11px;opacity:.7">${b.time}</span>  
-    `;  
+    div.innerHTML = `
+  <span>${b.type === "FREE" ? "FREE FIRE" : b.type}</span>
+  <span>₹${b.amount}</span>
+  <span style="font-size:11px;opacity:.7">${b.time}</span>
+`;
   
     list.appendChild(div);  
   });  
