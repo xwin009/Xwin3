@@ -327,26 +327,50 @@ body{
   <div class="popup-box" id="popupText"></div>
 </div>
 
-<script>
+
+  <script>
 window.onload = function(){
 
   document.getElementById("cover").style.display="block";
   document.getElementById("diceArea").style.display="none";
 
+  // ✅ LOAD WALLET
+  let savedWallet = localStorage.getItem("wallet");
+  if(savedWallet){
+    wallet = parseInt(savedWallet);
+    document.getElementById("wallet").innerText = wallet;
+  }
+
+  // ✅ LOAD HISTORY
+  let savedHistory = localStorage.getItem("history");
+  if(savedHistory){
+    document.getElementById("history").innerHTML = savedHistory;
+  }
+
+  // ✅ LOAD TIMER
+  let savedTime = localStorage.getItem("time");
+  if(savedTime){
+    time = parseInt(savedTime);
+  }
+
 }
+
 let chip=0;
 let bets={LOW:0,HIGH:0,MID:0};
 let wallet=10000;
 let time=20;
 let bettingOpen=true;
 
+// ⏱ TIMER LOOP
 setInterval(()=>{
 
   document.getElementById("timer").innerText=time;
 
+  localStorage.setItem("time", time); // ✅ SAVE TIME
+
   if(time===5){
-  bettingOpen=false;
-  showPopup("BET LOCK",null,true);
+    bettingOpen=false;
+    showPopup("BET LOCK",null,true);
   }
 
   time--;
@@ -360,12 +384,14 @@ setInterval(()=>{
 
 },1000);
 
+// 🎯 CHIP SELECT
 function setChip(v,e){
   chip=v;
   document.querySelectorAll(".chip").forEach(c=>c.classList.remove("active"));
   e.classList.add("active");
 }
 
+// 🎯 BET
 function bet(type,el){
 
   if(!chip || !bettingOpen) return;
@@ -377,14 +403,16 @@ function bet(type,el){
 
   wallet -= chip;
   document.getElementById("wallet").innerText=wallet;
+  localStorage.setItem("wallet", wallet); // ✅ SAVE WALLET
 
   bets[type]+=chip;
   document.getElementById(type.toLowerCase()+"Amt").innerText=bets[type];
 
   el.querySelector(".card-inner").classList.add("active");
-  }
-function result(){
+}
 
+// 🎲 RESULT
+function result(){
 
   let d1=Math.floor(Math.random()*6)+1;
   let d2=Math.floor(Math.random()*6)+1;
@@ -397,7 +425,7 @@ function result(){
   let d1El=document.getElementById("d1");
   let d2El=document.getElementById("d2");
 
-  // 🎁 STEP 1: BOX OPEN
+  // 🎁 OPEN BOX
   cover.style.display="none";
 
   d1El.innerText="🎲 "+d1;
@@ -405,7 +433,6 @@ function result(){
 
   dice.style.display="flex";
 
-  // 🎯 STEP 2: RESULT
   setTimeout(()=>{
 
     let winType;
@@ -416,10 +443,11 @@ function result(){
 
     if(bets[winType]>0){
 
-      let winAmount = winType=="MID" ? bets[winType]*5 : bets[winType]*2;
+      let winAmount = winType=="MID" ? bets[winType]*11 : bets[winType]*2;
 
       wallet += winAmount;
       document.getElementById("wallet").innerText=wallet;
+      localStorage.setItem("wallet", wallet); // ✅ SAVE
 
       showPopup("WIN ₹"+winAmount,true);
 
@@ -430,14 +458,15 @@ function result(){
     updateHistory(winType);
 
   },1000);
-  
-  // 🔄 STEP 3: NEXT ROUND RESET
+
+  // 🔄 RESET VIEW
   setTimeout(()=>{
     cover.style.display="block";
     dice.style.display="none";
   },2000);
 }
-  
+
+// 📜 HISTORY
 function updateHistory(type){
 
   let h=document.getElementById("history");
@@ -452,17 +481,22 @@ function updateHistory(type){
   if(h.children.length>10){
     h.removeChild(h.lastChild);
   }
+
+  localStorage.setItem("history", h.innerHTML); // ✅ SAVE HISTORY
 }
 
+// 🔄 RESET
 function reset(){
   bets={LOW:0,HIGH:0,MID:0};
+
   document.getElementById("lowAmt").innerText=0;
   document.getElementById("highAmt").innerText=0;
   document.getElementById("midAmt").innerText=0;
 
-  document.querySelectorAll(".box").forEach(b=>b.classList.remove("active"));
+  document.querySelectorAll(".card-inner").forEach(b=>b.classList.remove("active"));
 }
 
+// 💬 POPUP
 function showPopup(msg,win,lock=false){
 
   const p=document.getElementById("popup");
@@ -482,8 +516,7 @@ function showPopup(msg,win,lock=false){
     p.classList.remove("show");
   },2000);
 }
-
-</script>
+  </script>
 
 </body>
 </html>
