@@ -424,24 +424,34 @@ el.querySelector(".card-inner").classList.add("active");
 // 🔥 CONTROLLED RESULT
 function controlledResult(){
 
-let chance = houseEdge / 100;
-let winType;
+  let winType;
 
-if(Math.random() < chance){
-// 🟢 WIN (user bet side)
-if(bets.LOW > bets.HIGH && bets.LOW > bets.MID) winType="LOW";
-else if(bets.HIGH > bets.LOW && bets.HIGH > bets.MID) winType="HIGH";
-else if(bets.MID > 0) winType="MID";
-else winType = ["LOW","HIGH","MID"][Math.floor(Math.random()*3)];
-}
-else{
-// 🔴 LOSS (opposite)
-if(bets.LOW > bets.HIGH) winType="HIGH";
-else if(bets.HIGH > bets.LOW) winType="LOW";
-else winType="LOW";
-}
+  // 🎯 USER KA BET FIND KAR
+  let userBet = null;
 
-return winType;
+  if(bets.LOW > 0) userBet = "LOW";
+  else if(bets.HIGH > 0) userBet = "HIGH";
+  else if(bets.MID > 0) userBet = "MID";
+
+  // 🎯 AGAR USER NE BET HI NAHI KI
+  if(!userBet){
+    return ["LOW","HIGH","MID"][Math.floor(Math.random()*3)];
+  }
+
+  // 🎯 HOUSE EDGE LOGIC
+  let rand = Math.random() * 100;
+
+  if(rand < houseEdge){
+    // ✅ WIN (same side)
+    winType = userBet;
+  }else{
+    // ❌ LOSS (opposite side)
+    if(userBet=="LOW") winType="HIGH";
+    else if(userBet=="HIGH") winType="LOW";
+    else winType="LOW"; // MID ka loss safe side
+  }
+
+  return winType;
 }
 
 // 🔥 TIMER LOOP
