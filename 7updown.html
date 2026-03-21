@@ -128,31 +128,82 @@ body{
   animation:shake 0.6s;
 }
 /* BOX */
-.box{
+
+  /* 🔥 CARD BASE */
+.card{
   position:absolute;
-  border-radius:20px;
-  border:2px solid rgba(255,255,255,0.2);
+  width:26%;
+  height:65%;
   display:flex;
   justify-content:center;
   align-items:center;
+}
+
+/* POSITIONS */
+.low{ left:6%; top:18%; }
+.mid{ left:37%; top:18%; }
+.high{ right:6%; top:18%; }
+
+/* INNER CARD */
+.card-inner{
+  width:100%;
+  height:100%;
+  border-radius:20px;
+  display:flex;
   flex-direction:column;
+  justify-content:flex-end;
+  align-items:center;
+  padding-bottom:15px;
   font-weight:bold;
+  color:#fff;
+  position:relative;
 }
 
-.low{ left:8%; top:15%; width:28%; height:60%; }
-.high{ right:8%; top:15%; width:28%; height:60%; }
-.mid{ left:36%; bottom:8%; width:28%; height:30%; }
-
-.low span{color:red;}
-.high span{color:blue;}
-.mid span{color:#00ff99;}
-
-.box.active{
-  border:2px solid gold;
-  box-shadow:0 0 20px gold;
+/* 🔴 RED */
+.red{
+  background:linear-gradient(180deg,#7f1d1d,#1a0000);
+  border:2px solid #ff3b3b;
+  box-shadow:
+    0 0 20px #ff3b3b,
+    inset 0 0 20px rgba(255,0,0,0.5);
 }
 
-.amount{ color:#ffd700; }
+/* 🟢 GREEN */
+.green{
+  background:linear-gradient(180deg,#064e3b,#022c22);
+  border:2px solid #00ff99;
+  box-shadow:
+    0 0 20px #00ff99,
+    inset 0 0 20px rgba(0,255,150,0.5);
+}
+
+/* 🔵 BLUE */
+.blue{
+  background:linear-gradient(180deg,#1e3a8a,#020617);
+  border:2px solid #3b82f6;
+  box-shadow:
+    0 0 20px #3b82f6,
+    inset 0 0 20px rgba(0,100,255,0.5);
+}
+
+/* TEXT */
+.card-title{ font-size:14px; }
+.card-type{ margin-top:4px; }
+.card-amt{
+  margin-top:5px;
+  color:#ffd700;
+  font-size:18px;
+}
+
+/* CLICK EFFECT */
+.card-inner:active{
+  transform:scale(0.95);
+}
+
+/* ACTIVE BET */
+.card-inner.active{
+  box-shadow:0 0 30px gold, inset 0 0 20px gold;
+}
 
 /* CHIPS */
 .chips{
@@ -238,20 +289,29 @@ body{
   </div>
 </div>
     
-    <div class="box low" onclick="bet('LOW',this)">
-      BELOW 7 <span>(B)</span>
-      <div class="amount" id="lowAmt">0</div>
-    </div>
+<div class="card low" onclick="bet('LOW',this)">
+  <div class="card-inner red">
+    <div class="card-title">BELOW 7</div>
+    <div class="card-type">(B)</div>
+    <div class="card-amt" id="lowAmt">0</div>
+  </div>
+</div>
 
-    <div class="box high" onclick="bet('HIGH',this)">
-      ABOVE 7 <span>(A)</span>
-      <div class="amount" id="highAmt">0</div>
-    </div>
+<div class="card mid" onclick="bet('MID',this)">
+  <div class="card-inner green">
+    <div class="card-title">EXACT 7</div>
+    <div class="card-type">(E)</div>
+    <div class="card-amt" id="midAmt">0</div>
+  </div>
+</div>
 
-    <div class="box mid" onclick="bet('MID',this)">
-      EXACT 7 <span>(E)</span>
-      <div class="amount" id="midAmt">0</div>
-    </div>
+<div class="card high" onclick="bet('HIGH',this)">
+  <div class="card-inner blue">
+    <div class="card-title">ABOVE 7</div>
+    <div class="card-type">(A)</div>
+    <div class="card-amt" id="highAmt">0</div>
+  </div>
+</div>
 
   </div>
 </div>
@@ -322,10 +382,10 @@ function bet(type,el){
   bets[type]+=chip;
   document.getElementById(type.toLowerCase()+"Amt").innerText=bets[type];
 
-  el.classList.add("active");
-}
-
+  el.querySelector(".card-inner").classList.add("active");
+  }
 function result(){
+
 
   let d1=Math.floor(Math.random()*6)+1;
   let d2=Math.floor(Math.random()*6)+1;
