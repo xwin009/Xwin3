@@ -330,7 +330,7 @@ body{
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, doc, getDocs, collection, query, where, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, doc, getDoc, getDocs, collection, query, where, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // 🔥 FIREBASE INIT
 const app = initializeApp({
@@ -348,12 +348,6 @@ let userDocId = "";
 // 🔥 HOUSE EDGE
 let houseEdge = 50;
 
-onSnapshot(doc(db,"settings","houseEdge"), (snap)=>{
-  if(snap.exists()){
-    houseEdge = snap.data().sevenUpDown ?? 50;
-    console.log("🔥 EDGE:", houseEdge);
-  }
-});
 
 // 🔥 GAME VARS
 let chip=0;
@@ -377,6 +371,18 @@ document.getElementById("wallet").innerText = wallet;
 }
 
 await loadWallet();
+  async function loadHouseEdge(){
+  const snap = await getDoc(doc(db,"settings","houseEdge"));
+
+  if(snap.exists()){
+    houseEdge = snap.data().sevenUpDown ?? 50;
+    console.log("🔥 LOADED EDGE:", houseEdge);
+  }else{
+    console.log("❌ No houseEdge found");
+  }
+}
+
+await loadHouseEdge();
   // 🎁 INITIAL VIEW FIX
 document.getElementById("cover").style.display="block";
 document.getElementById("diceArea").style.display="none";
