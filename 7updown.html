@@ -470,25 +470,28 @@ setInterval(()=>{
 
 document.getElementById("timer").innerText=time;
 
-// ✅ SAVE TIME
+// save
 localStorage.setItem("time", time);
 
-if(time===5){
-bettingOpen=false;
-showPopup("BET LOCK",null,true);
+if(time === 5){
+  bettingOpen = false;
+  showPopup("BET LOCK",null,true);
 }
 
-time--;
+// ✅ FIXED LOGIC
+if(time === 0){
 
-if(time === 0)
-result();
-time=20;
-bettingOpen=true;
+  result();
 
-// ❌ purana time hata
-localStorage.removeItem("time");
+  time = 20;
+  bettingOpen = true;
 
-reset();
+  localStorage.removeItem("time");
+
+  reset();
+
+}else{
+  time--;
 }
 
 },1000);
