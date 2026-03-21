@@ -359,6 +359,7 @@ let bets={LOW:0,HIGH:0,MID:0};
 let wallet=0;
 let time=20;
 let bettingOpen=true;
+let resultRunning = false;
 
 // 🔥 LOAD WALLET FROM FIREBASE
 async function loadWallet(){
@@ -495,8 +496,8 @@ reset();
 // 🎲 RESULT
 async function result(){
 
-let d1, d2;
-let total=d1+d2;
+if(resultRunning) return; // ❌ second call block
+resultRunning = true;
 
 let cover=document.getElementById("cover");
 let dice=document.getElementById("diceArea");
@@ -505,36 +506,30 @@ let d1El=document.getElementById("d1");
 let d2El=document.getElementById("d2");
 
 cover.style.display="none";
-
-
 dice.style.display="flex";
 
-// 🔥 CONTROLLED WIN
 setTimeout(async ()=>{
 
 let winType = controlledResult();
 
-// 🎯 FIX: dice bhi same result ke hisab se
 let d1, d2;
 
 if(winType=="LOW"){
   d1 = 1;
-  d2 = 2; // total < 7
+  d2 = 2;
 }
 else if(winType=="HIGH"){
   d1 = 6;
-  d2 = 5; // total > 7
+  d2 = 5;
 }
 else{
   d1 = 3;
-  d2 = 4; // total = 7
+  d2 = 4;
 }
 
-// 🎲 UPDATE UI
 d1El.innerText="🎲 "+d1;
 d2El.innerText="🎲 "+d2;
 
-// 💰 WIN / LOSS
 if(bets[winType] > 0){
 
 let winAmount = winType=="MID" ? bets[winType]*11 : bets[winType]*2;
@@ -557,10 +552,11 @@ updateHistory(winType);
 
 },1000);
 
-// RESET VIEW
+// reset view
 setTimeout(()=>{
 cover.style.display="block";
 dice.style.display="none";
+resultRunning = false; // ✅ unlock
 },2000);
 }
 
