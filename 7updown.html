@@ -467,7 +467,7 @@ function controlledResult(){
 
 // 🔥 TIMER LOOP
 setInterval(()=>{
-
+if(resultRunning) return;
 document.getElementById("timer").innerText=time;
 
 // save
@@ -498,9 +498,10 @@ if(time === 0){
   
 // 🎲 RESULT
 async function result(){
-
-if(resultRunning) return; // ❌ second call block
+bettingOpen = false;
+if(resultRunning) return;
 resultRunning = true;
+bettingOpen = false; // ✅ IMPORTANT
 
 let cover=document.getElementById("cover");
 let dice=document.getElementById("diceArea");
@@ -551,16 +552,21 @@ showPopup("WIN ₹"+winAmount,true);
 showPopup("LOSS",false);
 }
 
+// ❌ OLD RESULT REMOVE (important)
+document.getElementById("history").innerHTML = "";
+
 updateHistory(winType);
 
 },1000);
 
-// reset view
+// RESET
 setTimeout(()=>{
 cover.style.display="block";
 dice.style.display="none";
-resultRunning = false; // ✅ unlock
-},2000);
+resultRunning = false;
+bettingOpen = true; // ✅ reopen betting
+},2500); // ⬅ thoda delay badha diya
+
 }
 
 // 📜 HISTORY
