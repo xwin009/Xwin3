@@ -484,6 +484,27 @@ setTimeout(async ()=>{
 
 let winType = controlledResult();
 
+// 🎯 FIX: dice bhi same result ke hisab se
+let d1, d2;
+
+if(winType=="LOW"){
+  d1 = 1;
+  d2 = 2; // total < 7
+}
+else if(winType=="HIGH"){
+  d1 = 6;
+  d2 = 5; // total > 7
+}
+else{
+  d1 = 3;
+  d2 = 4; // total = 7
+}
+
+// 🎲 UPDATE UI
+d1El.innerText="🎲 "+d1;
+d2El.innerText="🎲 "+d2;
+
+// 💰 WIN / LOSS
 if(bets[winType] > 0){
 
 let winAmount = winType=="MID" ? bets[winType]*11 : bets[winType]*2;
