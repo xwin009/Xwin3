@@ -468,8 +468,6 @@ function controlledResult(){
 // 🔥 TIMER LOOP
 setInterval(()=>{
 
-if(resultRunning) return;
-
 document.getElementById("timer").innerText = time;
 
 localStorage.setItem("time", time);
@@ -479,9 +477,9 @@ if(time === 5){
   showPopup("BET LOCK",null,true);
 }
 
-if(time === 0){
+if(time === 0 && !resultRunning){
 
-  result(); // ✅ sirf call
+  result(); // ✅ safe call
 
 }else{
   time--;
