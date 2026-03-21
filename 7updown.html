@@ -331,16 +331,16 @@ body{
   <div class="popup-box" id="popupText"></div>
 </div>
 
-<script type="module">
-
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  <script type="module">
+    
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, doc, getDoc, getDocs, collection, query, where, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // 🔥 FIREBASE INIT
 const app = initializeApp({
-apiKey:"AIzaSyBx3J9aGn_98rTPgurMMKw_GR3puIMj4Ms",
-authDomain:"colourcash-ea60e.firebaseapp.com",
-projectId:"colourcash-ea60e"
+  apiKey:"AIzaSyBx3J9aGn_98rTPgurMMKw_GR3puIMj4Ms",
+  authDomain:"colourcash-ea60e.firebaseapp.com",
+  projectId:"colourcash-ea60e"
 });
 
 const db = getFirestore(app);
@@ -349,273 +349,241 @@ const db = getFirestore(app);
 const userEmail = localStorage.getItem("userEmail");
 let userDocId = "";
 
-// 🔥 HOUSE EDGE
-let houseEdge = 50;
-
-
 // 🔥 GAME VARS
 let chip=0;
 let bets={LOW:0,HIGH:0,MID:0};
 let wallet=0;
 let time=20;
 let bettingOpen=true;
-let resultRunning = false;
+let resultRunning=false;
+let houseEdge=50;
 
-// 🔥 LOAD WALLET FROM FIREBASE
+// 🔥 LOAD WALLET
 async function loadWallet(){
-const snap = await getDocs(
-query(collection(db,"users"), where("email","==",userEmail))
-);
+  const snap = await getDocs(
+    query(collection(db,"users"), where("email","==",userEmail))
+  );
 
-snap.forEach(d=>{
-userDocId = d.id;
-wallet = d.data().balance || 0;
-});
+  snap.forEach(d=>{
+    userDocId = d.id;
+    wallet = d.data().balance || 0;
+  });
 
-document.getElementById("wallet").innerText = wallet;
+  document.getElementById("wallet").innerText = wallet;
 }
-
 await loadWallet();
-  async function loadHouseEdge(){
-  const snap = await getDoc(doc(db,"settings","houseEdge"));
 
+// 🔥 LOAD EDGE
+async function loadHouseEdge(){
+  const snap = await getDoc(doc(db,"settings","houseEdge"));
   if(snap.exists()){
     houseEdge = snap.data().sevenUpDown ?? 50;
-    console.log("🔥 LOADED EDGE:", houseEdge);
-  }else{
-    console.log("❌ No houseEdge found");
   }
 }
-
 await loadHouseEdge();
-  // 🎁 INITIAL VIEW FIX
+
+// 🎁 INIT VIEW
 document.getElementById("cover").style.display="block";
 document.getElementById("diceArea").style.display="none";
-  // ⏱ LOAD TIMER
-if(localStorage.getItem("time")){
-  time = parseInt(localStorage.getItem("time"));
-}
 
-// 🔥 LOAD HISTORY
+// 🔥 HISTORY LOAD
 if(localStorage.getItem("history")){
-document.getElementById("history").innerHTML = localStorage.getItem("history");
+  document.getElementById("history").innerHTML = localStorage.getItem("history");
 }
 
-// 🔥 CHIP SELECT
+// 🔥 CHIP
 window.setChip = (v,e)=>{
-chip=v;
-document.querySelectorAll(".chip").forEach(c=>c.classList.remove("active"));
-e.classList.add("active");
+  chip=v;
+  document.querySelectorAll(".chip").forEach(c=>c.classList.remove("active"));
+  e.classList.add("active");
 };
 
 // 🔥 BET
 window.bet = async (type,el)=>{
 
-if(!chip || !bettingOpen) return;
+  if(!chip || !bettingOpen) return;
 
-if(wallet < chip){
-alert("Low Balance");
-return;
-}
+  if(wallet < chip){
+    alert("Low Balance");
+    return;
+  }
 
-wallet -= chip;
+  wallet -= chip;
 
-await updateDoc(doc(db,"users",userDocId),{
-balance: wallet
-});
+  await updateDoc(doc(db,"users",userDocId),{
+    balance: wallet
+  });
 
-document.getElementById("wallet").innerText=wallet;
+  document.getElementById("wallet").innerText=wallet;
 
-bets[type]+=chip;
-document.getElementById(type.toLowerCase()+"Amt").innerText=bets[type];
+  bets[type]+=chip;
+  document.getElementById(type.toLowerCase()+"Amt").innerText=bets[type];
 
-el.querySelector(".card-inner").classList.add("active");
+  el.querySelector(".card-inner").classList.add("active");
 };
 
-// 🔥 CONTROLLED RESULT
+// 🔥 RESULT LOGIC
 function controlledResult(){
 
-  let winType;
-
-  // 🎯 USER KA BET FIND KAR
   let userBet = null;
 
-  if(bets.LOW > 0) userBet = "LOW";
-  else if(bets.HIGH > 0) userBet = "HIGH";
-  else if(bets.MID > 0) userBet = "MID";
+  if(bets.LOW > 0) userBet="LOW";
+  else if(bets.HIGH > 0) userBet="HIGH";
+  else if(bets.MID > 0) userBet="MID";
 
-  // 🎯 AGAR USER NE BET HI NAHI KI
   if(!userBet){
     return ["LOW","HIGH","MID"][Math.floor(Math.random()*3)];
   }
 
-  // 🎯 HOUSE EDGE LOGIC
-  let rand = Math.random() * 100;
+  let rand = Math.random()*100;
 
   if(rand < houseEdge){
-    // ✅ WIN (same side)
-    winType = userBet;
+    return userBet;
   }else{
-    // ❌ LOSS (opposite side)
-    if(userBet=="LOW") winType="HIGH";
-    else if(userBet=="HIGH") winType="LOW";
-    else winType="LOW"; // MID ka loss safe side
+    if(userBet=="LOW") return "HIGH";
+    if(userBet=="HIGH") return "LOW";
+    return "LOW";
   }
-
-  return winType;
 }
 
-// 🔥 TIMER LOOP
+// 🔥 TIMER
 setInterval(()=>{
 
-document.getElementById("timer").innerText = time;
+  document.getElementById("timer").innerText=time;
 
-localStorage.setItem("time", time);
+  if(time===5){
+    bettingOpen=false;
+    showPopup("BET LOCK",null,true);
+  }
 
-if(time === 5){
-  bettingOpen = false;
-  showPopup("BET LOCK",null,true);
-}
-
-if(time === 0 && !resultRunning){
-
-  result(); // ✅ safe call
-
-}else{
-  time--;
-}
+  if(time===0 && !resultRunning){
+    result();
+  }else{
+    time--;
+  }
 
 },1000);
-  
+
 // 🎲 RESULT
 async function result(){
-bettingOpen = false;
-if(resultRunning) return;
-resultRunning = true;
-bettingOpen = false; // ✅ IMPORTANT
 
-let cover=document.getElementById("cover");
-let dice=document.getElementById("diceArea");
+  if(resultRunning) return;
 
-let d1El=document.getElementById("d1");
-let d2El=document.getElementById("d2");
+  resultRunning=true;
+  bettingOpen=false;
 
-cover.style.display="none";
-dice.style.display="flex";
+  let cover=document.getElementById("cover");
+  let dice=document.getElementById("diceArea");
 
-setTimeout(async ()=>{
+  let d1El=document.getElementById("d1");
+  let d2El=document.getElementById("d2");
 
-let winType = controlledResult();
+  cover.style.display="none";
+  dice.style.display="flex";
 
-let d1, d2;
+  // 🎯 RESULT CALC
+  let winType = controlledResult();
 
-if(winType=="LOW"){
-  d1 = 1;
-  d2 = 2;
-}
-else if(winType=="HIGH"){
-  d1 = 6;
-  d2 = 5;
-}
-else{
-  d1 = 3;
-  d2 = 4;
-}
+  let d1,d2;
 
-d1El.innerText="🎲 "+d1;
-d2El.innerText="🎲 "+d2;
+  if(winType=="LOW"){ d1=1; d2=2; }
+  else if(winType=="HIGH"){ d1=6; d2=5; }
+  else{ d1=3; d2=4; }
 
-if(bets[winType] > 0){
+  // 🎲 SHOW RESULT (ONLY ONCE)
+  setTimeout(async ()=>{
 
-let winAmount = winType=="MID" ? bets[winType]*11 : bets[winType]*2;
+    d1El.innerText="🎲 "+d1;
+    d2El.innerText="🎲 "+d2;
 
-wallet += winAmount;
+    if(bets[winType] > 0){
 
-await updateDoc(doc(db,"users",userDocId),{
-balance: wallet
-});
+      let winAmount = winType=="MID" ? bets[winType]*11 : bets[winType]*2;
 
-document.getElementById("wallet").innerText=wallet;
+      wallet += winAmount;
 
-showPopup("WIN ₹"+winAmount,true);
+      await updateDoc(doc(db,"users",userDocId),{
+        balance: wallet
+      });
 
-}else{
-showPopup("LOSS",false);
-}
+      document.getElementById("wallet").innerText=wallet;
 
+      showPopup("WIN ₹"+winAmount,true);
 
-updateHistory(winType);
+    }else{
+      showPopup("LOSS",false);
+    }
 
-},1000);
+    updateHistory(winType);
 
-// RESET
-setTimeout(()=>{
-cover.style.display="block";
-dice.style.display="none";
+  },800);
 
-resultRunning = false;
-bettingOpen = true;
+  // 🔄 RESET
+  setTimeout(()=>{
 
-// ✅ NEXT ROUND YAHAN START
-time = 20;
-localStorage.removeItem("time");
-reset();
+    cover.style.display="block";
+    dice.style.display="none";
 
-},2500);
+    resultRunning=false;
+    bettingOpen=true;
+
+    time=20;
+    reset();
+
+  },2200);
 }
 
 // 📜 HISTORY
 function updateHistory(type){
 
-let h=document.getElementById("history");
-let div=document.createElement("div");
+  let h=document.getElementById("history");
+  let div=document.createElement("div");
 
-if(type=="LOW"){div.className="B";div.innerText="B";}
-else if(type=="HIGH"){div.className="A";div.innerText="A";}
-else{div.className="E";div.innerText="E";}
+  if(type=="LOW"){div.className="B";div.innerText="B";}
+  else if(type=="HIGH"){div.className="A";div.innerText="A";}
+  else{div.className="E";div.innerText="E";}
 
-h.prepend(div);
+  h.prepend(div);
 
-if(h.children.length>10){
-h.removeChild(h.lastChild);
-}
+  if(h.children.length>10){
+    h.removeChild(h.lastChild);
+  }
 
-localStorage.setItem("history", h.innerHTML);
+  localStorage.setItem("history", h.innerHTML);
 }
 
 // 🔄 RESET
 function reset(){
-bets={LOW:0,HIGH:0,MID:0};
 
-document.getElementById("lowAmt").innerText=0;
-document.getElementById("highAmt").innerText=0;
-document.getElementById("midAmt").innerText=0;
+  bets={LOW:0,HIGH:0,MID:0};
 
-document.querySelectorAll(".card-inner").forEach(b=>b.classList.remove("active"));
+  document.getElementById("lowAmt").innerText=0;
+  document.getElementById("highAmt").innerText=0;
+  document.getElementById("midAmt").innerText=0;
+
+  document.querySelectorAll(".card-inner").forEach(b=>b.classList.remove("active"));
 }
 
 // 💬 POPUP
 function showPopup(msg,win,lock=false){
 
-const p=document.getElementById("popup");
-const box=document.getElementById("popupText");
+  const p=document.getElementById("popup");
+  const box=document.getElementById("popupText");
 
-box.innerText=msg;
+  box.innerText=msg;
 
-if(lock){
-box.className="popup-box lock";
-}else{
-box.className="popup-box "+(win?"win":"loss");
+  if(lock){
+    box.className="popup-box lock";
+  }else{
+    box.className="popup-box "+(win?"win":"loss");
+  }
+
+  p.classList.add("show");
+
+  setTimeout(()=>{
+    p.classList.remove("show");
+  },2000);
 }
-
-p.classList.add("show");
-
-setTimeout(()=>{
-p.classList.remove("show");
-},2000);
-}
-
-</script>
 
 </body>
 </html>
