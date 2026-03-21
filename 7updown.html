@@ -377,6 +377,10 @@ document.getElementById("wallet").innerText = wallet;
 }
 
 await loadWallet();
+  // ⏱ LOAD TIMER
+if(localStorage.getItem("time")){
+  time = parseInt(localStorage.getItem("time"));
+}
 
 // 🔥 LOAD HISTORY
 if(localStorage.getItem("history")){
@@ -442,6 +446,9 @@ setInterval(()=>{
 
 document.getElementById("timer").innerText=time;
 
+// ✅ SAVE TIME
+localStorage.setItem("time", time);
+
 if(time===5){
 bettingOpen=false;
 showPopup("BET LOCK",null,true);
@@ -453,11 +460,15 @@ if(time<0){
 result();
 time=20;
 bettingOpen=true;
+
+// ❌ purana time hata
+localStorage.removeItem("time");
+
 reset();
 }
 
 },1000);
-
+  
 // 🎲 RESULT
 async function result(){
 
