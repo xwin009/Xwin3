@@ -464,10 +464,10 @@ body{
   <div class="popup-box" id="popupText"></div>
 </div>
 
-  <script type="module">
-    
+    <script type="module">
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, doc, getDoc, getDocs, collection, query, where, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, doc, getDoc, getDocs, collection, query, where, updateDoc, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // 🔥 FIREBASE INIT
 const app = initializeApp({
@@ -514,31 +514,11 @@ async function loadHouseEdge(){
   }
 }
 await loadHouseEdge();
-    let savedStart = localStorage.getItem("roundStart");
 
-if(savedStart){
-  let diff = Math.floor((Date.now() - savedStart) / 1000);
-  time = 20 - diff;
-
-  if(time < 0) time = 0;
-}else{
-  localStorage.setItem("roundStart", Date.now());
-}
-    document.body.style.opacity = "0";
-    
-setTimeout(()=>{
-  document.body.style.opacity = "1";
-},100);
-    
 // 🎁 INIT
 document.getElementById("cover").style.display="block";
 document.getElementById("diceArea").style.display="none";
 document.getElementById("diceArea").style.visibility="hidden";
-
-// 🔥 HISTORY LOAD
-if(localStorage.getItem("history")){
-  document.getElementById("history").innerHTML = localStorage.getItem("history");
-}
 
 // 🔥 CHIP
 window.setChip = (v,e)=>{
@@ -571,7 +551,7 @@ window.bet = async (type,el)=>{
   el.querySelector(".card-inner").classList.add("active");
 };
 
-// 🔥 RESULT LOGIC
+// 🎲 RESULT LOGIC
 function controlledResult(){
 
   let userBet=null;
@@ -595,10 +575,9 @@ function controlledResult(){
   }
 }
 
-// 🔥 TIMER (FIXED)
+// 🔥 TIMER
 setInterval(()=>{
 
-  // ❌ stop negative
   if(time < 0) time = 0;
 
   document.getElementById("timer").innerText = time;
@@ -608,14 +587,9 @@ setInterval(()=>{
     showPopup("BET LOCK",null,true);
   }
 
-  // ✅ only once trigger
   if(time === 0){
-
-    if(!resultRunning){
-      result();
-    }
-
-    return; // ❗ stop further decrease
+    if(!resultRunning) result();
+    return;
   }
 
   time--;
@@ -638,8 +612,7 @@ async function result(){
 
   cover.style.display="none";
   dice.style.display="flex";
-  dice.style.visibility="hidden"; // 🔥 ADD
-  dice.style.opacity="1";
+  dice.style.visibility="hidden";
 
   let winType = controlledResult();
 
@@ -651,14 +624,18 @@ async function result(){
 
   setTimeout(async ()=>{
     
-    dice.style.visibility="visible"; // 🔥 ADD
+    dice.style.visibility="visible";
 
     d1El.innerText="🎲 "+d1;
     d2El.innerText="🎲 "+d2;
 
+    let win = false;
+    let winAmount = 0;
+
     if(bets[winType] > 0){
 
-      let winAmount = winType=="MID" ? bets[winType]*11 : bets[winType]*2;
+      win = true;
+      winAmount = winType=="MID" ? bets[winType]*11 : bets[winType]*2;
 
       wallet += winAmount;
 
@@ -674,6 +651,14 @@ async function result(){
       showPopup("LOSS",false);
     }
 
+    // 🔥 SAVE HISTORY
+    await addDoc(collection(db,"users",userDocId,"bets"),{
+      type: winType,
+      amount: bets[winType] || 0,
+      win: win,
+      time: new Date().toLocaleTimeString()
+    });
+
     updateHistory(winType);
 
   },700);
@@ -686,14 +671,13 @@ async function result(){
     resultRunning=false;
     bettingOpen=true;
 
-    time=20; // ✅ reset properly
-    localStorage.setItem("roundStart", Date.now());
+    time=20;
     reset();
 
   },2000);
 }
 
-// 📜 HISTORY
+// 📜 HISTORY DOTS
 function updateHistory(type){
 
   let h=document.getElementById("history");
@@ -743,20 +727,74 @@ function showPopup(msg,win,lock=false){
   setTimeout(()=>{
     p.classList.remove("show");
   },2000);
-    }
-    // ❓ HELP POPUP (FINAL)
+}
+
+// ❓ HELP POPUP
 const helpBtn = document.getElementById("helpBtn");
 const helpPopup = document.getElementById("helpPopup");
 
-helpBtn.onclick = ()=>{
-  helpPopup.classList.add("show");
+helpBtn.onclick = ()=> helpPopup.classList.add("show");
+helpPopup.onclick = ()=> helpPopup.classList.remove("show");
+
+// 📜 HISTORY POPUP
+const historyBtn = document.getElementById("historyBtn");
+const historyPopup = document.getElementById("historyPopup");
+const closeHistory = document.getElementById("closeHistory");
+const historyList = document.getElementById("historyList");
+
+historyBtn.onclick = ()=>{
+  historyPopup.classList.add("show");
+  loadBetHistory();
 };
 
-helpPopup.onclick = ()=>{
-  helpPopup.classList.remove("show");
+closeHistory.onclick = ()=>{
+  historyPopup.classList.remove("show");
 };
-    
-</script>
+
+historyPopup.onclick = (e)=>{
+  if(e.target === historyPopup){
+    historyPopup.classList.remove("show");
+  }
+};
+
+// 🔥 LOAD HISTORY
+async function loadBetHistory(){
+
+  historyList.innerHTML = "Loading...";
+
+  const snap = await getDocs(collection(db,"users",userDocId,"bets"));
+
+  let data = [];
+
+  snap.forEach(doc=>{
+    data.push(doc.data());
+  });
+
+  data.reverse();
+
+  historyList.innerHTML = "";
+
+  if(data.length === 0){
+    historyList.innerHTML = "No bets yet";
+    return;
+  }
+
+  data.forEach(item=>{
+
+    let div = document.createElement("div");
+    div.className = "history-item " + (item.win ? "win-item" : "loss-item");
+
+    div.innerHTML = `
+      <span>${item.type}</span>
+      <span>₹${item.amount}</span>
+      <span>${item.time}</span>
+    `;
+
+    historyList.appendChild(div);
+  });
+}
+
+    </script>  
   
     <div id="helpPopup" class="help-popup">
   <div class="help-box">
