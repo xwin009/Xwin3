@@ -10,6 +10,8 @@ body{
   font-family:Arial;
   background:linear-gradient(180deg,#3b0d4f,#1a0826);
   color:#fff;
+  body{
+  transition: opacity 0.2s ease;
 }
 
 /* TITLE */
@@ -399,7 +401,12 @@ if(savedStart){
 }else{
   localStorage.setItem("roundStart", Date.now());
 }
-
+    document.body.style.opacity = "0";
+    
+setTimeout(()=>{
+  document.body.style.opacity = "1";
+},100);
+    
 // 🎁 INIT
 document.getElementById("cover").style.display="block";
 document.getElementById("diceArea").style.display="none";
@@ -507,6 +514,7 @@ async function result(){
 
   cover.style.display="none";
   dice.style.display="flex";
+  dice.style.visibility="hidden"; // 🔥 ADD
 
   let winType = controlledResult();
 
@@ -517,6 +525,7 @@ async function result(){
   else{ d1=3; d2=4; }
 
   setTimeout(async ()=>{
+    dice.style.visibility="visible"; // 🔥 ADD
 
     d1El.innerText="🎲 "+d1;
     d2El.innerText="🎲 "+d2;
