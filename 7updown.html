@@ -107,6 +107,8 @@ body{
   transform:translate(-50%,-50%);
   display:flex;
   gap:10px;
+  opacity:0;
+  transition:0.2s;
 }
 
 .dice{
@@ -516,6 +518,7 @@ async function result(){
   cover.style.display="none";
   dice.style.display="flex";
   dice.style.visibility="hidden"; // 🔥 ADD
+  dice.style.opacity="1";
 
   let winType = controlledResult();
 
@@ -526,6 +529,7 @@ async function result(){
   else{ d1=3; d2=4; }
 
   setTimeout(async ()=>{
+    
     dice.style.visibility="visible"; // 🔥 ADD
 
     d1El.innerText="🎲 "+d1;
