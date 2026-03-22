@@ -686,7 +686,7 @@ async function loadFullHistory(){
     else if(type=="HIGH"){div.className="A";div.innerText="A";}
     else{div.className="E";div.innerText="E";}
 
-    h.appendChild(div);
+    h.prepend(div);
   });
 
 }
