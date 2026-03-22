@@ -468,9 +468,9 @@ body{
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { 
-  getFirestore, doc, getDocs, collection, query, where, updateDoc, onSnapshot
+  getFirestore, doc, getDocs, collection, query, where, updateDoc, onSnapshot, addDoc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
+      
 const app = initializeApp({
   apiKey:"AIzaSyBx3J9aGn_98rTPgurMMKw_GR3puIMj4Ms",
   authDomain:"colourcash-ea60e.firebaseapp.com",
@@ -491,6 +491,7 @@ let bettingOpen=true;
 // UI
 const cover=document.getElementById("cover");
 const dice=document.getElementById("diceArea");
+const historyList = document.getElementById("historyList");  
 
 // 🔥 WALLET
 async function loadWallet(){
@@ -608,30 +609,23 @@ async function showResult(){
 
   resultDone = true;
 
-  // 🔥 STEP 1: gift hide
   cover.style.display = "none";
-
-  // 🔥 STEP 2: dice show (force)
   dice.style.display = "flex";
-
-  // 🔥 STEP 3: reset opacity (important)
   dice.style.opacity = "0";
 
-  setTimeout(()=>{
-    dice.style.opacity = "1";
-  },100);
+  setTimeout(()=> dice.style.opacity="1",100);
 
-  // 🔥 STEP 4: set dice values AFTER visible
   setTimeout(()=>{
     document.getElementById("d1").innerText = "🎲 " + currentRound.d1;
     document.getElementById("d2").innerText = "🎲 " + currentRound.d2;
   },200);
 
-
   let r = currentRound.result;
   let winAmt = 0;
+  let win = false;
 
   if(bets[r] > 0){
+    win = true;
 
     if(r=="MID") winAmt = bets[r]*5;
     else winAmt = bets[r]*2;
@@ -645,13 +639,15 @@ async function showResult(){
   }else{
     showPopup("LOSS",false);
   }
+
+  // 🔥 HISTORY SAVE (FIXED)
+  await addDoc(collection(db,"users",userDocId,"bets"),{
+    type: r,
+    amount: bets.LOW + bets.HIGH + bets.MID,
+    win: win,
+    time: new Date().toLocaleTimeString()
+  });
 }
-await addDoc(collection(db,"users",userDocId,"bets"),{
-  type: winType,
-  amount: bets.LOW + bets.HIGH + bets.MID,
-  win: win,
-  time: new Date().toLocaleTimeString()
-});
 
 // 📜 HISTORY
 function updateHistory(type){
