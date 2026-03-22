@@ -10,9 +10,8 @@
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { 
-  getFirestore, doc, setDoc, getDoc 
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, doc, setDoc, getDoc } 
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const app = initializeApp({
   apiKey:"AIzaSyBx3J9aGn_98rTPgurMMKw_GR3puIMj4Ms",
@@ -22,62 +21,40 @@ const app = initializeApp({
 
 const db = getFirestore(app);
 
-let running = false;
-
-// 🎯 FINAL SMART RESULT LOGIC
+// 🎯 RESULT LOGIC (same tera)
 async function getResult(){
 
   const snap = await getDoc(doc(db,"bets","global"));
 
-  if(!snap.exists()){
-    return "LOW"; // fallback
-  }
+  if(!snap.exists()) return "LOW";
 
   const data = snap.data();
 
-  let low = Number(data.LOW) || 0;
-  let high = Number(data.HIGH) || 0;
-  let mid = Number(data.MID) || 0;
+  let low = Number(data.LOW)||0;
+  let high = Number(data.HIGH)||0;
+  let mid = Number(data.MID)||0;
 
-  console.log("LOW:",low,"HIGH:",high,"MID:",mid);
-
-  // 💣 RULE 1: MID > 20 → MID NEVER WIN
   if(mid > 20){
     if(low === high){
-      return Math.random() > 0.5 ? "LOW" : "HIGH";
+      return Math.random()>0.5?"LOW":"HIGH";
     }
-    return low > high ? "HIGH" : "LOW";
+    return low>high?"HIGH":"LOW";
   }
 
-  // 💣 RULE 2: JISPE JYADA → WO HAREGA
-  if(low > high){
-    return "HIGH";
-  }
-  if(high > low){
-    return "LOW";
-  }
+  if(low > high) return "HIGH";
+  if(high > low) return "LOW";
 
-  // 💣 RULE 3: LOW == HIGH
   if(low === high){
+    let total = low+high+mid;
+    let payoutMid = mid*5;
+    let profit = total - payoutMid;
 
-    // 🎯 MID PROFIT CHECK
-    let total = low + high + mid;
-    let payoutMid = mid * 5;
+    if(mid>0 && profit>0) return "MID";
 
-    let profitIfMid = total - payoutMid;
-
-    console.log("ProfitIfMID:",profitIfMid);
-
-    // ✅ agar profit hai → MID jeetne de
-    if(mid > 0 && profitIfMid > 0){
-      return "MID";
-    }
-
-    // ❌ warna random LOW/HIGH
-    return Math.random() > 0.5 ? "LOW" : "HIGH";
+    return Math.random()>0.5?"LOW":"HIGH";
   }
 
-  return "LOW"; // fallback
+  return "LOW";
 }
 
 // 🎲 DICE
@@ -87,46 +64,49 @@ function getDice(r){
   return {d1:3,d2:4};
 }
 
-// 🔥 MAIN LOOP
-async function startGame(){
+// 🔥 TIME SYNC
+function getNextTime(){
+  let now = Date.now();
+  return Math.ceil(now/20000)*20000;
+}
 
-  if(running) return;
-  running = true;
+// 🔥 MAIN LOOP
+async function start(){
 
   while(true){
+
+    let startTime = getNextTime();
+
+    let wait = startTime - Date.now();
+    if(wait>0){
+      await new Promise(r=>setTimeout(r,wait));
+    }
 
     const r = await getResult();
     const d = getDice(r);
 
-    // 🔥 ROUND CREATE
     await setDoc(doc(db,"gameRounds","current"),{
-      roundId: Date.now(),
-      startTime: Date.now(),
-      result: r,
-      d1: d.d1,
-      d2: d.d2
+      roundId:startTime,
+      startTime:startTime,
+      result:r,
+      d1:d.d1,
+      d2:d.d2
     });
-    
-await setDoc(doc(db,"history","global"),{
-  lastResult: r,
-  time: Date.now()
-});
-    console.log("🎯 FINAL RESULT:", r);
 
-    // 🔥 RESET BETS
+    await setDoc(doc(db,"history","global"),{
+      lastResult:r,
+      time:startTime
+    });
+
     await setDoc(doc(db,"bets","global"),{
-      LOW:0,
-      HIGH:0,
-      MID:0
+      LOW:0,HIGH:0,MID:0
     });
 
-    // ⏱ 20 sec wait
-    await new Promise(res => setTimeout(res, 20000));
+    console.log("RESULT:",r);
   }
 }
 
-// 🚀 START
-startGame();
+start();
 
 </script>
 
