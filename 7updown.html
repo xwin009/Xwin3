@@ -509,7 +509,10 @@ onSnapshot(doc(db,"gameRounds","current"), snap=>{
   if(!snap.exists()) return;
 
   currentRound=snap.data();
-
+// 🔥 FIX: agar timestamp pending hai
+  if(!currentRound.startTime){
+    currentRound.startTime = { toMillis: () => Date.now() };
+  }
   if(!lastRoundId){
     lastRoundId=currentRound.roundId;
   }
@@ -519,10 +522,12 @@ onSnapshot(doc(db,"gameRounds","current"), snap=>{
 function getTime(){
   if(!currentRound || !currentRound.startTime) return 20;
 
-  let start=currentRound.startTime.toMillis(); // 🔥 FIX
-  let t=Math.floor((20000-(Date.now()-start))/1000);
+  // 🔥 FIX: null handle
+  let start = currentRound.startTime?.toMillis?.() || Date.now();
 
-  return t<0?0:t;
+  let t = Math.floor((20000 - (Date.now() - start)) / 1000);
+
+  return t < 0 ? 0 : t;
 }
 
 // 🔥 CHIP
