@@ -503,7 +503,9 @@ async function loadWallet(){
   document.getElementById("wallet").innerText=wallet;
 }
 await loadWallet();
- loadFullHistory();
+ window.addEventListener("load", ()=>{
+  loadFullHistory();
+});
 
 // 🔥 ROUND SYNC (MAIN)
 onSnapshot(doc(db,"gameRounds","current"), snap=>{
@@ -536,17 +538,24 @@ onSnapshot(doc(db,"gameRounds","current"), snap=>{
 
 // 🔥 HISTORY CONTROL
 let lastHistoryTime = null;
-      onSnapshot(doc(db,"history","global"), snap=>{
-  if(!snap.exists()) return;
+     setTimeout(()=>{
+  onSnapshot(doc(db,"history","global"), snap=>{
+    if(!snap.exists()) return;
 
-  let data = snap.data();
+    let data = snap.data();
 
-  if(lastHistoryTime === data.time) return;
+    if(lastHistoryTime === null){
+      lastHistoryTime = data.time;
+      return;
+    }
 
-  lastHistoryTime = data.time;
+    if(lastHistoryTime === data.time) return;
 
-  updateHistory(data.lastResult);
-});
+    lastHistoryTime = data.time;
+
+    updateHistory(data.lastResult);
+  });
+},500);
 
 // 🔥 TIMER
 function getTime(){
@@ -675,7 +684,9 @@ async function loadFullHistory(){
   );
 
   const h = document.getElementById("history");
+  if(h.children.length === 0){
   h.innerHTML = "";
+  }
 
   snap.forEach(d=>{
     let type = d.data().result;
