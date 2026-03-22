@@ -20,18 +20,21 @@ const app = initializeApp({
 });
 const db = getFirestore(app);
 
+// 🎲 RESULT
 function getResult(){
   let arr=["LOW","HIGH","MID"];
   return arr[Math.floor(Math.random()*3)];
 }
 
+// 🎲 DICE
 function getDice(r){
   if(r=="LOW") return {d1:1,d2:2};
   if(r=="HIGH") return {d1:6,d2:5};
   return {d1:3,d2:4};
 }
 
-setInterval(async ()=>{
+// 🔥 MAIN FUNCTION
+async function createRound(){
 
   let r=getResult();
   let d=getDice(r);
@@ -44,9 +47,17 @@ setInterval(async ()=>{
     d2:d.d2
   });
 
-},20000);
+  console.log("NEW ROUND CREATED");
+}
+
+// 🔥 FIRST RUN (IMPORTANT)
+createRound();
+
+// 🔁 LOOP
+setInterval(createRound,20000);
 
 </script>
+
 
 </body>
 </html>
