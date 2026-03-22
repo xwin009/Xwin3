@@ -520,10 +520,9 @@ onSnapshot(doc(db,"gameRounds","current"), snap=>{
 
 // 🔥 TIMER FIX (MAIN FIX)
 function getTime(){
-  if(!currentRound || !currentRound.startTime) return 20;
+  if(!currentRound) return 20;
 
-  // 🔥 FIX: null handle
-  let start = currentRound.startTime?.toMillis?.() || Date.now();
+  let start = currentRound.startTime; // 🔥 simple number
 
   let t = Math.floor((20000 - (Date.now() - start)) / 1000);
 
