@@ -464,11 +464,11 @@ body{
   <div class="popup-box" id="popupText"></div>
 </div>
 
-  <script type="module">
+<script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { 
-  getFirestore, doc, getDocs, collection, query, where, updateDoc, onSnapshot, increment
+  getFirestore, doc, getDocs, collection, query, where, updateDoc, onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const app = initializeApp({
@@ -488,16 +488,15 @@ let currentRound=null;
 let bettingOpen=true;
 let resultDone=false;
 
-// 🔥 HISTORY CONTROL
-let lastRoundIdHistory = null;
-let historyLoaded = false;
+// 🔥 history control
+let lastHistoryTime=null;
 
 // UI
 const cover=document.getElementById("cover");
 const dice=document.getElementById("diceArea");
 
 
-// 🔥 WALLET LOAD
+// ✅ WALLET
 async function loadWallet(){
   const snap = await getDocs(query(collection(db,"users"), where("email","==",userEmail)));
   snap.forEach(d=>{
@@ -509,11 +508,11 @@ async function loadWallet(){
 await loadWallet();
 
 
-// 🔥 LOAD HISTORY (LOCAL)
+// ✅ LOAD LOCAL HISTORY
 renderHistory(JSON.parse(localStorage.getItem("history") || "[]"));
 
 
-// 🔥 ROUND SYNC
+// ✅ ROUND SYNC
 onSnapshot(doc(db,"gameRounds","current"), snap=>{
   if(!snap.exists()) return;
 
@@ -548,27 +547,20 @@ onSnapshot(doc(db,"gameRounds","current"), snap=>{
 });
 
 
-// 🔥 HISTORY SYNC (FIREBASE)
+// ✅ HISTORY FIREBASE
 onSnapshot(doc(db,"history","global"), snap=>{
   if(!snap.exists()) return;
 
   let data = snap.data();
 
-  if(!historyLoaded){
-    historyLoaded = true;
-    lastRoundIdHistory = data.time;
-    return;
-  }
-
-  if(lastRoundIdHistory === data.time) return;
-
-  lastRoundIdHistory = data.time;
+  if(lastHistoryTime === data.time) return;
+  lastHistoryTime = data.time;
 
   updateHistory(data.lastResult);
 });
 
 
-// 🔥 TIMER
+// ✅ TIMER
 function getTime(){
   if(!currentRound) return 20;
 
@@ -587,6 +579,7 @@ setInterval(()=>{
   if(t === 0 && currentRound && currentRound.result && !resultDone){
     showResult();
   }
+
 },1000);
 
 
@@ -598,7 +591,7 @@ window.setChip=(v,e)=>{
 };
 
 
-// 🎯 BET
+// 🎯 BET (NO increment → no crash)
 window.bet=async(type,el)=>{
   if(!chip || !bettingOpen) return;
 
@@ -607,10 +600,6 @@ window.bet=async(type,el)=>{
   wallet -= chip;
 
   await updateDoc(doc(db,"users",userDocId),{balance:wallet});
-
-  await updateDoc(doc(db,"bets","global"),{
-    [type]: increment(chip)
-  });
 
   document.getElementById("wallet").innerText=wallet;
 
@@ -636,24 +625,19 @@ async function showResult(){
   document.getElementById("d1").innerText="🎲 "+currentRound.d1;
   document.getElementById("d2").innerText="🎲 "+currentRound.d2;
 
-  let r=currentRound.result;
+  let sum = currentRound.d1 + currentRound.d2;
 
-  // 🔥 RESULT FIX
-  if(typeof r === "number"){
-    if(r < 7) r = "LOW";
-    else if(r > 7) r = "HIGH";
-    else r = "MID";
-  }
+  let r;
+  if(sum < 7) r="LOW";
+  else if(sum > 7) r="HIGH";
+  else r="MID";
 
   let winAmt=0;
 
   if(bets[r]>0){
 
-    if(r=="MID"){
-      winAmt = bets[r]*5;
-    }else{
-      winAmt = bets[r]*2;
-    }
+    if(r=="MID") winAmt=bets[r]*5;
+    else winAmt=bets[r]*2;
 
     wallet += winAmt;
 
@@ -667,16 +651,16 @@ async function showResult(){
 }
 
 
-// 📜 UPDATE HISTORY (LOCAL + UI)
+// 📜 UPDATE HISTORY
 function updateHistory(type){
 
   let saved = JSON.parse(localStorage.getItem("history") || "[]");
 
   saved.unshift(type);
 
-  if(saved.length > 10) saved.pop();
+  if(saved.length>10) saved.pop();
 
-  localStorage.setItem("history", JSON.stringify(saved));
+  localStorage.setItem("history",JSON.stringify(saved));
 
   renderHistory(saved);
 }
@@ -686,7 +670,7 @@ function updateHistory(type){
 function renderHistory(saved){
 
   let h=document.getElementById("history");
-  h.innerHTML = "";
+  h.innerHTML="";
 
   saved.forEach(type=>{
     let d=document.createElement("div");
@@ -698,26 +682,6 @@ function renderHistory(saved){
     h.appendChild(d);
   });
 }
-
-
-// 📜 POPUP
-document.getElementById("historyBtn").onclick=()=>{
-  document.getElementById("historyPopup").classList.add("show");
-};
-
-document.getElementById("closeHistory").onclick=()=>{
-  document.getElementById("historyPopup").classList.remove("show");
-};
-
-
-// ❓ HELP
-document.getElementById("helpBtn").onclick=()=>{
-  document.getElementById("helpPopup").classList.add("show");
-};
-
-document.getElementById("helpPopup").onclick=()=>{
-  document.getElementById("helpPopup").classList.remove("show");
-};
 
 
 // 🔥 POPUP
@@ -732,7 +696,7 @@ function showPopup(msg,win){
   setTimeout(()=>p.classList.remove("show"),2000);
 }
 
-  </script>
+</script>
     
 
     <div id="helpPopup" class="help-popup">
