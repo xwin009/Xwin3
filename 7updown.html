@@ -646,7 +646,12 @@ async function showResult(){
     showPopup("LOSS",false);
   }
 }
-
+await addDoc(collection(db,"users",userDocId,"bets"),{
+  type: winType,
+  amount: bets.LOW + bets.HIGH + bets.MID,
+  win: win,
+  time: new Date().toLocaleTimeString()
+});
 
 // 📜 HISTORY
 function updateHistory(type){
@@ -679,6 +684,50 @@ function showPopup(msg,win){
   setTimeout(()=>p.classList.remove("show"),2000);
 }
 
+      async function loadBetHistory(){
+
+  historyList.innerHTML = "Loading...";
+
+  const snap = await getDocs(collection(db,"users",userDocId,"bets"));
+
+  let data = [];
+  snap.forEach(d => data.push(d.data()));
+
+  data.reverse(); // latest first
+
+  historyList.innerHTML = "";
+
+  if(data.length === 0){
+    historyList.innerHTML = "No bets yet";
+    return;
+  }
+
+  data.forEach(item=>{
+
+    let div = document.createElement("div");
+
+    // 🎯 TYPE NAME FIX
+    let typeName = "";
+    if(item.type === "LOW") typeName = "BELOW 7";
+    else if(item.type === "HIGH") typeName = "ABOVE 7";
+    else typeName = "EXACT 7";
+
+    // 🎯 WIN / LOSS UI
+    let amountText = item.win 
+      ? `+₹${item.amount}` 
+      : `-₹${item.amount}`;
+
+    div.className = "history-item " + (item.win ? "win-item" : "loss-item");
+
+    div.innerHTML = `
+      <span>${typeName}</span>
+      <span>${amountText} ${item.win ? "🎉" : "❌"}</span>
+      <span>${item.time}</span>
+    `;
+
+    historyList.appendChild(div);
+  });
+}
     </script>    
   
     <div id="helpPopup" class="help-popup">
