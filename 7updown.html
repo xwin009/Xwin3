@@ -599,24 +599,37 @@ async function showResult(){
 
   if(resultDone || !currentRound) return;
 
-  resultDone=true;
+  resultDone = true;
 
-  cover.style.display="none";
-  dice.style.display="flex";
+  // 🔥 STEP 1: gift hide
+  cover.style.display = "none";
 
-  document.getElementById("d1").innerText="🎲 "+currentRound.d1;
-  document.getElementById("d2").innerText="🎲 "+currentRound.d2;
+  // 🔥 STEP 2: dice show (force)
+  dice.style.display = "flex";
 
-  let r=currentRound.result;
+  // 🔥 STEP 3: reset opacity (important)
+  dice.style.opacity = "0";
 
-  let winAmt=0;
+  setTimeout(()=>{
+    dice.style.opacity = "1";
+  },100);
 
-  if(bets[r]>0){
+  // 🔥 STEP 4: set dice values AFTER visible
+  setTimeout(()=>{
+    document.getElementById("d1").innerText = "🎲 " + currentRound.d1;
+    document.getElementById("d2").innerText = "🎲 " + currentRound.d2;
+  },200);
 
-    if(r=="MID") winAmt=bets[r]*5;
-    else winAmt=bets[r]*2;
 
-    wallet+=winAmt;
+  let r = currentRound.result;
+  let winAmt = 0;
+
+  if(bets[r] > 0){
+
+    if(r=="MID") winAmt = bets[r]*5;
+    else winAmt = bets[r]*2;
+
+    wallet += winAmt;
 
     await updateDoc(doc(db,"users",userDocId),{balance:wallet});
 
