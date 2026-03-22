@@ -630,19 +630,25 @@ async function showResult(){
   let r=currentRound.result;
   let winAmt=0;
 
-  if(bets[r]>0){
-    winAmt = bets[r]*2; // 🔥 FIXED
+if(bets[r]>0){
 
-    wallet+=winAmt;
-
-    await updateDoc(doc(db,"users",userDocId),{balance:wallet});
-
-    showPopup("WIN ₹"+winAmt,true);
+  if(r=="MID"){
+    winAmt = bets[r]*5;
   }else{
-    showPopup("LOSS",false);
+    winAmt = bets[r]*2;
   }
 
-  updateHistory(r);
+  wallet += winAmt;
+
+  await updateDoc(doc(db,"users",userDocId),{balance:wallet});
+
+  showPopup("WIN ₹"+winAmt,true);
+
+}else{
+  showPopup("LOSS",false);
+}
+
+updateHistory(r);
 }
 
 
