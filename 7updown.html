@@ -503,7 +503,7 @@ async function loadWallet(){
   document.getElementById("wallet").innerText=wallet;
 }
 await loadWallet();
-await loadFullHistory();
+ loadFullHistory();
 
 // 🔥 ROUND SYNC (MAIN)
 onSnapshot(doc(db,"gameRounds","current"), snap=>{
@@ -628,12 +628,12 @@ async function showResult(){
 
   // 🔥 HISTORY SAVE (FIXED)
   await addDoc(collection(db,"users",userDocId,"bets"),{
-    type: r,
-    amount: bets.LOW + bets.HIGH + bets.MID,
-    win: win,
-    time: new Date().toLocaleTimeString(),
-timeStamp: Date.now()// 🔥 sorting ke liye
-  });
+  type: r,
+  amount: bets.LOW + bets.HIGH + bets.MID,
+  win: win,
+  time: new Date().toLocaleTimeString(),
+  timeStamp: Date.now()
+});
 }
 
 // 📜 HISTORY
