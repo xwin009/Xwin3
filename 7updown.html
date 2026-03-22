@@ -517,30 +517,29 @@ onSnapshot(doc(db,"gameRounds","current"), snap=>{
 
   currentRound = data;
 
-  // 🔥 yaha fix
   let diff = Date.now() - data.startTime;
   let remaining = Math.floor((20000 - diff)/1000);
 
   if(remaining <= 0){
     resultDone = true;
-    showResult(); // 🔥 direct result dikha
+    showResult();
   }else{
     resultDone = false;
   }
-}
-    bets={LOW:0,HIGH:0,MID:0};
 
-    document.getElementById("lowAmt").innerText=0;
-    document.getElementById("highAmt").innerText=0;
-    document.getElementById("midAmt").innerText=0;
+  // 🔥 YE ANDAR HI RAHEGA
+  bets={LOW:0,HIGH:0,MID:0};
 
-    document.querySelectorAll(".card-inner")
-      .forEach(e=>e.classList.remove("active"));
+  document.getElementById("lowAmt").innerText=0;
+  document.getElementById("highAmt").innerText=0;
+  document.getElementById("midAmt").innerText=0;
 
-    dice.style.display="none";
-    cover.style.display="block";
-  }
+  document.querySelectorAll(".card-inner")
+    .forEach(e=>e.classList.remove("active"));
 
+  dice.style.display="none";
+  cover.style.display="block";
+ }
   currentRound = data;
 });
 
@@ -583,7 +582,9 @@ setInterval(()=>{
 
   if(t<=5) bettingOpen=false;
 if(currentRound && Date.now() > currentRound.startTime + 20000){
-  showResult();
+  if(!resultDone){
+    showResult();
+  }
 }
   if(t===0 && !resultDone){
     showResult();
@@ -695,7 +696,7 @@ async function loadFullHistory(){
   );
 
   const h = document.getElementById("history");
-  if(h.children.length === 0){
+
   h.innerHTML = "";
   }
 
