@@ -93,10 +93,12 @@ async function start(){
       d2:d.d2
     });
 
-    await setDoc(doc(db,"history","global"),{
-      lastResult:r,
-      time:startTime
-    });
+    setTimeout(async ()=>{
+  await setDoc(doc(db,"history","global"),{
+    lastResult: r,
+    time: Date.now()
+  });
+}, 500); // small delay = FIX
 
     await setDoc(doc(db,"bets","global"),{
       LOW:0,HIGH:0,MID:0
