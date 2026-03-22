@@ -42,7 +42,7 @@ async function createRound(){
 
   await setDoc(doc(db,"gameRounds","current"),{
     roundId:Date.now(),
-    startTime: serverTimestamp(), // 🔥 FIX
+    startTime: Date.now(),
     result:r,
     d1:d.d1,
     d2:d.d2
