@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Admin Auto Round</title>
+</head>
+<body>
+
+<h2>Auto Round Running...</h2>
+
+<!-- 🔥 TERA CODE -->
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const app = initializeApp({
+  apiKey:"AIzaSyBx3J9aGn_98rTPgurMMKw_GR3puIMj4Ms",
+  authDomain:"colourcash-ea60e.firebaseapp.com",
+  projectId:"colourcash-ea60e"
+});
+const db = getFirestore(app);
+
+function getResult(){
+  let arr=["LOW","HIGH","MID"];
+  return arr[Math.floor(Math.random()*3)];
+}
+
+function getDice(r){
+  if(r=="LOW") return {d1:1,d2:2};
+  if(r=="HIGH") return {d1:6,d2:5};
+  return {d1:3,d2:4};
+}
+
+setInterval(async ()=>{
+
+  let r=getResult();
+  let d=getDice(r);
+
+  await setDoc(doc(db,"gameRounds","current"),{
+    roundId:Date.now(),
+    startTime:Date.now(),
+    result:r,
+    d1:d.d1,
+    d2:d.d2
+  });
+
+},20000);
+
+</script>
+
+</body>
+</html>
