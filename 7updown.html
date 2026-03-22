@@ -561,7 +561,12 @@ onSnapshot(doc(db,"gameRounds","current"), snap=>{
 
   currentRound = data;
 });
+onSnapshot(doc(db,"history","global"), snap=>{
+  if(!snap.exists()) return;
 
+  let data = snap.data();
+  updateHistory(data.lastResult);
+});
 
 // 🔥 TIMER
 function getTime(){
@@ -605,6 +610,12 @@ window.bet=async(type,el)=>{
   await updateDoc(doc(db,"users",userDocId),{balance:wallet});
   document.getElementById("wallet").innerText=wallet;
 
+  await updateDoc(doc(db,"bets","global"),{
+  [type]: increment(chip)
+});
+  document.getElementById("wallet").innerText=wallet;
+
+  
   bets[type]+=chip;
   document.getElementById(type.toLowerCase()+"Amt").innerText=bets[type];
 
@@ -655,19 +666,20 @@ updateHistory(r);
 // 📜 HISTORY SAVE + SHOW
 function updateHistory(type){
 
-  let saved = JSON.parse(localStorage.getItem("history") || "[]");
+  let h=document.getElementById("history");
 
-  saved.unshift(type);
+  let d=document.createElement("div");
 
-  if(saved.length > 10){
-    saved.pop();
+  if(type=="LOW"){d.className="B";d.innerText="B";}
+  else if(type=="HIGH"){d.className="A";d.innerText="A";}
+  else{d.className="E";d.innerText="E";}
+
+  h.prepend(d);
+
+  if(h.children.length>10){
+    h.removeChild(h.lastChild);
   }
-
-  localStorage.setItem("history", JSON.stringify(saved));
-
-  loadHistory(); // 🔥 reload UI
 }
-
 
 // 📜 HISTORY BUTTON
 document.getElementById("historyBtn").onclick=()=>{
