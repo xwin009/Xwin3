@@ -464,7 +464,8 @@ body{
   <div class="popup-box" id="popupText"></div>
 </div>
 
-<script type="module">
+
+  <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, doc, getDocs, collection, query, where, updateDoc, onSnapshot }
@@ -505,6 +506,26 @@ async function loadWallet(){
 await loadWallet();
 
 
+// 🔥 LOAD HISTORY FROM STORAGE
+function loadHistory(){
+  let saved = JSON.parse(localStorage.getItem("history") || "[]");
+
+  let h = document.getElementById("history");
+  h.innerHTML = "";
+
+  saved.forEach(type=>{
+    let d=document.createElement("div");
+
+    if(type=="LOW"){d.className="B";d.innerText="B";}
+    else if(type=="HIGH"){d.className="A";d.innerText="A";}
+    else{d.className="E";d.innerText="E";}
+
+    h.appendChild(d);
+  });
+}
+loadHistory();
+
+
 // 🔥 REALTIME GAME
 onSnapshot(doc(db,"gameRounds","current"), snap=>{
   if(!snap.exists()) return;
@@ -542,7 +563,7 @@ onSnapshot(doc(db,"gameRounds","current"), snap=>{
 });
 
 
-// 🔥 TIMER LOOP (ONLY RESULT TRIGGER HERE)
+// 🔥 TIMER
 function getTime(){
   if(!currentRound) return 20;
 
@@ -559,7 +580,6 @@ setInterval(()=>{
 
   if(t <= 5) bettingOpen = false;
 
-  // ✅ ONLY HERE RESULT CALL
   if(t === 0 && currentRound && currentRound.result && !resultDone){
     showResult();
   }
@@ -592,7 +612,7 @@ window.bet=async(type,el)=>{
 };
 
 
-// 🔥 RESULT (FINAL SAFE)
+// 🔥 RESULT
 async function showResult(){
 
   if(resultDone || !currentRound || !currentRound.result) return;
@@ -611,7 +631,7 @@ async function showResult(){
   let winAmt=0;
 
   if(bets[r]>0){
-    winAmt=r=="MID"?bets[r]*11:bets[r]*2;
+    winAmt = bets[r]*2; // 🔥 FIXED
 
     wallet+=winAmt;
 
@@ -623,6 +643,23 @@ async function showResult(){
   }
 
   updateHistory(r);
+}
+
+
+// 📜 HISTORY SAVE + SHOW
+function updateHistory(type){
+
+  let saved = JSON.parse(localStorage.getItem("history") || "[]");
+
+  saved.unshift(type);
+
+  if(saved.length > 10){
+    saved.pop();
+  }
+
+  localStorage.setItem("history", JSON.stringify(saved));
+
+  loadHistory(); // 🔥 reload UI
 }
 
 
@@ -646,30 +683,6 @@ document.getElementById("helpPopup").onclick=()=>{
 };
 
 
-// HISTORY TOP (NO DUPLICATE)
-function updateHistory(type){
-
-  let h=document.getElementById("history");
-
-  // 🔥 prevent double insert
-  if(h.firstChild && h.firstChild.innerText === (type=="LOW"?"B":type=="HIGH"?"A":"E")){
-    return;
-  }
-
-  let d=document.createElement("div");
-
-  if(type=="LOW"){d.className="B";d.innerText="B";}
-  else if(type=="HIGH"){d.className="A";d.innerText="A";}
-  else{d.className="E";d.innerText="E";}
-
-  h.prepend(d);
-
-  if(h.children.length>10){
-    h.removeChild(h.lastChild);
-  }
-}
-
-
 // POPUP
 function showPopup(msg,win){
   const p=document.getElementById("popup");
@@ -682,7 +695,7 @@ function showPopup(msg,win){
   setTimeout(()=>p.classList.remove("show"),2000);
 }
 
-</script>
+  </script>
       
     <div id="helpPopup" class="help-popup">
   <div class="help-box">
