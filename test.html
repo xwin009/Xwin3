@@ -10,7 +10,7 @@
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, doc, setDoc } 
+import { getFirestore, doc, setDoc, getDocs, collection } 
 from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const app = initializeApp({
@@ -21,10 +21,45 @@ const app = initializeApp({
 
 const db = getFirestore(app);
 
-// 🎲 RESULT
-function getResult(){
-  const arr=["LOW","HIGH","MID"];
-  return arr[Math.floor(Math.random()*3)];
+let running = false; // 🔥 duplicate loop rokne ke liye
+
+// 🎲 SMART RESULT (HOUSE EDGE)
+async function getResult(){
+
+  let low=0, high=0, mid=0;
+
+  try{
+    const snap = await getDocs(collection(db,"bets"));
+
+    snap.forEach(d=>{
+      const b = d.data();
+      low += b.LOW || 0;
+      high += b.HIGH || 0;
+      mid += b.MID || 0;
+    });
+
+  }catch(e){
+    console.log("⚠ bets fetch error",e);
+  }
+
+  console.log("💰 BETS:",low,high,mid);
+
+  // ✅ Equal bet → MID (SAFE, no loss)
+  if(low === high){
+    return "MID";
+  }
+
+  // ✅ MID heavy → avoid MID (loss control)
+  if(mid > low && mid > high){
+    return low > high ? "HIGH" : "LOW";
+  }
+
+  // ✅ Jispe jyada bet → usko harana
+  if(low > high){
+    return "HIGH";
+  }else{
+    return "LOW";
+  }
 }
 
 // 🎲 DICE
@@ -34,12 +69,15 @@ function getDice(r){
   return {d1:3,d2:4};
 }
 
-// 🔥 MAIN LOOP (IMPORTANT)
+// 🔥 MAIN GAME LOOP
 async function startGame(){
+
+  if(running) return; // 🔥 double start fix
+  running = true;
 
   while(true){
 
-    const r = getResult();
+    const r = await getResult();
     const d = getDice(r);
 
     await setDoc(doc(db,"gameRounds","current"),{
@@ -50,23 +88,15 @@ async function startGame(){
       d2: d.d2
     });
 
-    console.log("✅ NEW ROUND");
+    console.log("✅ NEW ROUND:", r);
 
-    // ⏱ wait 20 sec
+    // ⏱ 20 sec wait
     await new Promise(res => setTimeout(res, 20000));
   }
 }
 
-// 🔥 RUN
+// 🔥 START
 startGame();
-
-// 🔥 VISIBILITY FIX (VERY IMPORTANT)
-document.addEventListener("visibilitychange", ()=>{
-  if(document.visibilityState === "visible"){
-    console.log("🔁 Restarting loop");
-    startGame();
-  }
-});
 
 </script>
 
