@@ -659,11 +659,11 @@ async function result(){
 
     // 🔥 SAVE HISTORY
     await addDoc(collection(db,"users",userDocId,"bets"),{
-      type: winType,
-      amount: win ? winAmount : bets[winType] || 0
-      win: win,
-      time: new Date().toLocaleTimeString()
-    });
+  type: winType,
+  amount: win ? winAmount : bets[winType] || 0,  // ✅ comma yahan
+  win: win,
+  time: new Date().toLocaleTimeString()
+});
 
     updateHistory(winType);
 
