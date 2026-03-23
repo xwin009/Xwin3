@@ -18,10 +18,12 @@ body{
   padding:10px;
 }
 
+/* HEADER */
 .header{
   text-align:center;
   font-size:22px;
   font-weight:bold;
+  margin-bottom:10px;
 }
 
 /* ROAD */
@@ -35,37 +37,44 @@ body{
 .road{
   display:flex;
   gap:12px;
-  padding-left:20px;
+  padding-left:120px; /* 🔥 center chicken */
   transition:0.4s;
 }
 
-/* STEP */
+/* STEP DESIGN */
 .step{
-  min-width:80px;
+  min-width:85px;
   height:110px;
-  border-radius:12px;
-  background:#1e293b;
+  border-radius:14px;
+  background:linear-gradient(145deg,#1e293b,#020617);
   display:flex;
   align-items:center;
   justify-content:center;
   font-weight:bold;
+  color:#00ffcc;
+  font-size:16px;
+  box-shadow:0 0 15px rgba(0,255,200,0.2);
+  border:1px solid rgba(0,255,200,0.2);
 }
 
+/* ACTIVE STEP */
 .active{
-  background:#00ffcc;
+  background:linear-gradient(145deg,#00ffcc,#00cc99);
   color:#000;
+  box-shadow:0 0 25px #00ffcc;
+  transform:scale(1.1);
 }
 
-/* 🐔 CHICKEN IMAGE */
+/* 🐔 CHICKEN */
 .chicken{
   position:absolute;
   bottom:10px;
-  left:20px;
+  left:120px;
   width:70px;
   transition:0.3s;
 }
 
-/* 🔥 JUMP ANIMATION */
+/* JUMP */
 @keyframes jump{
   0%{transform:translateY(0);}
   50%{transform:translateY(-60px);}
@@ -76,13 +85,15 @@ body{
   animation:jump 0.4s;
 }
 
-/* UI */
+/* MULTI */
 #multi{
   text-align:center;
+  font-size:22px;
   margin:10px;
-  font-size:20px;
+  color:#ffd700;
 }
 
+/* BUTTONS */
 button{
   width:100%;
   padding:14px;
@@ -106,14 +117,12 @@ button{
 
 <div class="road-container">
   <div class="road" id="road"></div>
-
-  <!-- 🐔 IMAGE -->
   <img src="images/28859-removebg-preview.png" id="chicken" class="chicken">
 </div>
 
 <div id="multi">1.00x</div>
 
-<select id="level">
+<select id="level" onchange="initGame()">
 <option value="easy">Easy</option>
 <option value="medium">Medium</option>
 <option value="hard">Hard</option>
@@ -127,11 +136,12 @@ button{
 
 <script>
 
+// 🔥 MULTIPLIERS FULL
 const levels = {
-easy:[1.02,1.08,1.14,1.21,1.29,1.37,1.46,1.56,1.67,1.80],
-medium:[1.08,1.22,1.38,1.57,1.79,2.06,2.38],
-hard:[1.19,1.47,1.84,2.32,2.97,3.84],
-hardcore:[1.45,2.22,3.47,5.56,9.13]
+easy:[1.02,1.08,1.14,1.21,1.29,1.37,1.46,1.56,1.67,1.80,1.94,2.09],
+medium:[1.08,1.22,1.38,1.57,1.79,2.06,2.38,2.78],
+hard:[1.19,1.47,1.84,2.32,2.97,3.84,5.05],
+hardcore:[1.45,2.22,3.47,5.56,9.13,15.46]
 };
 
 let playing=false;
@@ -139,7 +149,14 @@ let step=0;
 let currentLevel="easy";
 let bet=100;
 
-// CREATE ROAD
+// 🔥 INIT
+function initGame(){
+  currentLevel=document.getElementById("level").value;
+  createRoad();
+}
+initGame();
+
+// 🔥 CREATE ROAD
 function createRoad(){
   let road=document.getElementById("road");
   road.innerHTML="";
@@ -153,15 +170,12 @@ function createRoad(){
   });
 }
 
-// PLAY / JUMP
+// ▶️ PLAY / JUMP
 function play(){
 
   if(!playing){
     playing=true;
     step=0;
-    currentLevel=document.getElementById("level").value;
-
-    createRoad();
 
     document.getElementById("playBtn").innerText="JUMP";
     document.getElementById("multi").innerText="1.00x";
@@ -195,27 +209,26 @@ function play(){
   }
 }
 
-// 🐔 MOVE + JUMP
+// 🐔 MOVE + FIXED POSITION
 function move(s){
 
   let chicken=document.getElementById("chicken");
+  let road=document.getElementById("road");
 
-  // 🔥 JUMP EFFECT
+  // jump
   chicken.classList.add("jump");
   setTimeout(()=>chicken.classList.remove("jump"),400);
 
-  // 🔥 MOVE RIGHT
-  chicken.style.left = (20 + s*90)+"px";
-
-  // 🔥 ROAD SLIDE
-  let road=document.getElementById("road");
-  road.style.transform = `translateX(-${s*60}px)`;
-
+  // highlight
   document.querySelectorAll(".step").forEach(e=>e.classList.remove("active"));
   document.getElementById("s"+s).classList.add("active");
+
+  // slide road
+  let stepWidth=95;
+  road.style.transform = `translateX(-${s * stepWidth}px)`;
 }
 
-// CASHOUT
+// 💰 CASHOUT
 function cashout(){
   if(!playing) return;
 
@@ -226,21 +239,22 @@ function cashout(){
   reset();
 }
 
-// LOSE
+// ❌ LOSE
 function gameOver(){
   alert("❌ LOSE");
   reset();
 }
 
-// RESET
+// 🔄 RESET
 function reset(){
   playing=false;
   step=0;
+
   document.getElementById("playBtn").innerText="PLAY";
   document.getElementById("multi").innerText="1.00x";
-  document.getElementById("road").innerHTML="";
+
   document.getElementById("road").style.transform="translateX(0)";
-  document.getElementById("chicken").style.left="20px";
+  document.querySelectorAll(".step").forEach(e=>e.classList.remove("active"));
 }
 
 </script>
