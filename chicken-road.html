@@ -133,6 +133,44 @@ button{
 }
 .win{ background:#065f46; color:#00ff99; }
 .loss{ background:#7f1d1d; color:#ff4d4d; }
+  
+  .fire-line{
+  display:flex;
+  justify-content:space-around;
+  position:absolute;
+  bottom:0;
+  width:100%;
+}
+
+.pipe{
+  width:40px;
+  height:20px;
+  background:#222;
+  border-radius:10px;
+  position:relative;
+  overflow:hidden;
+}
+
+/* 🔥 FIRE */
+.pipe::before{
+  content:"";
+  position:absolute;
+  bottom:0;
+  left:50%;
+  transform:translateX(-50%);
+  width:20px;
+  height:0;
+  background:linear-gradient(to top, orange, red, yellow);
+  border-radius:50%;
+  opacity:0;
+  transition:0.3s;
+}
+
+/* 🔥 ACTIVE FIRE */
+.pipe.active::before{
+  height:40px;
+  opacity:1;
+}
 
 @keyframes pop{
   from{transform:scale(0.7);}
@@ -153,6 +191,12 @@ button{
 <div class="multi-box">
   <div class="road" id="road">
     <img src="images/28859-removebg-preview.png" id="chicken">
+ <div class="fire-line">
+  <div class="pipe"></div>
+  <div class="pipe"></div>
+  <div class="pipe"></div>
+  <div class="pipe"></div>
+</div>
   </div>
 </div>
 
@@ -197,24 +241,38 @@ function initGame(){
 }
 initGame();
 
-// CREATE ROAD
+// CREATE ROAD + FIRE PIPE
 function createRoad(){
   let road=document.getElementById("road");
-  road.innerHTML = `<img src="images/28859-removebg-preview.png" id="chicken">`;
+
+  road.innerHTML = `
+    <img src="images/28859-removebg-preview.png" id="chicken">
+    <div class="fire-line" id="fireLine"></div>
+  `;
+
+  let fireLine=document.getElementById("fireLine");
 
   levels[currentLevel].forEach((m,i)=>{
+
+    // STEP
     let d=document.createElement("div");
     d.className="step";
     d.innerText=m+"x";
     d.id="s"+i;
     road.appendChild(d);
+
+    // PIPE
+    let pipe=document.createElement("div");
+    pipe.className="pipe";
+    fireLine.appendChild(pipe);
+
   });
 
   document.getElementById("s0").classList.add("active");
   moveChicken(0);
 }
 
-// PLAY
+// PLAY / JUMP
 function play(){
 
   if(!playing){
@@ -247,7 +305,13 @@ function play(){
     };
 
     if(Math.random()<loseChance[currentLevel]){
-      gameOver();
+
+      triggerFire(step); // 🔥 FIRE
+
+      setTimeout(()=>{
+        gameOver();
+      },400);
+
       return;
     }
 
@@ -255,7 +319,7 @@ function play(){
   }
 }
 
-// 🐔 MOVE (NOW PERFECT)
+// 🐔 MOVE
 function moveChicken(s){
 
   let chicken=document.getElementById("chicken");
@@ -268,6 +332,20 @@ function moveChicken(s){
 
   document.querySelectorAll(".step").forEach(e=>e.classList.remove("active"));
   document.getElementById("s"+s).classList.add("active");
+}
+
+// 🔥 FIRE TRIGGER
+function triggerFire(index){
+
+  let pipes=document.querySelectorAll(".pipe");
+
+  if(pipes[index]){
+    pipes[index].classList.add("active");
+
+    setTimeout(()=>{
+      pipes[index].classList.remove("active");
+    },800);
+  }
 }
 
 // POPUP
@@ -292,17 +370,18 @@ function cashout(){
   wallet += winAmount;
   document.getElementById("wallet").innerText=wallet;
 
-  showPopup(`🎉 Congratulations!<br>Win ₹${winAmount}`,true);
+  showPopup(`🎉 Congratulations!<br>Win ₹${winAmount} 💰`,true);
 
   reset();
 }
 
 // LOSE
 function gameOver(){
+
   wallet -= bet;
   document.getElementById("wallet").innerText=wallet;
 
-  showPopup(`😢 Bad News!<br>You Loss ₹${bet}`,false);
+  showPopup(`💀 Bad Luck!<br>You Lost ₹${bet} 🔥`,false);
 
   reset();
 }
@@ -321,7 +400,7 @@ function reset(){
   moveChicken(0);
 }
 
-</script>
-
+        </script>
+    
 </body>
 </html>
