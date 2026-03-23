@@ -1,224 +1,84 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>🐔 Chicken Road</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
-<style>
-body{margin:0;background:#0f0f0f;color:#fff;font-family:Arial}
-.header{text-align:center;padding:14px;font-size:24px;font-weight:bold}
-.card{background:#1b1b1b;margin:12px;padding:14px;border-radius:14px}
-.center{text-align:center}
-.row{display:flex;gap:10px}
-.btn{flex:1;padding:12px;border-radius:10px;border:none;background:#333;color:#fff;font-weight:bold;cursor:pointer}
-.btn.active{outline:3px solid #fff}
-.btn.primary{background:#ff9800;color:#000}
-.btn.success{background:#4caf50}
-.btn.danger{background:#ff5252}
-.btn:disabled{opacity:.5}
-input{width:100%;padding:12px;border-radius:10px;border:none;font-size:16px;margin-top:8px}
-
-.track{display:flex;gap:6px;overflow-x:auto;margin-top:10px}
-.step{min-width:70px;padding:10px;border-radius:10px;background:#2a2a2a;text-align:center;font-size:13px}
-.step.active{background:#ff9800;color:#000}
-
-.chicken{font-size:34px;transition:.3s}
-.jump{transform:translateX(8px) scale(1.1)}
-
-.popup{
-  position:fixed;inset:0;display:none;
-  align-items:center;justify-content:center;
-  background:rgba(0,0,0,.6);z-index:9999
-}
-.popup div{
-  background:#222;padding:22px;border-radius:14px;
-  font-size:18px;text-align:center;min-width:240px
-}
-.win{color:#4caf50}
-.lose{color:#ff5252}
-
-.history{font-size:14px;line-height:1.6;margin-top:6px}
-</style>
+  <meta charset="UTF-8">
+  <title>Chicken Betting Game</title>
+  <style>
+    body {
+      background: #222;
+      color: #fff;
+      text-align: center;
+      font-family: Arial, sans-serif;
+    }
+    #gameArea {
+      position: relative;
+      width: 600px;
+      height: 300px;
+      margin: 20px auto;
+      border: 2px solid #fff;
+      background: #333;
+    }
+    #chicken {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      width: 50px;
+      height: 50px;
+      background: url('https://i.ibb.co/3mLkYwM/chicken.png') no-repeat center/cover;
+      transition: left 0.5s;
+    }
+    .door {
+      position: absolute;
+      bottom: 20px;
+      width: 60px;
+      height: 100px;
+      background: brown;
+      color: #fff;
+      text-align: center;
+      line-height: 100px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+  </style>
 </head>
-
 <body>
-
-<div class="header">🐔 CHICKEN ROAD</div>
-
-<div class="card center">
-  <div style="font-size:26px">Balance: ₹<span id="bal">0.00</span></div>
-  <div style="margin-top:6px">Current X: <b id="curX">1.00x</b></div>
-  <div class="chicken" id="chicken">🐔</div>
-</div>
-
-<div class="card">
-  <b>Select Mode</b>
-  <div class="row" style="margin-top:8px">
-    <button class="btn active" onclick="setMode('easy',this)">Easy</button>
-    <button class="btn" onclick="setMode('medium',this)">Medium</button>
-    <button class="btn" onclick="setMode('hard',this)">Hard</button>
-    <button class="btn" onclick="setMode('veryhard',this)">Very Hard</button>
+  <h1>Chicken Betting Game</h1>
+  <div>
+    Bet Amount: <input type="number" id="betAmount" value="100">
+    <button onclick="playGame()">Play</button>
+  </div>
+  
+  <div id="gameArea">
+    <div id="chicken"></div>
+    <!-- Doors with multipliers -->
+    <div class="door" style="left:150px;" data-multiplier="2">2X</div>
+    <div class="door" style="left:250px;" data-multiplier="5">5X</div>
+    <div class="door" style="left:350px;" data-multiplier="10">10X</div>
+    <div class="door" style="left:450px;" data-multiplier="20">20X</div>
   </div>
 
-  <input id="amt" type="number" min="1" placeholder="Bet Amount ₹">
-  <button class="btn primary" onclick="startGame()">START</button>
-</div>
+  <p id="result"></p>
 
-<div class="card">
-  <div class="row">
-    <button class="btn success" onclick="nextStep()">NEXT STEP</button>
-    <button class="btn danger" onclick="cashOut()">CASH OUT</button>
-  </div>
-  <div class="track" id="track"></div>
-</div>
+  <script>
+    function playGame() {
+      let bet = parseInt(document.getElementById("betAmount").value);
+      let chicken = document.getElementById("chicken");
+      let doors = document.querySelectorAll(".door");
 
-<div class="card">
-  <b>My Bets</b>
-  <div class="history" id="betsDiv">No bets yet</div>
-</div>
+      doors.forEach(door => {
+        door.onclick = () => {
+          // Move chicken to door
+          chicken.style.left = door.style.left;
 
-<div class="popup" id="popup"><div id="popupText"></div></div>
+          // Calculate reward
+          let multiplier = parseFloat(door.dataset.multiplier);
+          let win = bet * multiplier;
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore,getDocs,collection,query,where,doc,updateDoc }
-from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-/* FIREBASE */
-const firebaseConfig={
-  apiKey:"AIzaSyBx3J9aGn_98rTPgurMMKw_GR3puIMj4Ms",
-  authDomain:"colourcash-ea60e.firebaseapp.com",
-  projectId:"colourcash-ea60e"
-};
-const app=initializeApp(firebaseConfig);
-const db=getFirestore(app);
-
-const userEmail=localStorage.getItem("userEmail");
-let userDocId="",balance=0;
-
-/* MULTIPLIERS (UNCHANGED) */
-const MODES={
-easy:[1.02,1.08,1.14,1.21,1.29,1.37,1.46,1.56,1.67,1.80,1.94,2.09,2.27,2.47,2.79,2.95,3.24,3.58,3.98,4.45,5.01,5.68,6.49,7.49,8.74,10.33,12.39,15.15,18.94,24.35],
-medium:[1.08,1.22,1.38,1.57,1.79,2.06,2.38,2.78,3.27,3.89,4.67,5.67,6.98,8.73,11.11,14.44,19.25,26.48,37.83,56.74,90.79,158.88,317.77,794.43,3177.72],
-hard:[1.19,1.47,1.84,2.32,2.97,3.84,5.05,6.73,9.13,12.65,17.92,26.07,39.11,60.84,98.87,169.49,310.74,621.49,1398.35,3728.95,13051.35,78308.1],
-veryhard:[1.45,2.22,3.47,5.56,9.13,15.46,27.06,49.21,93.5,187.01,397.39,908.33,2270.83,6358.35,20664.63,82658.55,456622.02,4546220.25]
-};
-
-/* 🔥 RISK SETTINGS (NEW) */
-const RISK={
-  easy:{base:0.03,step:0.015},
-  medium:{base:0.06,step:0.025},
-  hard:{base:0.10,step:0.04},
-  veryhard:{base:0.18,step:0.06}
-};
-
-let mode="easy",steps=MODES.easy;
-let index=-1,bet=0,alive=false;
-let bets=[];
-
-/* 🔥 DYNAMIC BOMB LOGIC */
-function bomb(){
-  const r=RISK[mode];
-  const chance=r.base+(index+1)*r.step;
-  return Math.random()<chance;
-}
-
-/* WALLET */
-async function loadWallet(){
-  const snap=await getDocs(query(collection(db,"users"),where("email","==",userEmail)));
-  snap.forEach(d=>{
-    userDocId=d.id;
-    balance=d.data().balance||0;
-  });
-  bal.innerText=balance.toFixed(2);
-}
-
-function popupMsg(msg,cls=""){
-  popupText.className=cls;
-  popupText.innerHTML=msg;
-  popup.style.display="flex";
-  setTimeout(()=>popup.style.display="none",1600);
-}
-
-function setMode(m,el){
-  mode=m;steps=MODES[m];index=-1;alive=false;
-  document.querySelectorAll(".row .btn").forEach(b=>b.classList.remove("active"));
-  el.classList.add("active");
-  renderTrack();
-}
-
-function renderTrack(){
-  track.innerHTML="";
-  steps.forEach((x,i)=>{
-    const d=document.createElement("div");
-    d.className="step"+(i===index?" active":"");
-    d.innerText=x+"x";
-    track.appendChild(d);
-  });
-}
-
-async function startGame(){
-  const a=+amt.value;
-  if(a<1||a>balance) return popupMsg("Min ₹1","lose");
-
-  bet=a;
-  balance-=bet;
-  await updateDoc(doc(db,"users",userDocId),{balance});
-  bal.innerText=balance.toFixed(2);
-
-  index=-1;alive=true;
-  curX.innerText="1.00x";
-  popupMsg("✅ Bet Placed ₹"+bet);
-  renderTrack();
-}
-
-function nextStep(){
-  if(!alive)return;
-
-  if(bomb()){
-    alive=false;
-    popupMsg("💣 CRASH! You Lost ₹"+bet,"lose");
-    bets.unshift(`❌ ${mode.toUpperCase()} | ₹${bet}`);
-    renderBets();
-    return;
-  }
-
-  index++;
-  chicken.classList.add("jump");
-  setTimeout(()=>chicken.classList.remove("jump"),300);
-
-  curX.innerText=steps[index].toFixed(2)+"x";
-  renderTrack();
-}
-
-async function cashOut(){
-  if(!alive||index<0)return;
-
-  const win=bet*steps[index];
-  balance+=win;
-  await updateDoc(doc(db,"users",userDocId),{balance});
-  bal.innerText=balance.toFixed(2);
-
-  alive=false;
-  popupMsg("🎉 WIN ₹"+win.toFixed(2),"win");
-  bets.unshift(`✅ ${mode.toUpperCase()} | ₹${bet} → ₹${win.toFixed(2)}`);
-  renderBets();
-}
-
-function renderBets(){
-  betsDiv.innerHTML=bets.length?bets.slice(0,10).join("<br>"):"No bets yet";
-}
-
-renderTrack();
-loadWallet();
-
-/* expose */
-window.setMode=setMode;
-window.startGame=startGame;
-window.nextStep=nextStep;
-window.cashOut=cashOut;
-</script>
-
+          document.getElementById("result").innerText =
+            "Chicken chose " + multiplier + "X door! You won ₹" + win;
+        };
+      });
+    }
+  </script>
 </body>
 </html>
