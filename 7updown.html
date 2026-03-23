@@ -660,7 +660,7 @@ async function result(){
     // 🔥 SAVE HISTORY
     await addDoc(collection(db,"users",userDocId,"bets"),{
       type: winType,
-      amount: bets[winType] || 0,
+      amount: win ? winAmount : bets[winType] || 0
       win: win,
       time: new Date().toLocaleTimeString()
     });
@@ -786,11 +786,21 @@ async function loadBetHistory(){
     let div=document.createElement("div");
     div.className="history-item "+(item.win?"win-item":"loss-item");
 
-    div.innerHTML=`
-      <span>${item.type}</span>
-      <span>₹${item.amount}</span>
-      <span>${item.time}</span>
-    `;
+    let typeName = "";
+
+if(item.type === "LOW") typeName = "BELOW 7";
+else if(item.type === "HIGH") typeName = "ABOVE 7";
+else typeName = "EXACT 7";
+
+let amountText = item.win 
+  ? `+₹${item.amount} 🎉` 
+  : `-₹${item.amount} ❌`;
+
+div.innerHTML = `
+  <span>${typeName}</span>
+  <span>${amountText}</span>
+  <span>${item.time}</span>
+`;
 
     historyList.appendChild(div);
   });
