@@ -1,84 +1,205 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>Chicken Betting Game</title>
-  <style>
-    body {
-      background: #222;
-      color: #fff;
-      text-align: center;
-      font-family: Arial, sans-serif;
-    }
-    #gameArea {
-      position: relative;
-      width: 600px;
-      height: 300px;
-      margin: 20px auto;
-      border: 2px solid #fff;
-      background: #333;
-    }
-    #chicken {
-      position: absolute;
-      bottom: 20px;
-      left: 20px;
-      width: 50px;
-      height: 50px;
-      background: url('https://i.ibb.co/3mLkYwM/chicken.png') no-repeat center/cover;
-      transition: left 0.5s;
-    }
-    .door {
-      position: absolute;
-      bottom: 20px;
-      width: 60px;
-      height: 100px;
-      background: brown;
-      color: #fff;
-      text-align: center;
-      line-height: 100px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-  </style>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chicken Road</title>
+
+<style>
+body{
+  margin:0;
+  background:#0b0f1a;
+  color:#fff;
+  font-family:Arial;
+  text-align:center;
+}
+
+.container{
+  max-width:400px;
+  margin:auto;
+  padding:10px;
+}
+
+h2{
+  margin:10px 0;
+}
+
+/* ROAD */
+.road{
+  display:flex;
+  justify-content:space-between;
+  margin:20px 0;
+}
+
+.step{
+  width:22%;
+  height:80px;
+  border:2px dashed #555;
+  border-radius:10px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.active{
+  border-color:#00ffcc;
+}
+
+/* CHICKEN */
+#chicken{
+  font-size:40px;
+  transition:0.3s;
+}
+
+/* BUTTONS */
+button{
+  width:100%;
+  padding:15px;
+  margin-top:10px;
+  border:none;
+  border-radius:10px;
+  font-size:16px;
+}
+
+.play{ background:#22c55e; }
+.cash{ background:#f59e0b; }
+
+</style>
 </head>
+
 <body>
-  <h1>Chicken Betting Game</h1>
-  <div>
-    Bet Amount: <input type="number" id="betAmount" value="100">
-    <button onclick="playGame()">Play</button>
-  </div>
-  
-  <div id="gameArea">
-    <div id="chicken"></div>
-    <!-- Doors with multipliers -->
-    <div class="door" style="left:150px;" data-multiplier="2">2X</div>
-    <div class="door" style="left:250px;" data-multiplier="5">5X</div>
-    <div class="door" style="left:350px;" data-multiplier="10">10X</div>
-    <div class="door" style="left:450px;" data-multiplier="20">20X</div>
-  </div>
 
-  <p id="result"></p>
+<div class="container">
 
-  <script>
-    function playGame() {
-      let bet = parseInt(document.getElementById("betAmount").value);
-      let chicken = document.getElementById("chicken");
-      let doors = document.querySelectorAll(".door");
+<h2>🐔 Chicken Road</h2>
 
-      doors.forEach(door => {
-        door.onclick = () => {
-          // Move chicken to door
-          chicken.style.left = door.style.left;
+<div id="chicken">🐔</div>
 
-          // Calculate reward
-          let multiplier = parseFloat(door.dataset.multiplier);
-          let win = bet * multiplier;
+<div class="road" id="road"></div>
 
-          document.getElementById("result").innerText =
-            "Chicken chose " + multiplier + "X door! You won ₹" + win;
-        };
-      });
+<h3 id="multi">1.00x</h3>
+
+<select id="level">
+<option value="easy">Easy</option>
+<option value="medium">Medium</option>
+<option value="hard">Hard</option>
+<option value="hardcore">Hardcore</option>
+</select>
+
+<button class="play" id="playBtn" onclick="play()">PLAY</button>
+<button class="cash" onclick="cashout()">CASH OUT</button>
+
+</div>
+
+<script>
+
+// 🔥 MULTIPLIERS
+const levels = {
+  easy:[1.02,1.08,1.14,1.21,1.29,1.37,1.46,1.56,1.67,1.80,1.94],
+  medium:[1.08,1.22,1.38,1.57,1.79,2.06,2.38],
+  hard:[1.19,1.47,1.84,2.32,2.97,3.84],
+  hardcore:[1.45,2.22,3.47,5.56,9.13]
+};
+
+let playing=false;
+let step=0;
+let currentLevel="easy";
+let bet=100;
+
+// 🧱 CREATE ROAD
+function createRoad(){
+  let road=document.getElementById("road");
+  road.innerHTML="";
+
+  let arr=levels[currentLevel];
+
+  arr.forEach((m,i)=>{
+    let d=document.createElement("div");
+    d.className="step";
+    d.innerText=m+"x";
+    d.id="step"+i;
+    road.appendChild(d);
+  });
+}
+
+// ▶️ PLAY / JUMP
+function play(){
+
+  if(!playing){
+    // START
+    playing=true;
+    step=0;
+    currentLevel=document.getElementById("level").value;
+
+    createRoad();
+
+    document.getElementById("playBtn").innerText="JUMP";
+    document.getElementById("multi").innerText="1.00x";
+
+  }else{
+    // JUMP
+    step++;
+
+    let arr=levels[currentLevel];
+
+    if(step >= arr.length){
+      gameOver();
+      return;
     }
-  </script>
+
+    moveChicken(step);
+
+    // 🔥 LOSE CHANCE
+    let loseChance = {
+      easy:0.1,
+      medium:0.2,
+      hard:0.3,
+      hardcore:0.5
+    };
+
+    if(Math.random() < loseChance[currentLevel]){
+      gameOver();
+      return;
+    }
+
+    document.getElementById("multi").innerText = arr[step]+"x";
+  }
+}
+
+// 🐔 MOVE
+function moveChicken(s){
+  document.querySelectorAll(".step").forEach(e=>e.classList.remove("active"));
+  document.getElementById("step"+s).classList.add("active");
+}
+
+// 💰 CASHOUT
+function cashout(){
+
+  if(!playing) return;
+
+  let arr=levels[currentLevel];
+  let win = bet * arr[step];
+
+  alert("WIN ₹"+Math.floor(win));
+
+  resetGame();
+}
+
+// ❌ LOSE
+function gameOver(){
+  alert("❌ LOSE");
+  resetGame();
+}
+
+// 🔄 RESET
+function resetGame(){
+  playing=false;
+  step=0;
+  document.getElementById("playBtn").innerText="PLAY";
+  document.getElementById("multi").innerText="1.00x";
+  document.getElementById("road").innerHTML="";
+}
+
+</script>
+
 </body>
 </html>
