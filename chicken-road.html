@@ -144,7 +144,7 @@ button{
 }
 
 .pipe{
-  width:35px;
+  width:85px;   /* 🔥 step ke equal */
   height:12px;
   background:#111;
   border-radius:8px;
@@ -267,19 +267,19 @@ function createRoad(){
 
   levels[currentLevel].forEach((m,i)=>{
 
-    // STEP
-    let d=document.createElement("div");
-    d.className="step";
-    d.innerText=m+"x";
-    d.id="s"+i;
-    road.appendChild(d);
+  // STEP
+  let d=document.createElement("div");
+  d.className="step";
+  d.innerText=m+"x";
+  d.id="s"+i;
+  road.appendChild(d);
 
-    // PIPE
-    let pipe=document.createElement("div");
-    pipe.className="pipe";
-    fireLine.appendChild(pipe);
+  // 🔥 PIPE (same count as steps)
+  let pipe=document.createElement("div");
+  pipe.className="pipe";
+  fireLine.appendChild(pipe);
 
-  });
+});
 
   document.getElementById("s0").classList.add("active");
   moveChicken(0);
