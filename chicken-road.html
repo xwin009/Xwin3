@@ -10,38 +10,40 @@ body{
   font-family:Arial;
   background:#0b0f1a;
   color:#fff;
+  display:flex;
+  justify-content:center;
 }
 
 .container{
+  width:100%;
   max-width:420px;
-  margin:auto;
-  padding:10px;
+  padding:20px 10px;
+  text-align:center;
 }
 
 /* HEADER */
 .header{
-  text-align:center;
   font-size:22px;
   font-weight:bold;
-  margin-bottom:10px;
+  margin-bottom:20px;
 }
 
-/* ROAD */
-.road-container{
+/* MULTI BOX CONTAINER */
+.multi-box{
+  border:2px solid rgba(0,255,200,0.3);
+  border-radius:20px;
+  padding:15px;
   overflow:hidden;
-  width:100%;
-  height:200px;
-  position:relative;
+  margin-bottom:20px;
 }
 
 .road{
   display:flex;
   gap:12px;
-  padding-left:120px; /* 🔥 center chicken */
   transition:0.4s;
 }
 
-/* STEP DESIGN */
+/* STEP */
 .step{
   min-width:85px;
   height:110px;
@@ -52,25 +54,19 @@ body{
   justify-content:center;
   font-weight:bold;
   color:#00ffcc;
-  font-size:16px;
   box-shadow:0 0 15px rgba(0,255,200,0.2);
-  border:1px solid rgba(0,255,200,0.2);
 }
 
-/* ACTIVE STEP */
 .active{
   background:linear-gradient(145deg,#00ffcc,#00cc99);
   color:#000;
-  box-shadow:0 0 25px #00ffcc;
   transform:scale(1.1);
 }
 
 /* 🐔 CHICKEN */
 .chicken{
-  position:absolute;
-  bottom:10px;
-  left:120px;
   width:70px;
+  margin:10px auto;
   transition:0.3s;
 }
 
@@ -85,12 +81,11 @@ body{
   animation:jump 0.4s;
 }
 
-/* MULTI */
+/* MULTI TEXT */
 #multi{
-  text-align:center;
-  font-size:22px;
-  margin:10px;
+  font-size:24px;
   color:#ffd700;
+  margin:10px 0;
 }
 
 /* BUTTONS */
@@ -106,6 +101,50 @@ button{
 .play{ background:#22c55e; }
 .cash{ background:#f59e0b; }
 
+/* POPUP */
+.popup{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:rgba(0,0,0,0.6);
+  opacity:0;
+  pointer-events:none;
+  transition:0.3s;
+}
+
+.popup.show{
+  opacity:1;
+  pointer-events:auto;
+}
+
+.popup-box{
+  padding:20px 30px;
+  border-radius:15px;
+  font-size:18px;
+  font-weight:bold;
+  animation:pop 0.3s;
+}
+
+.win{
+  background:#065f46;
+  color:#00ff99;
+}
+
+.loss{
+  background:#7f1d1d;
+  color:#ff4d4d;
+}
+
+@keyframes pop{
+  from{transform:scale(0.7);}
+  to{transform:scale(1);}
+}
+
 </style>
 </head>
 
@@ -115,10 +154,13 @@ button{
 
 <div class="header">🐔 Chicken Road</div>
 
-<div class="road-container">
+<!-- MULTIPLIER BOX -->
+<div class="multi-box">
   <div class="road" id="road"></div>
-  <img src="images/28859-removebg-preview.png" id="chicken" class="chicken">
 </div>
+
+<!-- 🐔 -->
+<img src="images/28859-removebg-preview.png" id="chicken" class="chicken">
 
 <div id="multi">1.00x</div>
 
@@ -134,14 +176,18 @@ button{
 
 </div>
 
+<!-- POPUP -->
+<div id="popup" class="popup">
+  <div id="popupText" class="popup-box"></div>
+</div>
+
 <script>
 
-// 🔥 MULTIPLIERS FULL
-const levels = {
-easy:[1.02,1.08,1.14,1.21,1.29,1.37,1.46,1.56,1.67,1.80,1.94,2.09],
-medium:[1.08,1.22,1.38,1.57,1.79,2.06,2.38,2.78],
-hard:[1.19,1.47,1.84,2.32,2.97,3.84,5.05],
-hardcore:[1.45,2.22,3.47,5.56,9.13,15.46]
+const levels={
+easy:[1.02,1.08,1.14,1.21,1.29,1.37],
+medium:[1.08,1.22,1.38,1.57,1.79],
+hard:[1.19,1.47,1.84,2.32],
+hardcore:[1.45,2.22,3.47,5.56]
 };
 
 let playing=false;
@@ -149,14 +195,14 @@ let step=0;
 let currentLevel="easy";
 let bet=100;
 
-// 🔥 INIT
+// INIT
 function initGame(){
   currentLevel=document.getElementById("level").value;
   createRoad();
 }
 initGame();
 
-// 🔥 CREATE ROAD
+// CREATE ROAD
 function createRoad(){
   let road=document.getElementById("road");
   road.innerHTML="";
@@ -170,7 +216,7 @@ function createRoad(){
   });
 }
 
-// ▶️ PLAY / JUMP
+// PLAY / JUMP
 function play(){
 
   if(!playing){
@@ -178,7 +224,9 @@ function play(){
     step=0;
 
     document.getElementById("playBtn").innerText="JUMP";
-    document.getElementById("multi").innerText="1.00x";
+
+    // 🔥 FIRST JUMP
+    move(0);
 
   }else{
 
@@ -209,50 +257,58 @@ function play(){
   }
 }
 
-// 🐔 MOVE + FIXED POSITION
+// MOVE
 function move(s){
 
   let chicken=document.getElementById("chicken");
-  let road=document.getElementById("road");
 
-  // jump
   chicken.classList.add("jump");
   setTimeout(()=>chicken.classList.remove("jump"),400);
 
-  // highlight
   document.querySelectorAll(".step").forEach(e=>e.classList.remove("active"));
   document.getElementById("s"+s).classList.add("active");
 
-  // slide road
-  let stepWidth=95;
-  road.style.transform = `translateX(-${s * stepWidth}px)`;
+  // slide
+  document.getElementById("road").style.transform = `translateX(-${s*90}px)`;
 }
 
-// 💰 CASHOUT
+// POPUP
+function showPopup(msg,win){
+
+  let p=document.getElementById("popup");
+  let box=document.getElementById("popupText");
+
+  box.innerText=msg;
+  box.className="popup-box "+(win?"win":"loss");
+
+  p.classList.add("show");
+
+  setTimeout(()=>p.classList.remove("show"),2000);
+}
+
+// CASHOUT
 function cashout(){
   if(!playing) return;
 
   let arr=levels[currentLevel];
   let win=bet*arr[step];
 
-  alert("WIN ₹"+Math.floor(win));
+  showPopup("WIN ₹"+Math.floor(win),true);
   reset();
 }
 
-// ❌ LOSE
+// LOSE
 function gameOver(){
-  alert("❌ LOSE");
+  showPopup("❌ LOSS",false);
   reset();
 }
 
-// 🔄 RESET
+// RESET
 function reset(){
   playing=false;
   step=0;
-
   document.getElementById("playBtn").innerText="PLAY";
   document.getElementById("multi").innerText="1.00x";
-
   document.getElementById("road").style.transform="translateX(0)";
   document.querySelectorAll(".step").forEach(e=>e.classList.remove("active"));
 }
