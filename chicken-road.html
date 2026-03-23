@@ -172,6 +172,47 @@ button{
   opacity:1;
 }
 
+  .bet-box{
+  margin-top:15px;
+}
+
+.bet-input{
+  display:flex;
+  justify-content:center;
+  gap:10px;
+}
+
+.bet-input input{
+  width:100px;
+  text-align:center;
+  font-size:16px;
+  border-radius:8px;
+  border:none;
+  padding:8px;
+}
+
+.bet-input button{
+  width:40px;
+  border-radius:8px;
+  background:#333;
+  color:#fff;
+}
+
+.chips{
+  display:flex;
+  justify-content:center;
+  gap:10px;
+  margin-top:10px;
+}
+
+.chips button{
+  padding:8px 12px;
+  border-radius:20px;
+  border:none;
+  background:#222;
+  color:#fff;
+}
+  
 @keyframes pop{
   from{transform:scale(0.7);}
   to{transform:scale(1);}
@@ -211,6 +252,22 @@ button{
 
 <button class="play" id="playBtn" onclick="play()">PLAY</button>
 <button class="cash" onclick="cashout()">CASH OUT</button>
+  <div class="bet-box">
+
+  <div class="bet-input">
+    <button onclick="changeBet(-10)">-</button>
+    <input type="number" id="betAmount" value="100">
+    <button onclick="changeBet(10)">+</button>
+  </div>
+
+  <div class="chips">
+    <button onclick="setBet(10)">10</button>
+    <button onclick="setBet(50)">50</button>
+    <button onclick="setBet(100)">100</button>
+    <button onclick="setBet(500)">500</button>
+  </div>
+
+</div>
 
 </div>
 
@@ -241,7 +298,9 @@ hardcore:[
 };
 
 let wallet=1000;
-let bet=100;
+function getBet(){
+  return parseInt(document.getElementById("betAmount").value) || 0;
+}
 
 let playing=false;
 let step=0;
@@ -398,12 +457,23 @@ function showPopup(msg,win){
   p.classList.add("show");
   setTimeout(()=>p.classList.remove("show"),2500);
 }
+  function setBet(val){
+  document.getElementById("betAmount").value = val;
+}
+
+function changeBet(val){
+  let input = document.getElementById("betAmount");
+  let current = parseInt(input.value) || 0;
+  input.value = Math.max(10, current + val);
+}
 
 // CASHOUT
 function cashout(){
   if(!playing) return;
 
-  let arr=levels[currentLevel];
+  let bet = parseInt(document.getElementById("betAmount").value) || 0;  // 🔥 YAHAN ADD
+
+  let arr = levels[currentLevel];
   let winAmount = Math.floor(bet * arr[step]);
 
   wallet += winAmount;
@@ -416,6 +486,8 @@ function cashout(){
 
 // LOSE
 function gameOver(){
+
+  let bet = parseInt(document.getElementById("betAmount").value) || 0;  // 🔥 YAHAN ADD
 
   wallet -= bet;
   document.getElementById("wallet").innerText=wallet;
