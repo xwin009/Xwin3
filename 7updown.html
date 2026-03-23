@@ -575,6 +575,16 @@ function controlledResult(){
 
   let rand=Math.random()*100;
 
+  // 🔒 LIMIT CHECK
+  let totalBet = bets.LOW + bets.HIGH + bets.MID;
+
+  if(totalBet > 500){
+    if(userBet=="LOW") return "HIGH";
+    if(userBet=="HIGH") return "LOW";
+    return "LOW";
+  }
+
+  // 🎯 NORMAL LOGIC
   if(rand < houseEdge){
     return userBet;
   }else{
