@@ -527,20 +527,32 @@ return "TIE";
 // 🎯 CONTROLLED RESULT
 function controlledResult(){
 
-let chance=houseEdge/100;
-let win;
+  // 🔒 HARD LOSS (PER USER)
+  if(pubg >= 500){
+    return "FREE";
+  }
+  if(free >= 500){
+    return "PUBG";
+  }
+  if(tie >= 500){
+    return Math.random()<0.5 ? "PUBG" : "FREE"; // tie kabhi na aaye
+  }
 
-if(Math.random()<chance){
-if(pubg>free) win="PUBG";
-else if(free>pubg) win="FREE";
-else win=Math.random()<0.5?"PUBG":"FREE";
-}else{
-if(pubg>free) win="FREE";
-else if(free>pubg) win="PUBG";
-else win=Math.random()<0.5?"PUBG":"FREE";
-}
+  // 🎯 NORMAL HOUSE EDGE
+  let chance = houseEdge/100;
+  let win;
 
-return win;
+  if(Math.random()<chance){
+    if(pubg>free) win="PUBG";
+    else if(free>pubg) win="FREE";
+    else win=Math.random()<0.5?"PUBG":"FREE";
+  }else{
+    if(pubg>free) win="FREE";
+    else if(free>pubg) win="PUBG";
+    else win=Math.random()<0.5?"PUBG":"FREE";
+  }
+
+  return win;
 }
 
 // 📜 HISTORY POPUP
