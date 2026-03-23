@@ -15,9 +15,9 @@ body{
 }
 
 .container{
-  width:100%;
   max-width:420px;
-  padding:20px 10px;
+  width:100%;
+  padding:15px;
   text-align:center;
 }
 
@@ -35,19 +35,17 @@ body{
   border-radius:10px;
 }
 
-/* MULTI BOX */
+/* 🔥 MULTI BOX */
 .multi-box{
   border:2px solid rgba(0,255,200,0.3);
   border-radius:20px;
   padding:15px;
-  overflow:hidden;
-  margin:15px 0;
+  overflow-x:auto;   /* 🔥 SCROLL ENABLE */
 }
 
 .road{
   display:flex;
   gap:12px;
-  transition:0.4s;
 }
 
 /* STEP */
@@ -69,18 +67,28 @@ body{
   transform:scale(1.1);
 }
 
-/* 🐔 */
-.chicken{
-  width:70px;
-  margin-top:-10px;
+/* 🐔 LANE (NEW) */
+.chicken-lane{
+  margin-top:10px;
+  height:80px;
+  position:relative;
+  overflow:hidden;
+}
+
+#chicken{
+  position:absolute;
+  width:60px;
+  left:0;
+  transition:0.3s;
 }
 
 /* JUMP */
 @keyframes jump{
   0%{transform:translateY(0);}
-  50%{transform:translateY(-60px);}
+  50%{transform:translateY(-40px);}
   100%{transform:translateY(0);}
 }
+
 .jump{
   animation:jump 0.4s;
 }
@@ -89,6 +97,7 @@ body{
 #multi{
   font-size:24px;
   color:#ffd700;
+  margin:10px 0;
 }
 
 /* BUTTON */
@@ -129,14 +138,9 @@ button{
   font-weight:bold;
   animation:pop 0.3s;
 }
-.win{
-  background:#065f46;
-  color:#00ff99;
-}
-.loss{
-  background:#7f1d1d;
-  color:#ff4d4d;
-}
+.win{ background:#065f46; color:#00ff99; }
+.loss{ background:#7f1d1d; color:#ff4d4d; }
+
 @keyframes pop{
   from{transform:scale(0.7);}
   to{transform:scale(1);}
@@ -153,11 +157,15 @@ button{
 
 <div class="wallet">💰 Wallet: ₹ <span id="wallet">1000</span></div>
 
+<!-- MULTIPLIERS -->
 <div class="multi-box">
   <div class="road" id="road"></div>
 </div>
 
-<img src="images/28859-removebg-preview.png" id="chicken" class="chicken">
+<!-- 🐔 LANE -->
+<div class="chicken-lane">
+  <img src="images/28859-removebg-preview.png" id="chicken">
+</div>
 
 <div id="multi">1.00x</div>
 
@@ -180,10 +188,10 @@ button{
 <script>
 
 const levels={
-easy:[1.02,1.08,1.14,1.21],
-medium:[1.08,1.22,1.38],
-hard:[1.19,1.47,1.84],
-hardcore:[1.45,2.22,3.47]
+easy:[1.02,1.08,1.14,1.21,1.29,1.37,1.46,1.56],
+medium:[1.08,1.22,1.38,1.57,1.79],
+hard:[1.19,1.47,1.84,2.32],
+hardcore:[1.45,2.22,3.47,5.56]
 };
 
 let wallet=1000;
@@ -200,7 +208,7 @@ function initGame(){
 }
 initGame();
 
-// CREATE
+// CREATE ROAD
 function createRoad(){
   let road=document.getElementById("road");
   road.innerHTML="";
@@ -213,8 +221,10 @@ function createRoad(){
     road.appendChild(d);
   });
 
-  // first active
   document.getElementById("s0").classList.add("active");
+
+  // chicken first position
+  moveChicken(0);
 }
 
 // PLAY
@@ -226,7 +236,6 @@ function play(){
 
     document.getElementById("playBtn").innerText="JUMP";
 
-    // 👉 first multiplier direct
     let first=levels[currentLevel][0];
     document.getElementById("multi").innerText=first+"x";
 
@@ -241,7 +250,7 @@ function play(){
       return;
     }
 
-    move(step);
+    moveChicken(step);
 
     let loseChance={
       easy:0.1,
@@ -259,18 +268,19 @@ function play(){
   }
 }
 
-// MOVE
-function move(s){
+// 🐔 MOVE IN LANE
+function moveChicken(s){
 
   let chicken=document.getElementById("chicken");
+
+  let boxWidth=97; // adjust
+  chicken.style.left = (s * boxWidth)+"px";
 
   chicken.classList.add("jump");
   setTimeout(()=>chicken.classList.remove("jump"),400);
 
   document.querySelectorAll(".step").forEach(e=>e.classList.remove("active"));
   document.getElementById("s"+s).classList.add("active");
-
-  document.getElementById("road").style.transform = `translateX(-${s*90}px)`;
 }
 
 // POPUP
@@ -295,18 +305,17 @@ function cashout(){
   wallet += winAmount;
   document.getElementById("wallet").innerText=wallet;
 
-  showPopup(`🎉 Congratulations! <br> You Win ₹${winAmount}`,true);
+  showPopup(`🎉 Congratulations!<br>Win ₹${winAmount}`,true);
 
   reset();
 }
 
 // LOSE
 function gameOver(){
-
   wallet -= bet;
   document.getElementById("wallet").innerText=wallet;
 
-  showPopup(`😢 Bad Luck! <br> You Loss ₹${bet}`,false);
+  showPopup(`😢 Bad News!<br>You Loss ₹${bet}`,false);
 
   reset();
 }
@@ -319,10 +328,10 @@ function reset(){
   document.getElementById("playBtn").innerText="PLAY";
   document.getElementById("multi").innerText="1.00x";
 
-  document.getElementById("road").style.transform="translateX(0)";
   document.querySelectorAll(".step").forEach(e=>e.classList.remove("active"));
-
   document.getElementById("s0").classList.add("active");
+
+  moveChicken(0);
 }
 
 </script>
