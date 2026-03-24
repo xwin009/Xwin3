@@ -264,6 +264,8 @@ void ball.offsetWidth;
 // ANIMATION
 ball.style.transition="transform 4.5s cubic-bezier(.22,.61,.36,1)";
 ball.style.transform=`rotate(${360*8+angle}deg) translateY(-140px)`;
+  let color = result===0 ? "🟢 GREEN" : red.includes(result) ? "🔴 RED" : "⚫ BLACK";
+popupMsg(`🎯 ${result} → ${color}`, "win");
 
 // FINAL STOP + RESULT LOGIC
 setTimeout(()=>{
