@@ -183,7 +183,7 @@ button, .sel{
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {
   getFirestore,collection,query,where,
-  getDocs,doc,updateDoc,getDoc
+  getDocs,doc,updateDoc,getDoc,onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 /* ===== ELEMENTS ===== */
@@ -246,7 +246,13 @@ async function saveWallet(){
 
 /* ===== INIT ===== */
 await loadWallet();
-await loadEdge();
+onSnapshot(doc(db,"settings","houseEdge"), (snap)=>{
+  if(snap.exists()){
+    HOUSE_EDGE = snap.data().draxTurbo ?? 0.25;
+
+    console.log("🔥 LIVE EDGE:", HOUSE_EDGE);
+  }
+});
 
 /* ===== GAME ===== */
 let selected = "";
