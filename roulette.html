@@ -21,16 +21,12 @@ body{margin:0;font-family:Arial;background:#0e3b2f;color:#fff}
   border:14px solid #111;
   background: url("images/29021-removebg-preview.png") no-repeat center;
   background-size: cover;
-  #2e7d32 0deg 10deg,
-  #c62828 10deg 20deg,
-  #111 20deg 30deg,
-  #c62828 30deg 40deg,
-  #111 40deg 50deg
+
 );
   box-shadow:inset 0 0 25px rgba(0,0,0,.9);
   transition:transform 4.5s cubic-bezier(.22,.61,.36,1);
   position:relative;
-}
+
 
   #ball{
   width:12px;
@@ -186,15 +182,6 @@ const black=[2,4,6,8,10,11,13,15,17,20,22,24,26,28,29,31,33,35];
 const wheel=document.getElementById("wheel");
 const ball=document.getElementById("ball"); // 🔥 NEW
 
-/* BUILD WHEEL */
-for(let i=0;i<37;i++){
-  let s=document.createElement("span");
-  let ang=(360/37)*i;
-  s.style.transform=`rotate(${ang}deg) translate(135px) rotate(-${ang}deg)`;
-  s.innerText=i;
-  s.style.color=i===0?"#00e676":red.includes(i)?"#ff5252":"#fff";
-  wheel.appendChild(s);
-}
 
 /* GRID */
 const grid=document.getElementById("numbers");
