@@ -136,7 +136,7 @@ const multipliers=[
 ];
 
 let holeX=0,dir=1,moveHole;
-let lastLeft=110;
+let lastLeft=65;
 let lastWidth=170;
 
 /* ELEMENTS */
@@ -180,17 +180,21 @@ function startGame(){
 
  game.innerHTML='<div id="hole" class="hole"></div><div class="base"></div>';
 
+ /* RESET STACK */
+ lastLeft=65;
+ lastWidth=170;
+
  startHole();
 }
 
-/* 🔥 SLOW HOLE MOVEMENT */
+/* HOLE MOVE */
 function startHole(){
  const hole=document.getElementById("hole");
 
  hole.style.background="url(images/29199-removebg-preview.png) center/contain no-repeat";
 
  moveHole=setInterval(()=>{
-   holeX+=dir*2;   /* 🔥 SPEED SLOW */
+   holeX+=dir*2;
 
    if(holeX>220) dir=-1;
    if(holeX<0) dir=1;
@@ -214,15 +218,20 @@ function drop(){
 
  game.appendChild(block);
 
- /* FALL */
+ const blockHeight = 90;
+ const baseOffset = 90;
+
+ let targetY = game.clientHeight - baseOffset - (step * blockHeight);
+
  let fall=setInterval(()=>{
    let top=parseInt(block.style.top);
-   top+=4;   /* 🔥 SLOW FALL */
+   top+=4;
    block.style.top=top+"px";
 
-   if(top>=350-(step*30)){
+   if(top >= targetY){
      clearInterval(fall);
 
+     /* LOSS */
      if(Math.random()<0.25){
        block.style.filter="brightness(0)";
        showPopup("🔥 Bad Luck! You Loss","loss");
@@ -230,7 +239,9 @@ function drop(){
        return;
      }
 
+     /* STACK */
      let overlap=Math.min(holeX+160,lastLeft+lastWidth)-Math.max(holeX,lastLeft);
+
      if(overlap<=0){
        block.style.filter="brightness(0)";
        showPopup("🔥 Miss! You Loss","loss");
@@ -247,6 +258,11 @@ function drop(){
      document.getElementById("mult").innerText="x"+multipliers[step];
 
      step++;
+
+     /* 🔥 AUTO SCROLL */
+     if(step > 4){
+       game.scrollTop += 90;
+     }
 
      if(step>=multipliers.length){
        cashout();
