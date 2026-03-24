@@ -253,8 +253,7 @@ async function spin(){
   }
 
   let angle=(360/37)*result;
-
-  // RESET
+// RESET
 ball.style.transition="none";
 ball.style.transform="rotate(0deg)";
 void ball.offsetWidth;
@@ -263,46 +262,41 @@ void ball.offsetWidth;
 ball.style.transition="transform 4.5s cubic-bezier(.22,.61,.36,1)";
 ball.style.transform=`rotate(${360*8+angle}deg)`;
 
-// FINAL STOP
+// FINAL STOP + RESULT LOGIC
 setTimeout(()=>{
+
   ball.style.transition="none";
-  ball.style.transform=`rotate(${angle}deg)`;
+  ball.style.transform=`rotate(${angle}deg)`; // ✔️ ONLY THIS
+
+  state.last.unshift(result);
+  state.last=state.last.slice(0,10);
+
+  state.bets.forEach(b=>{
+    if(b.res!=="PENDING")return;
+
+    let win=false;
+
+    if(b.type==="NUMBER"&&b.value===result) win=true;
+    if(b.type==="RED"&&red.includes(result)) win=true;
+    if(b.type==="BLACK"&&black.includes(result)) win=true;
+
+    if(win){
+      let w=b.amt*2;
+      state.wallet+=w;
+      syncWallet();
+      b.res="WIN ₹"+w;
+      popupMsg(`🎉 ${result} → WIN ₹${w}`,"win");
+    }else{
+      b.res="LOSS";
+      popupMsg(`❌ ${result} → LOSS`,"lose");
+    }
+  });
+
+  save();render();
+
 },4600);
   
-
-    // 🔥 FINAL STOP EXACT NUMBER
-    ball.style.transition="none";
-    ball.style.transform=`rotate(-${angle}deg)`;
-
-    state.last.unshift(result);
-    state.last=state.last.slice(0,10);
-
-    state.bets.forEach(b=>{
-      if(b.res!=="PENDING")return;
-
-      let win=false;
-
-      if(b.type==="NUMBER"&&b.value===result) win=true;
-      if(b.type==="RED"&&red.includes(result)) win=true;
-      if(b.type==="BLACK"&&black.includes(result)) win=true;
-
-      if(win){
-        let w=b.amt*2;
-        state.wallet+=w;
-        syncWallet();
-        b.res="WIN ₹"+w;
-        popupMsg(`🎉 ${result} → WIN ₹${w}`,"win");
-      }else{
-        b.res="LOSS";
-        popupMsg(`❌ ${result} → LOSS`,"lose");
-      }
-    });
-
-    save();render();
-
-  },4600);
-}
-
+  
 /* LOOP */
 setInterval(()=>{
   state.time--;
