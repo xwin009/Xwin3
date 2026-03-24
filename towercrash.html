@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>💥 Stack Tower</title>
+<title>💥 Stack Tower Pro</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
@@ -30,7 +30,7 @@ body{
 /* GAME */
 .game{
   position:relative;
-  height:300px;
+  height:320px;
   max-width:300px;
   margin:20px auto;
   overflow:hidden;
@@ -42,6 +42,7 @@ body{
   height:30px;
   border-radius:6px;
   pointer-events:none;
+  transition:top 0.3s ease;
 }
 
 /* BASE */
@@ -62,7 +63,7 @@ body{
   margin:10px;
 }
 
-/* INPUT + BTN */
+/* BTN */
 input,button{
   width:85%;
   padding:14px;
@@ -74,7 +75,6 @@ input,button{
 button{
   background:#ff4fd8;
   font-weight:bold;
-  font-size:16px;
 }
 
 /* POPUP */
@@ -122,6 +122,7 @@ button{
 let wallet=1000;
 let running=false;
 let bet=0;
+let startTime=0;
 
 let step=0;
 
@@ -144,17 +145,17 @@ const dropBtn=document.getElementById("dropBtn");
 
 /* UI */
 function updateWallet(){
- document.getElementById("wallet").innerText=wallet;
+ wallet.innerText=wallet;
 }
 
 function popup(msg,type){
  popupText.className=type;
  popupText.innerText=msg;
  popup.style.display="flex";
- setTimeout(()=>popup.style.display="none",1500);
+ setTimeout(()=>popup.style.display="none",1800);
 }
 
-/* START / CASHOUT */
+/* BUTTON */
 mainBtn.onclick=()=>{
  if(!running){
    startGame();
@@ -163,7 +164,6 @@ mainBtn.onclick=()=>{
  }
 };
 
-/* DROP BUTTON */
 dropBtn.onclick=()=>drop();
 
 /* START */
@@ -180,6 +180,7 @@ function startGame(){
 
  running=true;
  step=0;
+ startTime=Date.now();
 
  mainBtn.innerText="CASHOUT";
 
@@ -191,17 +192,22 @@ function startGame(){
  createBlock();
 }
 
-/* CREATE BLOCK */
+/* CREATE BLOCK (UPPER DROP EFFECT) */
 function createBlock(){
  block=document.createElement("div");
  block.className="block";
 
  block.style.width=lastWidth+"px";
- block.style.bottom=(30*(step+1))+"px";
+ block.style.top="-40px"; /* 🔥 upar se aayega */
  block.style.left="0px";
  block.style.background="#fff";
 
  game.appendChild(block);
+
+ /* fall animation */
+ setTimeout(()=>{
+   block.style.top=(280 - (step*30))+"px";
+ },50);
 
  pos=0;dir=1;
 
@@ -221,19 +227,21 @@ function drop(){
 
  clearInterval(move);
 
+ /* RANDOM CRASH */
  const crash=Math.random()<0.3;
 
  if(crash){
-   block.style.background="black";
+   block.style.background="red";
    popup("💥 CRASH","loss");
    reset();
    return;
  }
 
+ /* STACK */
  let overlap=Math.min(pos+lastWidth,lastLeft+lastWidth)-Math.max(pos,lastLeft);
 
  if(overlap<=0){
-   block.style.background="black";
+   block.style.background="red";
    popup("💥 MISS","loss");
    reset();
    return;
@@ -258,12 +266,13 @@ function drop(){
 function cashout(){
  if(!running) return;
 
+ let time = ((Date.now()-startTime)/1000).toFixed(1);
  let win=bet*multipliers[Math.max(step-1,0)];
 
  wallet+=win;
  updateWallet();
 
- popup("💰 ₹"+Math.floor(win),"win");
+ popup(`💰 ₹${Math.floor(win)}\n⏱ ${time}s`,"win");
 
  reset();
 }
