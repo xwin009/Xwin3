@@ -13,12 +13,35 @@ body{
 }
 
 /* HEADER */
-.header{padding:14px;font-size:22px;font-weight:bold}
-.wallet{
-  background:rgba(0,0,0,.3);
-  padding:6px 16px;border-radius:20px;margin-left:10px
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:14px;
+  font-size:22px;
+  font-weight:bold;
 }
 
+.wallet{
+  background:rgba(0,0,0,.3);
+  padding:6px 16px;
+  border-radius:20px;
+}
+  
+.multis{
+  display:flex;
+  justify-content:center;
+  gap:10px;
+  margin:10px;
+}
+
+.multi{
+  background:#000;
+  padding:8px 14px;
+  border-radius:14px;
+  font-weight:bold;
+}
+  
 /* TRACK */
 .track{
   display:flex;gap:10px;padding:10px;
@@ -94,10 +117,16 @@ button{
 <body>
 
 <div class="header">
-🚗 DRAX TURBO DRIVE
-<span class="wallet">₹ <span id="wallet">0</span></span>
+  🚗 DRAX TURBO DRIVE
+  <div class="wallet">₹ <span id="wallet">0</span></div>
 </div>
 
+  <div class="multis">
+  <div class="multi">Mercedes 3x</div>
+  <div class="multi">Audi 3x</div>
+  <div class="multi">BMW 5x</div>
+  </div>
+  
 <!-- TRACK -->
 <div class="track">
 
