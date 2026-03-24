@@ -167,11 +167,11 @@ button{
 
 <div class="popup" id="popup"><div id="popupText"></div></div>
 
-<script type="module">
+ <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {
   getFirestore,collection,query,where,
-  getDocs,doc,updateDoc
+  getDocs,doc,updateDoc,getDoc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 /* ===== ELEMENTS ===== */
@@ -180,6 +180,9 @@ const popup = document.getElementById("popup");
 const popupText = document.getElementById("popupText");
 const historyBox = document.getElementById("historyBox");
 const walletSpan = document.getElementById("wallet");
+
+const slider = document.getElementById("edgeSlider");
+const edgeLabel = document.getElementById("edgeLabel");
 
 /* ===== FIREBASE ===== */
 const app=initializeApp({
@@ -211,6 +214,26 @@ async function loadWallet(){
   updateWallet();
 }
 
+/* ===== LOAD HOUSE EDGE ===== */
+async function loadEdge(){
+  const ref = doc(db,"settings","houseEdge");
+  const snap = await getDoc(ref);
+
+  if(snap.exists()){
+    let val = snap.data().draxTurbo ?? 0.25;
+    HOUSE_EDGE = val;
+
+    slider.value = val * 100;
+    edgeLabel.innerText = "House Edge: " + Math.floor(val*100) + "%";
+  }
+}
+
+/* ===== SAVE EDGE ===== */
+async function saveEdge(val){
+  const ref = doc(db,"settings","houseEdge");
+  await updateDoc(ref,{draxTurbo:val});
+}
+
 /* ===== SAVE WALLET ===== */
 async function saveWallet(){
   if(uid){
@@ -220,6 +243,18 @@ async function saveWallet(){
 
 /* ===== INIT ===== */
 await loadWallet();
+await loadEdge();
+
+/* ===== LIVE SLIDER 🔥 */
+slider.oninput = async ()=>{
+  let val = slider.value / 100;
+
+  HOUSE_EDGE = val; // 🔥 LIVE CHANGE
+
+  edgeLabel.innerText = "House Edge: " + slider.value + "%";
+
+  await saveEdge(val); // optional firebase save
+};
 
 /* ===== GAME ===== */
 let selected="";
@@ -257,7 +292,6 @@ window.startRace=async()=>{
 
  raceRunning=true;
 
- /* RESET CARS */
  Object.values(cars).forEach(c=>{
   document.getElementById(c.el).style.transform="translateY(0)";
  });
@@ -266,15 +300,14 @@ window.startRace=async()=>{
  await saveWallet();
  updateWallet();
 
+ /* 🔥 RESULT LOGIC (LIVE EDGE) */
  const winner = Math.random()<HOUSE_EDGE ? selected : getOther();
 
- /* MOVE WINNER */
  setTimeout(()=>{
   document.getElementById(cars[winner].el)
    .style.transform="translateY(-120px)";
  },200);
 
- /* RESULT */
  setTimeout(async()=>{
 
   if(winner===selected){
@@ -310,7 +343,7 @@ function addHistory(t){
 }
 
 function updateWallet(){
- walletSpan.innerText = wallet;   // ✔️ FIXED
+ walletSpan.innerText = wallet;
 }
 
 function showPopup(t){
@@ -318,7 +351,7 @@ function showPopup(t){
  popup.style.display="flex";
  setTimeout(()=>popup.style.display="none",1500);
 }
-</script>
+ </script>
   
 </body>
 </html>
