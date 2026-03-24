@@ -14,14 +14,13 @@ body{
   text-align:center;
 }
 
-/* HEADER */
 .header{
   padding:12px;
   font-size:22px;
   font-weight:bold;
 }
 
-/* GAME AREA */
+/* GAME */
 .game{
   position:relative;
   height:400px;
@@ -36,30 +35,28 @@ body{
 .hole{
   width:80px;
   height:40px;
-  background:#fff;
   position:absolute;
   top:10px;
-  border-radius:10px;
 }
 
-/* BLOCK */
+/* IMAGE BLOCK */
 .block{
   width:80px;
-  height:30px;
-  background:#fff;
+  height:40px;
   position:absolute;
-  border-radius:6px;
+  background-size:cover;
+  background-repeat:no-repeat;
 }
 
-/* BASE */
+/* BASE IMAGE */
 .base{
   width:100px;
-  height:30px;
-  background:#fff;
+  height:40px;
   position:absolute;
   bottom:0;
   left:50%;
   transform:translateX(-50%);
+  background:url("images/29202-removebg-preview.png") no-repeat center/contain;
 }
 
 /* MULT */
@@ -142,7 +139,6 @@ let lastLeft=110;
 let lastWidth=100;
 
 /* ELEMENTS */
-const hole=document.getElementById("hole");
 const game=document.getElementById("game");
 const mainBtn=document.getElementById("mainBtn");
 const dropBtn=document.getElementById("dropBtn");
@@ -155,7 +151,7 @@ function showPopup(text,type){
  setTimeout(()=>popup.style.display="none",2000);
 }
 
-/* START / CASHOUT */
+/* BUTTON */
 mainBtn.onclick=()=>{
  if(!running){
    startGame();
@@ -182,22 +178,24 @@ function startGame(){
  mainBtn.innerText="CASHOUT";
 
  game.innerHTML='<div id="hole" class="hole"></div><div class="base"></div>';
- 
+
  startHole();
 }
 
-/* MOVE HOLE */
+/* 🔥 SLOW HOLE MOVEMENT */
 function startHole(){
  const hole=document.getElementById("hole");
 
+ hole.style.background="url(images/29199-removebg-preview.png) center/contain no-repeat";
+
  moveHole=setInterval(()=>{
-   holeX+=dir*4;
+   holeX+=dir*2;   /* 🔥 SPEED SLOW */
 
    if(holeX>220) dir=-1;
    if(holeX<0) dir=1;
 
    hole.style.left=holeX+"px";
- },20);
+ },25);
 }
 
 /* DROP */
@@ -206,37 +204,35 @@ function drop(){
 
  clearInterval(moveHole);
 
- const hole=document.getElementById("hole");
+ const block=document.createElement("div");
 
- let block=document.createElement("div");
  block.className="block";
  block.style.left=holeX+"px";
  block.style.top="0px";
+ block.style.background="url(images/29199-removebg-preview.png) center/contain no-repeat";
 
  game.appendChild(block);
 
  /* FALL */
  let fall=setInterval(()=>{
    let top=parseInt(block.style.top);
-   top+=5;
+   top+=4;   /* 🔥 SLOW FALL */
    block.style.top=top+"px";
 
    if(top>=350-(step*30)){
      clearInterval(fall);
 
-     /* LOSS (random black) */
      if(Math.random()<0.25){
-       block.style.background="red";
+       block.style.filter="brightness(0)";
        showPopup("🔥 Bad Luck! You Loss","loss");
        reset();
        return;
      }
 
-     /* STACK */
      let overlap=Math.min(holeX+80,lastLeft+lastWidth)-Math.max(holeX,lastLeft);
 
      if(overlap<=0){
-       block.style.background="red";
+       block.style.filter="brightness(0)";
        showPopup("🔥 Miss! You Loss","loss");
        reset();
        return;
@@ -248,7 +244,6 @@ function drop(){
      lastLeft=parseFloat(block.style.left);
      lastWidth=overlap;
 
-     /* MULTIPLIER */
      document.getElementById("mult").innerText="x"+multipliers[step];
 
      step++;
