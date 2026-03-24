@@ -448,12 +448,24 @@ async function play(){
     document.getElementById("wallet").innerText = wallet;
 
     playing=true;
-    step=0;
+step=0;
 
-    document.getElementById("playBtn").innerText="JUMP";
+document.getElementById("playBtn").innerText="JUMP";
 
-    document.getElementById("multi").innerText=
-      levels[currentLevel][0]+"x";
+// 🔥 HOUSE EDGE = 0 → INSTANT LOSS
+if(houseEdge === 0){
+  triggerFire(0);
+
+  setTimeout(()=>{
+    gameOver();
+  },300);
+
+  return;
+}
+
+// warna normal start
+let first=levels[currentLevel][0];
+document.getElementById("multi").innerText=first+"x";
 
   }else{
 
