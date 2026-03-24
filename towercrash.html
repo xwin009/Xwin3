@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>💥 Stack Tower</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+body{
+  margin:0;
+  font-family:Arial;
+  background:#050518;
+  color:#fff;
+  text-align:center;
+}
+
+.header{
+  padding:15px;
+  font-size:22px;
+  font-weight:bold;
+}
+
+.wallet{
+  background:#111;
+  padding:6px 16px;
+  border-radius:20px;
+  display:inline-block;
+}
+
+/* GAME */
+.game{
+  position:relative;
+  height:350px;
+  overflow:hidden;
+}
+
+.block{
+  position:absolute;
+  height:30px;
+  border-radius:6px;
+}
+
+.base{
+  width:200px;
+  height:30px;
+  background:#fff;
+  position:absolute;
+  bottom:0;
+  left:50%;
+  transform:translateX(-50%);
+}
+
+/* MULT */
+.mult{
+  font-size:26px;
+  color:#00ffc3;
+  margin:10px;
+}
+
+/* INPUT + BTN */
+input,button{
+  width:85%;
+  padding:14px;
+  border:none;
+  border-radius:30px;
+  margin-top:10px;
+}
+
+button{
+  background:#ff4fd8;
+  font-weight:bold;
+  font-size:16px;
+}
+
+/* POPUP */
+.popup{
+  position:fixed;
+  inset:0;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  background:rgba(0,0,0,.7);
+}
+
+.popup div{
+  background:#111;
+  padding:25px;
+  border-radius:20px;
+  font-size:20px;
+}
+
+.win{color:#00ff88;}
+.loss{color:#ff3b3b;}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+💥 STACK TOWER  
+<div class="wallet">₹ <span id="wallet">0</span></div>
+</div>
+
+<div id="game" class="game">
+  <div class="base"></div>
+</div>
+
+<div class="mult" id="mult">x1.00</div>
+
+<input id="bet" type="number" value="100">
+<button id="mainBtn" onclick="mainAction()">START</button>
+<button onclick="drop()">DROP</button>
+
+<div class="popup" id="popup"><div id="popupText"></div></div>
+
+<script>
+let wallet=1000;
+let running=false;
+let bet=0;
+
+let step=0;
+
+const multipliers=[
+1.02,1.08,1.14,1.21,1.29,1.37,1.46,1.56,1.67,1.80,
+1.94,2.09,2.27,2.47,2.69,2.95,3.24,3.58,3.98,4.45,
+5.01,5.68,6.49,7.49,8.74,10.33,12.39,15.15,18.94,24.35
+];
+
+let lastLeft=0;
+let lastWidth=200;
+let block=null;
+let pos=0,dir=1,move;
+
+/* UI */
+function updateWallet(){
+ document.getElementById("wallet").innerText=wallet;
+}
+
+function popup(msg,type){
+ popupText.className=type;
+ popupText.innerText=msg;
+ popup.style.display="flex";
+ setTimeout(()=>popup.style.display="none",1500);
+}
+
+/* START / CASHOUT BUTTON */
+function mainAction(){
+ if(!running){
+   startGame();
+ }else{
+   cashout();
+ }
+}
+
+/* START */
+function startGame(){
+ bet=+betInput.value;
+
+ if(bet<=0 || bet>wallet){
+   popup("Low Balance","loss");
+   return;
+ }
+
+ wallet-=bet;
+ updateWallet();
+
+ running=true;
+ step=0;
+
+ document.getElementById("mainBtn").innerText="CASHOUT";
+
+ document.getElementById("game").innerHTML='<div class="base"></div>';
+
+ lastLeft=window.innerWidth/2-100;
+ lastWidth=200;
+
+ createBlock();
+}
+
+/* CREATE BLOCK */
+function createBlock(){
+ const game=document.getElementById("game");
+
+ block=document.createElement("div");
+ block.className="block";
+ block.style.width=lastWidth+"px";
+ block.style.height="30px";
+ block.style.bottom=(30*(step+1))+"px";
+ block.style.left="0px";
+ block.style.background="#fff";
+
+ game.appendChild(block);
+
+ pos=0;dir=1;
+
+ move=setInterval(()=>{
+   pos+=dir*4;
+
+   if(pos>window.innerWidth-lastWidth) dir=-1;
+   if(pos<0) dir=1;
+
+   block.style.left=pos+"px";
+ },20);
+}
+
+/* DROP */
+function drop(){
+ if(!running) return;
+
+ clearInterval(move);
+
+ /* RANDOM CRASH */
+ const crash=Math.random()<0.3;
+
+ if(crash){
+   block.style.background="black";
+   popup("💥 CRASH","loss");
+   reset();
+   return;
+ }
+
+ /* STACK */
+ let overlap=Math.min(pos+lastWidth,lastLeft+lastWidth)-Math.max(pos,lastLeft);
+
+ if(overlap<=0){
+   block.style.background="black";
+   popup("💥 MISS","loss");
+   reset();
+   return;
+ }
+
+ block.style.left=Math.max(pos,lastLeft)+"px";
+ block.style.width=overlap+"px";
+
+ lastLeft=parseFloat(block.style.left);
+ lastWidth=overlap;
+
+ /* MULTIPLIER */
+ document.getElementById("mult").innerText="x"+multipliers[step];
+
+ step++;
+
+ popup("✅ SAFE","win");
+
+ setTimeout(createBlock,300);
+}
+
+/* CASHOUT */
+function cashout(){
+ if(!running) return;
+
+ let win=bet*multipliers[Math.max(step-1,0)];
+
+ wallet+=win;
+ updateWallet();
+
+ popup("💰 ₹"+Math.floor(win),"win");
+
+ reset();
+}
+
+/* RESET */
+function reset(){
+ running=false;
+ document.getElementById("mainBtn").innerText="START";
+}
+
+/* INIT */
+updateWallet();
+</script>
+
+</body>
+</html>
