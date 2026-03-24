@@ -303,7 +303,7 @@ window.startRace = async ()=>{
   updateWallet();
 
   /* 🎯 RESULT */
-  const winner = Math.random() < HOUSE_EDGE ? selected : getOther();
+  const winner = Math.random() < HOUSE_EDGE ? getOther() : selected;
 
   setTimeout(()=>{
     document.getElementById(cars[winner].el)
