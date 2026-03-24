@@ -134,8 +134,12 @@ let lastLeft=0;
 let lastWidth=200;
 let pos=0,dir=1,move;
 
+/* ELEMENTS */
 const game=document.getElementById("game");
 const mainBtn=document.getElementById("mainBtn");
+const dropBtn=document.getElementById("dropBtn");
+const betInput=document.getElementById("betInput");
+const walletEl=document.getElementById("wallet");
 
 /* UI */
 function updateWallet(){
@@ -149,7 +153,7 @@ function popup(msg,type){
  setTimeout(()=>popup.style.display="none",1800);
 }
 
-/* START / CASHOUT */
+/* BUTTON EVENTS */
 mainBtn.onclick=()=>{
  if(!running){
    startGame();
@@ -212,8 +216,6 @@ function createBlock(){
 
    block.style.left=pos+"px";
  },20);
-
- block.dataset.id=Date.now();
 }
 
 /* DROP */
@@ -249,7 +251,6 @@ function drop(){
  lastLeft=parseFloat(current.style.left);
  lastWidth=overlap;
 
- /* MULTIPLIER */
  document.getElementById("mult").innerText="x"+multipliers[step];
 
  step++;
