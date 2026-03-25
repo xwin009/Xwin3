@@ -123,7 +123,7 @@ button{
   <div id="popupText"></div>
 </div>
 
-       <script>
+ <script>
 let wallet=1000;
 let running=false;
 let bet=0;
@@ -139,7 +139,6 @@ let holeX=0,dir=1,moveHole;
 let lastLeft=0;
 let lastWidth=180;
 
-/* ELEMENTS */
 const game=document.getElementById("game");
 const mainBtn=document.getElementById("mainBtn");
 const dropBtn=document.getElementById("dropBtn");
@@ -180,7 +179,6 @@ function startGame(){
 
  game.innerHTML='<div id="hole" class="hole"></div><div class="base"></div>';
 
- /* CENTER BASE */
  lastWidth=180;
  lastLeft=(game.clientWidth/2)-(lastWidth/2);
 
@@ -218,7 +216,7 @@ function drop(){
 
  block.className="block";
  block.style.left=blockLeft+"px";
- block.style.top="0px";
+ block.style.top="-120px"; // 🔥 upar se start
  block.style.background="url(images/29199-removebg-preview.png) center/contain no-repeat";
 
  game.appendChild(block);
@@ -228,59 +226,80 @@ function drop(){
 
  let targetY = game.clientHeight - baseOffset - (step * blockHeight);
 
- let fall=setInterval(()=>{
-   let top=parseInt(block.style.top);
-   top+=4;
-   block.style.top=top+"px";
+ /* 🔥 REAL PHYSICS DROP */
+ let velocity = 0;
+ let gravity = 0.6;
 
-   if(top>=targetY){
+ let fall = setInterval(()=>{
+   let top = parseFloat(block.style.top);
+
+   velocity += gravity;
+   top += velocity;
+
+   block.style.top = top + "px";
+
+   if(top >= targetY){
      clearInterval(fall);
 
-     /* LOSS */
-     if(Math.random()<0.25){
-       block.style.filter="brightness(0)";
-       showPopup("🔥 Bad Luck! You Loss","loss");
-       reset();
-       return;
-     }
+     /* 🔥 BOUNCE EFFECT */
+     block.style.top = (targetY - 10) + "px";
 
-     /* PERFECT STACK */
-     let overlap = Math.min(blockLeft + blockWidth, lastLeft + lastWidth)
-                 - Math.max(blockLeft, lastLeft);
+     setTimeout(()=>{
+       block.style.top = targetY + "px";
 
-     if(overlap<=0){
-       block.style.filter="brightness(0)";
-       showPopup("🔥 Miss! You Loss","loss");
-       reset();
-       return;
-     }
+       /* LOSS RANDOM */
+       if(Math.random()<0.25){
+         block.style.filter="brightness(0)";
+         showPopup("🔥 Bad Luck! You Loss","loss");
+         reset();
+         return;
+       }
 
-     let newLeft = Math.max(blockLeft, lastLeft);
+       /* STACK */
+       let overlap = Math.min(blockLeft + blockWidth, lastLeft + lastWidth)
+                   - Math.max(blockLeft, lastLeft);
 
-     block.style.left=newLeft+"px";
-     block.style.width=overlap+"px";
+       if(overlap<=0){
+         block.style.filter="brightness(0)";
+         showPopup("🔥 Miss! You Loss","loss");
+         reset();
+         return;
+       }
 
-     lastLeft=newLeft;
-     lastWidth=overlap;
+       let newLeft = Math.max(blockLeft, lastLeft);
 
-     document.getElementById("mult").innerText="x"+multipliers[step];
+       block.style.left=newLeft+"px";
+       block.style.width=overlap+"px";
 
-     step++;
+       /* 🔥 IMPACT EFFECT */
+       block.style.transform="scaleY(0.95)";
+       setTimeout(()=>{
+         block.style.transform="scaleY(1)";
+       },120);
 
-     /* AUTO SCROLL */
-     if(step>3){
-       game.scrollTop += blockHeight;
-     }
+       lastLeft=newLeft;
+       lastWidth=overlap;
 
-     if(step>=multipliers.length){
-       cashout();
-       return;
-     }
+       document.getElementById("mult").innerText="x"+multipliers[step];
 
-     startHole();
+       step++;
+
+       /* AUTO SCROLL */
+       if(step>3){
+         game.scrollTop += blockHeight;
+       }
+
+       if(step>=multipliers.length){
+         cashout();
+         return;
+       }
+
+       startHole();
+
+     },120);
    }
 
- },20);
+ },16);
 }
 
 /* CASHOUT */
@@ -301,7 +320,7 @@ function reset(){
  running=false;
  mainBtn.innerText="START";
 }
-       </script>
-
+ </script>
+  
 </body>
 </html>
