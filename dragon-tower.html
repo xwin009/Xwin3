@@ -51,12 +51,17 @@ background-attachment:fixed;
   font-size:22px;
   cursor:pointer;
 
-  /* 🔥 NEW */
-  box-shadow:0 0 8px rgba(0,255,150,0.2);
+  /* 🔥 PERMANENT GREEN BORDER */
+  border:2px solid #22c55e;
+
+  /* 🔥 SHINING GLOW */
+  box-shadow:
+    0 0 6px #22c55e,
+    0 0 12px #22c55e,
+    0 0 20px #22c55e;
+
   transition:0.2s;
 }
-.safe{background:#22c55e;color:#000}
-.bomb{background:#dc2626}
 
 .cashout{
   margin:14px auto 8px;
