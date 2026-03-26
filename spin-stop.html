@@ -310,12 +310,6 @@ startBtn.onclick = async ()=>{
     spinner.style.transform = `rotate(${angle}deg)`;
   },50);
 };
-/* STOP */
-stopBtn.onclick = async ()=>{
-  if(!spinning || isStopping) return;
-
-  isStopping = true;
-
   // 🔥 STOP PRESS
 stopBtn.onclick = async ()=>{
   if(!spinning || isStopping) return;
