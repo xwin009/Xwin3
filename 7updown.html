@@ -620,8 +620,13 @@ async function result(){
     }while(d1+d2!==7);
   }
 
-  cover.style.display="none";
-  dice.style.display="flex";
+  cover.style.opacity = "0";
+
+setTimeout(()=>{
+  cover.style.display = "none";
+  dice.style.display = "flex";
+  dice.style.opacity = "1";
+},200);
 
   setTimeout(()=>{
     document.getElementById("d1").innerText=d1;
@@ -660,8 +665,13 @@ async function result(){
 
   setTimeout(()=>{
 
-    dice.style.display="none";
-    cover.style.display="block";
+    dice.style.opacity="0";
+
+setTimeout(()=>{
+  dice.style.display="none";
+  cover.style.display="block";
+  cover.style.opacity="1";
+},200);
 
     resultRunning=false;
     bettingOpen=true;
