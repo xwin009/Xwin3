@@ -37,7 +37,13 @@ body{
   width:240px;
   height:240px;
   border-radius:50%;
-  border:8px solid #ff5252;
+  border:8px solid #4fc3f7;
+
+  box-shadow:
+    0 0 20px #4fc3f7,
+    0 0 40px #4fc3f7,
+    0 0 60px rgba(79,195,247,0.6);
+
   position:relative;
   overflow:hidden;
 }
@@ -65,6 +71,10 @@ input{
   border:none;
   font-size:16px;
   margin-bottom:12px;
+
+  box-shadow:
+    0 0 10px #4fc3f7,
+    0 0 20px rgba(79,195,247,0.5);
 }
 button{
   width:80%;
@@ -77,6 +87,20 @@ button{
   font-weight:bold;
   margin-bottom:10px;
 }
+  #startBtn{
+  background:#ff5252;
+  box-shadow:
+    0 0 15px #ff5252,
+    0 0 30px #ff5252,
+    0 0 45px rgba(255,82,82,0.6);
+}
+  #stopBtn{
+  background:#ff1744;
+  box-shadow:
+    0 0 20px #ff1744,
+    0 0 40px #ff1744,
+    0 0 60px rgba(255,23,68,0.7);
+  }
   .choose{
   display:flex;
   justify-content:center;
@@ -93,8 +117,20 @@ button{
   font-size:16px;
 }
 
-.redBtn{background:#e53935;}
-.greenBtn{background:#2ecc71;}
+.redBtn{
+  background:#e53935;
+  box-shadow:
+    0 0 10px #ff3b3b,
+    0 0 20px #ff3b3b,
+    0 0 30px rgba(255,0,0,0.6);
+}
+.greenBtn{
+  background:#2ecc71;
+  box-shadow:
+    0 0 10px #00ff99,
+    0 0 20px #00ff99,
+    0 0 30px rgba(0,255,150,0.6);
+}
 
 .chooseBtn.active{
   outline:3px solid #fff;
