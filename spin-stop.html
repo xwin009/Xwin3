@@ -73,6 +73,29 @@ button{
   font-weight:bold;
   margin-bottom:10px;
 }
+  .choose{
+  display:flex;
+  justify-content:center;
+  gap:12px;
+  margin-bottom:10px;
+}
+
+.chooseBtn{
+  width:40%;
+  padding:14px;
+  border:none;
+  border-radius:30px;
+  font-weight:bold;
+  font-size:16px;
+}
+
+.redBtn{background:#e53935;}
+.greenBtn{background:#2ecc71;}
+
+.chooseBtn.active{
+  outline:3px solid #fff;
+  transform:scale(1.05);
+}
 
 /* HISTORY */
 .history{
@@ -130,7 +153,10 @@ button{
 
 <input type="number" id="bet" value="100" placeholder="Enter Bet Amount">
 <br>
-<button id="spinBtn">SPIN</button>
+<div class="choose">
+  <button class="chooseBtn redBtn" onclick="selectColor('red',this)">RED</button>
+  <button class="chooseBtn greenBtn" onclick="selectColor('green',this)">GREEN</button>
+</div>
 <button id="stopBtn" disabled>STOP</button>
 
 <div class="history">
@@ -176,7 +202,7 @@ async function saveWallet(){
   await updateDoc(doc(db,"users",uid), { balance: wallet });
 }
 
-/* 🔥 GET HOUSE EDGE */
+/* 🔥 HOUSE EDGE */
 async function getChance(){
   try{
     const ref = doc(db,"settings","houseEdge");
@@ -200,15 +226,29 @@ function renderWallet(){
   document.getElementById("wallet").innerText = wallet;
 }
 
-/* GAME STATE */
+/* 🔥 GAME STATE */
 let angle = 0;
 let spinInt = null;
 let spinning = false;
 let isStopping = false;
+let selectedColor = "";
+
+/* 🎯 COLOR SELECT */
+window.selectColor = (color, el)=>{
+  selectedColor = color;
+
+  document.querySelectorAll(".chooseBtn").forEach(btn=>{
+    btn.classList.remove("active");
+  });
+
+  el.classList.add("active");
+};
 
 /* SPIN */
 spinBtn.onclick = async ()=>{
   const bet = Number(document.getElementById("bet").value);
+
+  if(!selectedColor) return alert("Select RED or GREEN");
   if(bet<=0 || bet>wallet) return alert("Low balance");
 
   wallet -= bet;
@@ -247,7 +287,6 @@ stopBtn.onclick = async ()=>{
   let chance = await getChance();
   let win;
 
-  // 🎯 FINAL LOGIC (NO BUG)
   if(chance >= 100){
     win = true;
   }else if(chance <= 0){
@@ -256,19 +295,34 @@ stopBtn.onclick = async ()=>{
     win = Math.random()*100 < chance;
   }
 
-  // 🎡 FIXED SPINNER RESULT
   let finalAngle;
+  let resultColor;
 
   if(win){
-  // GREEN (top-right & bottom-left)
-  finalAngle = (Math.random() < 0.5)
-    ? 45   // center of 0–90
-    : 225; // center of 180–270
-}else{
-  // RED (top-left & bottom-right)
-  finalAngle = (Math.random() < 0.5)
-    ? 135  // center of 90–180
-    : 315; // center of 270–360
+    resultColor = selectedColor;
+
+    if(selectedColor === "green"){
+      finalAngle = (Math.random()<0.5)
+        ? Math.random()*90
+        : 180 + Math.random()*90;
+    }else{
+      finalAngle = (Math.random()<0.5)
+        ? 90 + Math.random()*90
+        : 270 + Math.random()*90;
+    }
+
+  }else{
+    resultColor = selectedColor === "green" ? "red" : "green";
+
+    if(resultColor === "green"){
+      finalAngle = (Math.random()<0.5)
+        ? Math.random()*90
+        : 180 + Math.random()*90;
+    }else{
+      finalAngle = (Math.random()<0.5)
+        ? 90 + Math.random()*90
+        : 270 + Math.random()*90;
+    }
   }
 
   spinner.style.transition = "transform 1s ease-out";
@@ -281,10 +335,10 @@ stopBtn.onclick = async ()=>{
     wallet += winAmt;
     await saveWallet();
 
-    resultText = `🎉 YOU WIN ₹${winAmt}`;
+    resultText = `🎉 ${resultColor.toUpperCase()} → YOU WIN ₹${winAmt}`;
     addHistory("WIN", winAmt);
   }else{
-    resultText = "❌ YOU LOST";
+    resultText = `❌ ${resultColor.toUpperCase()} → YOU LOST`;
     addHistory("LOSE", bet);
   }
 
@@ -311,6 +365,7 @@ function addHistory(type,amt){
 }
 
 loadWallet();
+  
   </script>
   
 </body>
