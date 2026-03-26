@@ -316,79 +316,76 @@ stopBtn.onclick = async ()=>{
 
   isStopping = true;
 
-  
+  // 🔥 STOP PRESS
+stopBtn.onclick = async ()=>{
+  if(!spinning || isStopping) return;
 
-clearInterval(spinInt);
-spinning = false;
+  isStopping = true;
 
-startBtn.disabled = false;
-stopBtn.disabled = true;
+  const bet = Number(document.getElementById("bet").value);
 
-const bet = Number(document.getElementById("bet").value);
+  let chance = await getChance();
+  let win;
 
-let chance = await getChance();
-let win;
+  if(chance >= 100){
+    win = true;
+  }else if(chance <= 0){
+    win = false;
+  }else{
+    win = Math.random()*100 < chance;
+  }
 
-if(chance >= 100){
-  win = true;
-}else if(chance <= 0){
-  win = false;
-}else{
-  win = Math.random()*100 < chance;
-}
+  let resultColor = win ? selectedColor : (selectedColor === "green" ? "red" : "green");
 
-/* 🎯 EXACT COLOR CONTROL */
-let resultColor;
+  let finalAngle;
 
-if(win){
-  resultColor = selectedColor;
-}else{
-  resultColor = selectedColor === "green" ? "red" : "green";
-}
+  if(resultColor === "green"){
+    finalAngle = Math.random()<0.5 
+      ? 45 + Math.random()*40
+      : 225 + Math.random()*40;
+  }else{
+    finalAngle = Math.random()<0.5
+      ? 135 + Math.random()*40
+      : 315 + Math.random()*40;
+  }
 
-/* 🎯 EXACT ANGLE (POINTER FIX) */
-let finalAngle;
+  // 🔥 CONTINUE SPIN 6 SEC + SMOOTH STOP
+  clearInterval(spinInt);
 
-if(resultColor === "green"){
-  // green zones (top-right + bottom-left)
-  finalAngle = Math.random()<0.5 
-    ? 45 + Math.random()*40     // top-right
-    : 225 + Math.random()*40;   // bottom-left
-}else{
-  // red zones (top-left + bottom-right)
-  finalAngle = Math.random()<0.5
-    ? 135 + Math.random()*40    // top-left
-    : 315 + Math.random()*40;   // bottom-right
-}
+  spinner.style.transition = "transform 6s cubic-bezier(.17,.67,.83,.67)";
+  spinner.style.transform = `rotate(${angle + 2000 + finalAngle}deg)`;
 
-/* 🔥 FINAL SMOOTH STOP */
-spinner.style.transition = "transform 1.5s cubic-bezier(.22,.61,.36,1)";
-spinner.style.transform = `rotate(${angle + finalAngle}deg)`;
+  angle += 2000 + finalAngle;
 
-angle += finalAngle;
+  spinning = false;
+  startBtn.disabled = false;
+  stopBtn.disabled = true;
 
-/* RESULT */
-let resultText;
+  // 🔥 RESULT AFTER SPIN COMPLETE
+  setTimeout(async ()=>{
 
-if(win){
-  let winAmt = bet * 2;
-  wallet += winAmt;
-  await saveWallet();
+    let resultText;
 
-  resultText = `🎉 ${resultColor.toUpperCase()} → YOU WIN ₹${winAmt}`;
-  addHistory("WIN", winAmt);
-}else{
-  resultText = `❌ ${resultColor.toUpperCase()} → YOU LOST`;
-  addHistory("LOSE", bet);
-}
+    if(win){
+      let winAmt = bet * 2;
+      wallet += winAmt;
+      await saveWallet();
 
-renderWallet();
+      resultText = `🎉 ${resultColor.toUpperCase()} → YOU WIN ₹${winAmt}`;
+      addHistory("WIN", winAmt);
+    }else{
+      resultText = `❌ ${resultColor.toUpperCase()} → YOU LOST`;
+      addHistory("LOSE", bet);
+    }
 
-setTimeout(()=>{
-  popupText.innerText = resultText;
-  popup.style.display="flex";
-  setTimeout(()=>popup.style.display="none",1500);
-},1200);
+    renderWallet();
+
+    popupText.innerText = resultText;
+    popup.style.display="flex";
+    setTimeout(()=>popup.style.display="none",1500);
+
+  },6000); // 🔥 EXACT 6 SEC
+
 };
 
 /* HISTORY */
