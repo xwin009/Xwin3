@@ -150,7 +150,15 @@ button{
   border-radius:8px;
   position:relative;
 }
+.fire{
+  width:50px;
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
 
+  mix-blend-mode:screen;
+}
 /* 🔥 FIRE */
 .pipe::before{
   content:"";
@@ -292,12 +300,19 @@ button{
   <div class="road" id="road">
     <img src="images/28859-removebg-preview.png" id="chicken">
  <div class="fire-line">
-  <div class="pipe"></div>
-  <div class="pipe"></div>
-  <div class="pipe"></div>
-  <div class="pipe"></div>
-</div>
+  <div class="pipe">
+    <img src="images/ezgif-3d522f875867e3de.gif" class="fire">
   </div>
+  <div class="pipe">
+    <img src="images/ezgif-3d522f875867e3de.gif" class="fire">
+  </div>
+  <div class="pipe">
+    <img src="images/ezgif-3d522f875867e3de.gif" class="fire">
+  </div>
+  <div class="pipe">
+    <img src="images/ezgif-3d522f875867e3de.gif" class="fire">
+  </div>
+ </div>
 </div>
 
 <div id="multi">1.00x</div>
