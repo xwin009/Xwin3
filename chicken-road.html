@@ -10,6 +10,8 @@ body{
   font-family:Arial;
   background:#0b0f1a;
   color:#fff;
+  display:flex;
+  justify-content:center;
 }
 
 .container{
@@ -38,19 +40,13 @@ body{
   padding:15px;
   padding-bottom:80px;   /* 🔥 IMPORTANT */
   overflow-x:auto;
-  overflow-y:hidden;   /* 🔥 IMPORTANT */
 }
-  .scroll-wrap{
-  overflow-x:auto;
-  overflow-y:hidden;
-  }
 
 /* ROAD */
 .road{
   display:flex;
   gap:12px;
   position:relative;
-  width:max-content;   /* 🔥 MAIN FIX */
 }
 
 /* STEP */
@@ -154,15 +150,7 @@ button{
   border-radius:8px;
   position:relative;
 }
-.fire{
-  width:50px;
-  position:absolute;
-  top:50%;
-  left:50%;
-  transform:translate(-50%,-50%);
 
-  mix-blend-mode:screen;
-}
 /* 🔥 FIRE */
 .pipe::before{
   content:"";
@@ -301,27 +289,15 @@ button{
 <div class="wallet">💰 Wallet: ₹ <span id="wallet">1000</span></div>
 
 <div class="multi-box">
-  <div class="scroll-wrap" id="scrollWrap">
-    <div class="road" id="road">
-      </div>
-  </div>
-</div>
-  
+  <div class="road" id="road">
     <img src="images/28859-removebg-preview.png" id="chicken">
  <div class="fire-line">
-  <div class="pipe">
-    <img src="images/ezgif-3d522f875867e3de.gif" class="fire">
+  <div class="pipe"></div>
+  <div class="pipe"></div>
+  <div class="pipe"></div>
+  <div class="pipe"></div>
+</div>
   </div>
-  <div class="pipe">
-    <img src="images/ezgif-3d522f875867e3de.gif" class="fire">
-  </div>
-  <div class="pipe">
-    <img src="images/ezgif-3d522f875867e3de.gif" class="fire">
-  </div>
-  <div class="pipe">
-    <img src="images/ezgif-3d522f875867e3de.gif" class="fire">
-  </div>
- </div>
 </div>
 
 <div id="multi">1.00x</div>
@@ -539,7 +515,7 @@ function moveChicken(s){
   chicken.style.left = newLeft + "px";
 
   // 🔥 AUTO SCROLL
-  document.getElementById("scrollWrap").scrollTo({
+  road.parentElement.scrollTo({
     left: newLeft - 100, // thoda center me rakhega
     behavior: "smooth"
   });
