@@ -1,292 +1,278 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<title>Aviator</title>
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<script src="game-control.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spinner Game</title>
+
 <style>
-body{margin:0;font-family:Arial;background:#0b0b0b;color:#fff}
-.header{display:flex;justify-content:space-between;align-items:center;padding:14px;background:#111}
-.logo{font-size:26px;font-weight:bold;color:#ff1744}
-.balance{font-size:18px;color:#00e676}
-.history{display:flex;gap:10px;padding:10px;overflow-x:auto;background:#0f0f0f}
-.history span{font-size:14px}
-.low{color:#64b5f6}
-.mid{color:#00e676}
-.high{color:#e040fb}
-.game{height:40vh;background:radial-gradient(circle at bottom,#1a1a1a,#000);display:flex;align-items:center;justify-content:center}
-.multiplier{text-align:center;font-size:64px;font-weight:bold}
-.crashed{color:#ff5252}
-.status{text-align:center;padding:8px;color:#aaa;font-size:16px}
-.controls{padding:12px;display:flex;flex-direction:column;gap:12px}
-.betbox{background:#151515;border-radius:14px;padding:12px}
-.row{display:flex;gap:8px;margin-bottom:8px}
-input{flex:1;padding:10px;border:none;border-radius:8px;font-size:16px;text-align:center}
-button{flex:1;padding:10px;border:none;border-radius:8px;font-weight:bold;font-size:16px}
-.gray{background:#333;color:#fff}
-.green{background:#2ecc71;color:#000}
-.locked{opacity:.5;pointer-events:none}
-.popup-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:999}
-.popup{background:#1c1c1c;padding:20px 26px;border-radius:14px;font-size:20px;font-weight:bold}
-.win{color:#2ecc71}
-.loss{color:#ff5252}
-.betp{color:#64b5f6}
+body{
+  margin:0;
+  background:#0b0f1a;
+  color:#fff;
+  font-family:Arial;
+  text-align:center;
+}
+
+/* HEADER */
+.header{
+  padding:10px;
+  font-size:20px;
+  font-weight:bold;
+}
+
+/* SPINNER */
+.spinner-box{
+  position:relative;
+  margin:20px auto;
+  width:260px;
+  height:260px;
+}
+
+.spinner{
+  width:100%;
+  height:100%;
+  border-radius:50%;
+  transition:4s cubic-bezier(.17,.67,.83,.67);
+}
+
+.arrow{
+  position:absolute;
+  top:-10px;
+  left:50%;
+  transform:translateX(-50%);
+  font-size:25px;
+}
+
+/* BOXES */
+.boxes{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  padding:10px;
+}
+
+.box{
+  background:#111;
+  padding:10px;
+  border-radius:12px;
+  border:2px solid transparent;
+}
+
+.box img{
+  width:50px;
+}
+
+.active{
+  border:2px solid #00ffcc;
+  box-shadow:0 0 10px #00ffcc;
+}
+
+/* BUTTON */
+button{
+  width:90%;
+  padding:12px;
+  margin-top:10px;
+  border:none;
+  border-radius:10px;
+  font-size:16px;
+}
+
+.start{background:#22c55e;}
+.history{background:#000;}
+
+/* BET */
+.bet{
+  display:flex;
+  justify-content:center;
+  gap:10px;
+  margin-top:10px;
+}
+
+.bet button{
+  width:40px;
+}
+
+/* POPUP */
+.popup{
+  position:fixed;
+  inset:0;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:rgba(0,0,0,0.7);
+  opacity:0;
+  pointer-events:none;
+}
+
+.popup.show{
+  opacity:1;
+  pointer-events:auto;
+}
+
+.popup-box{
+  background:#111;
+  padding:20px;
+  border-radius:10px;
+}
+
+/* HISTORY */
+.history-box{
+  position:fixed;
+  inset:0;
+  background:#000;
+  display:none;
+  flex-direction:column;
+  padding:20px;
+}
+
+.history-item{
+  background:#111;
+  margin:5px 0;
+  padding:10px;
+  border-radius:10px;
+}
 </style>
 </head>
 
 <body>
 
-<div class="header">
-  <div class="logo">Aviator</div>
-  <div class="balance">₹ <span id="wallet">3000</span></div>
+<div class="header">🎯 Spinner Game</div>
+
+<div class="spinner-box">
+  <div class="arrow">⬇️</div>
+  <img src="images/33724-removebg-preview.png" id="spinner" class="spinner">
 </div>
 
-<div class="history" id="history"></div>
-
-<div class="game">
-  <div class="multiplier" id="multi">WAITING</div>
-</div>
-
-<div class="status" id="status"></div>
-
-<div class="controls">
-
-  <div class="betbox" id="box1">
-    <div class="row">
-      <button class="gray" onclick="chg(1,-1)">-</button>
-      <input id="amt1" value="10">
-      <button class="gray" onclick="chg(1,1)">+</button>
-    </div>
-    <div class="row">
-      <button class="gray" onclick="setAmt(1,1)">1</button>
-      <button class="gray" onclick="setAmt(1,2)">2</button>
-      <button class="gray" onclick="setAmt(1,5)">5</button>
-      <button class="gray" onclick="setAmt(1,10)">10</button>
-    </div>
-    <button class="green" id="btn1" onclick="bet(1)">BET</button>
+<!-- BOXES -->
+<div class="boxes">
+  <div class="box" onclick="selectBox(0)">
+    <img src="images/33620-removebg-preview.png"><br>5x
   </div>
-
-  <div class="betbox" id="box2">
-    <div class="row">
-      <button class="gray" onclick="chg(2,-1)">-</button>
-      <input id="amt2" value="1">
-      <button class="gray" onclick="chg(2,1)">+</button>
-    </div>
-    <div class="row">
-      <button class="gray" onclick="setAmt(2,1)">1</button>
-      <button class="gray" onclick="setAmt(2,2)">2</button>
-      <button class="gray" onclick="setAmt(2,5)">5</button>
-      <button class="gray" onclick="setAmt(2,10)">10</button>
-    </div>
-    <button class="green" id="btn2" onclick="bet(2)">BET</button>
+  <div class="box" onclick="selectBox(1)">
+    <img src="images/33619-removebg-preview.png"><br>4x
   </div>
-
+  <div class="box" onclick="selectBox(2)">
+    <img src="images/IMG_20260327_114703.png"><br>2x
+  </div>
+  <div class="box" onclick="selectBox(3)">
+    <img src="images/33623-removebg-preview.png"><br>2x
+  </div>
 </div>
 
-<div class="popup-bg" id="popupBg">
-  <div class="popup" id="popup"></div>
+<!-- BET -->
+<div class="bet">
+  <button onclick="changeBet(-10)">-</button>
+  <input type="number" id="bet" value="100">
+  <button onclick="changeBet(10)">+</button>
 </div>
 
-<!-- ===== TERI ORIGINAL SCRIPT (AS IS) ===== -->
+<button class="start" onclick="spin()">START</button>
+<button class="history" onclick="openHistory()">📜 History</button>
+
+<!-- POPUP -->
+<div class="popup" id="popup">
+  <div class="popup-box" id="popupText"></div>
+</div>
+
+<!-- HISTORY -->
+<div class="history-box" id="historyBox">
+  <h3>History</h3>
+  <div id="historyList"></div>
+  <button onclick="closeHistory()">Close</button>
+</div>
+
 <script>
-/* ===== ORIGINAL GAME SCRIPT (UNCHANGED) ===== */
-let wallet=3000;
-let state="BET";
-let multi=1;
-let crash=0;
-let active=[false,false];
-let betAmt=[0,0];
-let history=[];
 
-const BET_TIME=25;
-const LOCK_TIME=5;
+let selected = -1;
+let rotation = 0;
+let history = [];
 
-let roundStart = Date.now();
+const multipliers = [5,4,2,2];
 
-const wEl=document.getElementById("wallet");
-const mEl=document.getElementById("multi");
-const sEl=document.getElementById("status");
-const hEl=document.getElementById("history");
-const popupBg=document.getElementById("popupBg");
-const popup=document.getElementById("popup");
-
-function showPopup(txt,cls){
-  popup.className="popup "+cls;
-  popup.innerText=txt;
-  popupBg.style.display="flex";
-  setTimeout(()=>popupBg.style.display="none",1500);
+// SELECT BOX
+function selectBox(i){
+  document.querySelectorAll(".box").forEach(b=>b.classList.remove("active"));
+  document.querySelectorAll(".box")[i].classList.add("active");
+  selected = i;
 }
 
-function randCrash(){
-  let r=Math.random();
-  if(r<0.6) return +(1+Math.random()*1.5).toFixed(2);
-  if(r<0.85) return +(2+Math.random()*3).toFixed(2);
-  return +(5+Math.random()*15).toFixed(2);
+// SPIN
+function spin(){
+
+  if(selected==-1){
+    return alert("Select box first");
+  }
+
+  let bet = parseInt(document.getElementById("bet").value);
+
+  let randomIndex = Math.floor(Math.random()*4);
+
+  let deg = 360 * 5 + (randomIndex * 90);
+
+  rotation += deg;
+
+  let spinner = document.getElementById("spinner");
+  spinner.style.transform = `rotate(${rotation}deg)`;
+
+  setTimeout(()=>{
+
+    let win = selected === randomIndex;
+
+    if(win){
+      let amount = bet * multipliers[selected];
+      showPopup(`🎉 WIN ₹${amount}`);
+      addHistory("WIN", amount);
+    }else{
+      showPopup(`💀 LOSS ₹${bet}`);
+      addHistory("LOSS", bet);
+    }
+
+  },4000);
+}
+
+// POPUP
+function showPopup(text){
+  let p = document.getElementById("popup");
+  let t = document.getElementById("popupText");
+
+  t.innerHTML = text;
+  p.classList.add("show");
+
+  setTimeout(()=>p.classList.remove("show"),2000);
+}
+
+// BET
+function changeBet(val){
+  let i = document.getElementById("bet");
+  i.value = Math.max(10,(parseInt(i.value)||0)+val);
+}
+
+// HISTORY
+function addHistory(type, amount){
+  let time = new Date().toLocaleTimeString();
+  history.unshift({type,amount,time});
+  renderHistory();
 }
 
 function renderHistory(){
-  hEl.innerHTML="";
-  history.forEach(x=>{
-    let s=document.createElement("span");
-    s.textContent=x+"x";
-    s.className=x<2?"low":x<10?"mid":"high";
-    hEl.appendChild(s);
+  let list = document.getElementById("historyList");
+  list.innerHTML = "";
+
+  history.forEach(h=>{
+    let d = document.createElement("div");
+    d.className="history-item";
+    d.innerHTML = `${h.time} - ${h.type} ₹${h.amount}`;
+    list.appendChild(d);
   });
 }
 
-function loop(){
-  let elapsed=Math.floor((Date.now()-roundStart)/1000);
-
-  if(elapsed < BET_TIME){
-    state="BET";
-    sEl.innerText=`Place your bets (${BET_TIME-elapsed}s)`;
-    mEl.innerText="WAITING";
-  }
-  else if(elapsed < BET_TIME+LOCK_TIME){
-    state="LOCK";
-    sEl.innerText=`Bet locked (${BET_TIME+LOCK_TIME-elapsed}s)`;
-  }
-  else{
-    if(state!=="FLY"){
-      state="FLY";
-      multi=1;
-      crash=randCrash();
-      sEl.innerText="Flying…";
-    }
-    if(active[0]) document.getElementById("btn1").innerText="CASH OUT";
-    if(active[1]) document.getElementById("btn2").innerText="CASH OUT";
-    multi += 0.02 + multi*0.004;
-    multi=+multi.toFixed(2);
-    mEl.innerText=multi+"x";
-
-    if(multi>=crash){
-      state="CRASH";
-      mEl.innerText="CRASHED @ "+crash+"x";
-      history.unshift(crash);
-      history=history.slice(0,10);
-      renderHistory();
-      active=[false,false];
-      document.getElementById("btn1").innerText="BET";
-      document.getElementById("btn2").innerText="BET";
-      roundStart=Date.now()+2000;
-    }
-  }
+function openHistory(){
+  document.getElementById("historyBox").style.display="flex";
+}
+function closeHistory(){
+  document.getElementById("historyBox").style.display="none";
 }
 
-setInterval(loop,100);
-
-function bet(n){
-  let i=n-1;
-  let amt=+document.getElementById("amt"+n).value;
-  if(state==="BET"){
-    if(wallet<amt) return showPopup("Low Balance","loss");
-    wallet-=amt;
-    wEl.innerText=wallet;
-    active[i]=true;
-    betAmt[i]=amt;
-    document.getElementById("btn"+n).innerText="CASH OUT";
-    showPopup("Bet Placed ₹"+amt,"betp");
-  }
- else if(state==="FLY" && active[i]){
-  active[i]=false;
-
-  let win = Math.floor(amt*multi);
-
-  win = addWinAmount(win);   // ⭐ daily limit apply
-
-  wallet += win;
-  wEl.innerText = wallet;
-
-  document.getElementById("btn"+n).innerText="BET";
-  showPopup("Cashed Out @ "+multi+"x","win");
- } 
-
-function chg(n,v){
-  let i=document.getElementById("amt"+n);
-  i.value=Math.max(1,+i.value+v);
-}
-function setAmt(n,v){
-  document.getElementById("amt"+n).value=v;
-}
-
-renderHistory();
-</script>
-<!-- ================= HARD REFRESH ROUND FIX (FINAL) ================= -->
-<script>
-(function(){
-  const KEY = "AVIATOR_PERSIST_STATE";
-
-  // LOAD
-  const saved = localStorage.getItem(KEY);
-  if(saved){
-    try{
-      const d = JSON.parse(saved);
-      if(d.roundStart) roundStart = d.roundStart;
-      if(d.state) state = d.state;
-      if(d.multi) multi = d.multi;
-      if(d.crash) crash = d.crash;
-      if(d.active) active = d.active;
-      if(d.betAmt) betAmt = d.betAmt;
-      if(d.history){
-        history = d.history;
-        renderHistory();
-      }
-    }catch(e){}
-  }
-
-  // SAVE CONTINUOUSLY
-  setInterval(()=>{
-    localStorage.setItem(KEY, JSON.stringify({
-      roundStart,
-      state,
-      multi,
-      crash,
-      active,
-      betAmt,
-      history
-    }));
-  }, 500);
-})();
-</script>
-<!-- ================= FIREBASE WALLET SYNC (ONLY ADDITION) ================= -->
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, query, where, getDocs, doc, updateDoc } 
-from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-const app = initializeApp({
-  apiKey:"AIzaSyBx3J9aGn_98rTPgurMMKw_GR3puIMj4Ms",
-  authDomain:"colourcash-ea60e.firebaseapp.com",
-  projectId:"colourcash-ea60e"
-});
-const db = getFirestore(app);
-
-const email = localStorage.getItem("userEmail");
-let uid="";
-let lastWallet = wallet;
-
-/* LOAD WALLET FROM FIREBASE */
-async function loadWallet(){
-  if(!email) return;
-  const q=query(collection(db,"users"),where("email","==",email));
-  const snap=await getDocs(q);
-  snap.forEach(d=>{
-    uid=d.id;
-    wallet = d.data().balance || wallet;
-    document.getElementById("wallet").innerText = wallet;
-  });
-}
-loadWallet();
-
-/* AUTO SYNC WALLET (NO GAME TOUCH) */
-setInterval(async ()=>{
-  if(!uid) return;
-  if(wallet !== lastWallet){
-    lastWallet = wallet;
-    await updateDoc(doc(db,"users",uid),{ balance: wallet });
-  }
-},600);
 </script>
 
 </body>
