@@ -123,22 +123,27 @@ body{
   font-weight:bold;
   font-size:16px;
 }
-  .hole{
-  width:30px;
-  height:20px;
+  .top-holes{
+  position:relative;
+  width:100%;
+  height:40px;
+}
+
+.hole{
+  width:35px;
+  height:25px;
   background:#000;
   position:absolute;
   top:0;
-  border-radius:0 0 15px 15px;
-  box-shadow:0 0 10px #000 inset;
+  border-radius:0 0 20px 20px;
 }
 
 .left-hole{
-  left:30%;
+  left:35%;
 }
 
 .right-hole{
-  right:30%;
+  right:35%;
 }
   
 </style>
@@ -150,12 +155,16 @@ body{
   <div>PLINKO</div>
   <div class="wallet">₹ <span id="wallet">0</span></div>
 </div>
-
+  
+<div class="top-holes">
+  <div class="hole left-hole"></div>
+  <div class="hole right-hole"></div>
+</div>
+  
 <div class="history" id="history">Encrypted Result:</div>
 <div class="board" id="board"></div>
 
- <div class="hole left-hole"></div>
-<div class="hole right-hole"></div>
+
   
 <div class="rows">
   <div class="row">
@@ -325,17 +334,20 @@ $("drop").onclick=async ()=>{
   // 🎯 RANDOM HOLE SELECT
 let startSide = Math.random() < 0.5 ? "left" : "right";
 
-let startX;
+let hole = document.querySelector(
+  startSide === "left" ? ".left-hole" : ".right-hole"
+);
 
-if(startSide === "left"){
-  startX = 100;  // adjust as per design
-}else{
-  startX = 200;
-}
+let rect = hole.getBoundingClientRect();
+let boardRect = board.getBoundingClientRect();
 
-ball.style.top = "0px";
+let startX = rect.left - boardRect.left + (rect.width / 2) - 7;
+
+// 🔥 TOP FIX
+let startY = rect.bottom - boardRect.top;
+
+ball.style.top = startY + "px";
 ball.style.left = startX + "px";
-
 // starting column set
 col = startSide === "left" ? 2 : 6;
 
