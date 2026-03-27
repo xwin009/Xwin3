@@ -238,7 +238,7 @@ async function loadWallet(){
 }
 await loadWallet();
 
-/* GAME OLD CODE (UNCHANGED) */
+/* GAME */
 let selected = -1;
 let history = [];
 
@@ -282,51 +282,43 @@ window.spin = async function(){
   document.getElementById("wallet").innerText = wallet;
   await updateDoc(doc(db,"users",userDocId),{ balance: wallet });
 
-  let randomIndex = Math.floor(Math.random() * 8);
-  let anglePerSlice = 360 / 8;
+  let spinner = document.getElementById("spinner");
 
-  // 🎯 target angle
-  let target = (randomIndex * anglePerSlice) + (anglePerSlice / 2);
+  // 🎯 RESULT PEHLE DECIDE
+  let index = Math.floor(Math.random() * 8);
+  let result = wheelMap[index];
 
-  // 🔥 RANDOM SPIN LENGTH (real feel)
-  let extraSpins = Math.floor(Math.random() * 3) + 4; // 4–6 rounds
+  let slice = 360 / 8;
 
-  let finalDeg = (360 * extraSpins) + target;
+  // 🔥 OFFSET (yaha tune karna agar thoda mismatch ho)
+  let offset = 90;
 
-// 🔥 RESET FIRST (important)
-spinner.style.transition = "none";
-spinner.style.transform = "rotate(0deg)";
+  let target = (index * slice) + (slice / 2);
 
-setTimeout(()=>{
+  let extraSpins = Math.floor(Math.random() * 2) + 5;
 
-  spinner.style.transition = "4s cubic-bezier(0.22, 1, 0.36, 1)";
-  spinner.style.transform = `rotate(${finalDeg}deg)`;
+  let finalDeg = (360 * extraSpins) + (360 - target + offset);
 
-},50);
+  // 🔥 RESET
+  spinner.style.transition = "none";
+  spinner.style.transform = "rotate(0deg)";
 
-  // 🧠 SMALL BACK EFFECT (real feel)
   setTimeout(()=>{
-  spinner.style.transition = "0.4s ease-out";
-  spinner.style.transform = `rotate(${finalDeg - 10}deg)`;
-},3800);
+    spinner.style.transition = "4s cubic-bezier(0.22, 1, 0.36, 1)";
+    spinner.style.transform = `rotate(${finalDeg}deg)`;
+  },50);
 
-  // 🎯 RESULT
+  // 🔥 BACK EFFECT
+  setTimeout(()=>{
+    spinner.style.transition = "0.4s ease-out";
+    spinner.style.transform = `rotate(${finalDeg - 10}deg)`;
+  },3800);
+
+  // 🎯 RESULT AFTER STOP
   setTimeout(async ()=>{
 
-    // 🎯 FINAL ROTATION ANGLE nikaal
-let actualDeg = finalDeg % 360;
-
-// slice size
-let slice = 360 / 8;
-
-// arrow top pe hai → 0° reference adjust
-let index = Math.floor((360 - actualDeg + slice/2) / slice) % 8;
-
-// 🔥 REAL RESULT
-let result = wheelMap[index];
-
     if(result.type === "lose"){
-      showPopup(`😅 Better Luck Next Time`);
+      showPopup(`🥲 Better Luck Next Time`);
       addHistory("LOSS", bet);
 
     } else {
