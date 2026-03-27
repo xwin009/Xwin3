@@ -198,7 +198,6 @@ button{
 <script>
 
 let selected = -1;
-let rotation = 0;
 let history = [];
 
 const multipliers = [5,4,2,2];
@@ -213,21 +212,35 @@ function selectBox(i){
 // SPIN
 function spin(){
 
-  if(selected==-1){
-    return alert("Select box first");
+  if(selected === -1){
+    alert("Select box first");
+    return;
   }
 
-  let bet = parseInt(document.getElementById("bet").value);
+  let bet = parseInt(document.getElementById("bet").value) || 0;
 
-  let randomIndex = Math.floor(Math.random()*4);
+  // RANDOM INDEX
+  let randomIndex = Math.floor(Math.random() * 4);
 
-  let deg = 360 * 5 + (randomIndex * 90);
+  let anglePerBox = 360 / 4;
 
-  rotation += deg;
+  // CENTER ALIGN FIX
+  let deg = 360 + (randomIndex * anglePerBox) + (anglePerBox / 2);
 
   let spinner = document.getElementById("spinner");
-  spinner.style.transform = `rotate(${rotation}deg)`;
 
+  // RESET FIRST (important)
+  spinner.style.transition = "none";
+  spinner.style.transform = "rotate(0deg)";
+
+  setTimeout(()=>{
+
+    spinner.style.transition = "3s cubic-bezier(.17,.67,.83,.67)";
+    spinner.style.transform = `rotate(${deg}deg)`;
+
+  },50);
+
+  // RESULT AFTER SPIN
   setTimeout(()=>{
 
     let win = selected === randomIndex;
@@ -237,11 +250,17 @@ function spin(){
       showPopup(`🎉 WIN ₹${amount}`);
       addHistory("WIN", amount);
     }else{
-      showPopup(`💀 LOSS ₹${bet}`);
+      showPopup(`💀 Better Luck Next Time ₹${bet}`);
       addHistory("LOSS", bet);
     }
 
-  },4000);
+  },3000);
+}
+
+// BET CHANGE
+function changeBet(val){
+  let i = document.getElementById("bet");
+  i.value = Math.max(10,(parseInt(i.value)||0)+val);
 }
 
 // POPUP
@@ -253,12 +272,6 @@ function showPopup(text){
   p.classList.add("show");
 
   setTimeout(()=>p.classList.remove("show"),2000);
-}
-
-// BET
-function changeBet(val){
-  let i = document.getElementById("bet");
-  i.value = Math.max(10,(parseInt(i.value)||0)+val);
 }
 
 // HISTORY
@@ -280,9 +293,11 @@ function renderHistory(){
   });
 }
 
+// HISTORY OPEN/CLOSE
 function openHistory(){
   document.getElementById("historyBox").style.display="flex";
 }
+
 function closeHistory(){
   document.getElementById("historyBox").style.display="none";
 }
