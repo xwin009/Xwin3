@@ -67,14 +67,16 @@ body{
 }
 
 .box{
-  background:#111;
-  padding:10px;
-  border-radius:12px;
-  border:2px solid transparent;
+  padding:0; /* 🔥 remove spacing */
+  overflow:hidden;
+  position:relative;
 }
 
 .box img{
-  width:50px;
+  width:100%;
+  height:100%;
+  object-fit:cover; /* 🔥 full cover */
+  border-radius:12px;
 }
 
 .active{
