@@ -201,35 +201,61 @@ button{
   <button onclick="closeHistory()">Close</button>
 </div>
 
-<script>
+<script type="module">
 
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, doc, getDocs, collection, query, where, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+/* FIREBASE */
+const app = initializeApp({
+  apiKey:"AIzaSyBx3J9aGn_98rTPgurMMKw_GR3puIMj4Ms",
+  authDomain:"colourcash-ea60e.firebaseapp.com",
+  projectId:"colourcash-ea60e"
+});
+const db = getFirestore(app);
+
+/* USER */
+const userEmail = localStorage.getItem("userEmail");
+let userDocId = "";
+let wallet = 0;
+
+/* LOAD WALLET */
+async function loadWallet(){
+  const snap = await getDocs(query(collection(db,"users"), where("email","==",userEmail)));
+  snap.forEach(d=>{
+    userDocId = d.id;
+    wallet = d.data().balance || 0;
+  });
+  document.getElementById("wallet").innerText = wallet;
+}
+await loadWallet();
+
+/* GAME OLD CODE (UNCHANGED) */
 let selected = -1;
 let history = [];
 
-// 4 boxes multipliers
 const multipliers = [5,4,2,2];
 
-// 8 slices (wheel mapping)
 const wheelMap = [
-  {type:"win", box:0},   // 5x
-  {type:"lose"},         // better luck
-  {type:"win", box:1},   // 4x
+  {type:"win", box:0},
   {type:"lose"},
-  {type:"win", box:2},   // 2x
+  {type:"win", box:1},
   {type:"lose"},
-  {type:"win", box:3},   // 2x
+  {type:"win", box:2},
+  {type:"lose"},
+  {type:"win", box:3},
   {type:"lose"}
 ];
 
 // SELECT BOX
-function selectBox(i){
+window.selectBox = function(i){
   document.querySelectorAll(".box").forEach(b=>b.classList.remove("active"));
   document.querySelectorAll(".box")[i].classList.add("active");
   selected = i;
 }
 
 // SPIN
-function spin(){
+window.spin = async function(){
 
   if(selected === -1){
     alert("Select box first");
@@ -238,7 +264,17 @@ function spin(){
 
   let bet = parseInt(document.getElementById("bet").value) || 0;
 
-  // RANDOM SLICE (0–7)
+  if(wallet < bet){
+    alert("Low Balance");
+    return;
+  }
+
+  // 🔥 BET CUT
+  wallet -= bet;
+  document.getElementById("wallet").innerText = wallet;
+  await updateDoc(doc(db,"users",userDocId),{ balance: wallet });
+
+  // RANDOM
   let randomIndex = Math.floor(Math.random() * 8);
 
   let anglePerSlice = 360 / 8;
@@ -246,7 +282,6 @@ function spin(){
 
   let spinner = document.getElementById("spinner");
 
-  // RESET
   spinner.style.transition = "none";
   spinner.style.transform = "rotate(0deg)";
 
@@ -256,19 +291,25 @@ function spin(){
   },50);
 
   // RESULT
-  setTimeout(()=>{
+  setTimeout(async ()=>{
 
     let result = wheelMap[randomIndex];
 
     if(result.type === "lose"){
-      // RED SLICE
       showPopup(`😅 Better Luck Next Time`);
       addHistory("LOSS", bet);
 
     } else {
 
       if(result.box === selected){
+
         let amount = bet * multipliers[selected];
+
+        // 🔥 WIN ADD
+        wallet += amount;
+        document.getElementById("wallet").innerText = wallet;
+        await updateDoc(doc(db,"users",userDocId),{ balance: wallet });
+
         showPopup(`🎉 WIN ₹${amount}`);
         addHistory("WIN", amount);
 
@@ -282,8 +323,8 @@ function spin(){
   },3000);
 }
 
-// BET
-function changeBet(val){
+// BET CHANGE
+window.changeBet = function(val){
   let i = document.getElementById("bet");
   i.value = Math.max(10,(parseInt(i.value)||0)+val);
 }
@@ -319,10 +360,10 @@ function renderHistory(){
 }
 
 // HISTORY
-function openHistory(){
+window.openHistory = function(){
   document.getElementById("historyBox").style.display="flex";
 }
-function closeHistory(){
+window.closeHistory = function(){
   document.getElementById("historyBox").style.display="none";
 }
 
