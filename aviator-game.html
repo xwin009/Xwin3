@@ -313,7 +313,17 @@ setTimeout(()=>{
   // 🎯 RESULT
   setTimeout(async ()=>{
 
-    let result = wheelMap[randomIndex];
+    // 🎯 FINAL ROTATION ANGLE nikaal
+let actualDeg = finalDeg % 360;
+
+// slice size
+let slice = 360 / 8;
+
+// arrow top pe hai → 0° reference adjust
+let index = Math.floor((360 - actualDeg + slice/2) / slice) % 8;
+
+// 🔥 REAL RESULT
+let result = wheelMap[index];
 
     if(result.type === "lose"){
       showPopup(`😅 Better Luck Next Time`);
