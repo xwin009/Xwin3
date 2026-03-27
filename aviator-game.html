@@ -277,28 +277,35 @@ window.spin = async function(){
     return;
   }
 
-  // 🔥 BET CUT
+  // 💰 BET CUT
   wallet -= bet;
   document.getElementById("wallet").innerText = wallet;
   await updateDoc(doc(db,"users",userDocId),{ balance: wallet });
 
-  // RANDOM
   let randomIndex = Math.floor(Math.random() * 8);
-
   let anglePerSlice = 360 / 8;
-  let deg = 360 + (randomIndex * anglePerSlice) + (anglePerSlice / 2);
+
+  // 🎯 target angle
+  let target = (randomIndex * anglePerSlice) + (anglePerSlice / 2);
+
+  // 🔥 RANDOM SPIN LENGTH (real feel)
+  let extraSpins = Math.floor(Math.random() * 3) + 4; // 4–6 rounds
+
+  let finalDeg = (360 * extraSpins) + target;
 
   let spinner = document.getElementById("spinner");
 
-  spinner.style.transition = "none";
-  spinner.style.transform = "rotate(0deg)";
+  // 🔥 SMOOTH CASINO EASING
+  spinner.style.transition = "4s cubic-bezier(0.22, 1, 0.36, 1)";
+  spinner.style.transform = `rotate(${finalDeg}deg)`;
 
+  // 🧠 SMALL BACK EFFECT (real feel)
   setTimeout(()=>{
-    spinner.style.transition = "3s cubic-bezier(.17,.67,.83,.67)";
-    spinner.style.transform = `rotate(${deg}deg)`;
-  },50);
+    spinner.style.transition = "0.4s ease-out";
+    spinner.style.transform = `rotate(${finalDeg - 10}deg)`;
+  },3800);
 
-  // RESULT
+  // 🎯 RESULT
   setTimeout(async ()=>{
 
     let result = wheelMap[randomIndex];
@@ -313,7 +320,6 @@ window.spin = async function(){
 
         let amount = bet * multipliers[selected];
 
-        // 🔥 WIN ADD
         wallet += amount;
         document.getElementById("wallet").innerText = wallet;
         await updateDoc(doc(db,"users",userDocId),{ balance: wallet });
@@ -328,7 +334,7 @@ window.spin = async function(){
 
     }
 
-  },3000);
+  },4200);
 }
 
 // BET CHANGE
