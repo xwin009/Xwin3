@@ -317,12 +317,16 @@ window.spin = async function(){
   let result = wheelMap[index];
 
   let slice = 360 / 8;
-  let offset = 90;
 
-  let target = (index * slice) + (slice / 2);
-  let extraSpins = Math.floor(Math.random() * 2) + 5;
+// 🔥 FIXED OFFSET
+let offset = -90;
 
-  let finalDeg = (360 * extraSpins) + (360 - target + offset);
+let target = (index * slice) + (slice / 2);
+
+let extraSpins = Math.floor(Math.random() * 2) + 5;
+
+// ✅ FINAL CORRECT ROTATION
+let finalDeg = (360 * extraSpins) + target + offset;
 
   // 🔥 RESET
   spinner.style.transition = "none";
