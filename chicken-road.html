@@ -40,6 +40,10 @@ body{
   overflow-x:auto;
   overflow-y:hidden;   /* 🔥 IMPORTANT */
 }
+  .scroll-wrap{
+  overflow-x:auto;
+  overflow-y:hidden;
+  }
 
 /* ROAD */
 .road{
@@ -297,7 +301,12 @@ button{
 <div class="wallet">💰 Wallet: ₹ <span id="wallet">1000</span></div>
 
 <div class="multi-box">
-  <div class="road" id="road">
+  <div class="scroll-wrap" id="scrollWrap">
+    <div class="road" id="road">
+      </div>
+  </div>
+</div>
+  
     <img src="images/28859-removebg-preview.png" id="chicken">
  <div class="fire-line">
   <div class="pipe">
@@ -530,7 +539,7 @@ function moveChicken(s){
   chicken.style.left = newLeft + "px";
 
   // 🔥 AUTO SCROLL
-  road.parentElement.scrollTo({
+  document.getElementById("scrollWrap").scrollTo({
     left: newLeft - 100, // thoda center me rakhega
     behavior: "smooth"
   });
