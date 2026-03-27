@@ -151,180 +151,185 @@ body{
     <button class="ctrl-btn" id="plus">+</button>  
   </div>  
   <button class="drop" id="drop">DROP BALL</button>  
-</div>  <script type="module">  
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";  
-import { getFirestore, getDocs, collection, query, where, doc, updateDoc, getDoc }   
-from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";  
-  
-/* FIREBASE */  
-const app = initializeApp({  
-  apiKey:"AIzaSyBx3J9aGn_98rTPgurMMKw_GR3puIMj4Ms",  
-  authDomain:"colourcash-ea60e.firebaseapp.com",  
-  projectId:"colourcash-ea60e"  
-});  
-const db = getFirestore(app);  
-const userEmail = localStorage.getItem("userEmail");  
-  
-/* STATE */  
-let wallet = 0;  
-let bet = 100;  
-let color = "green";  
-let uid = "";  
-  
-/* MULTIPLIERS */  
-const M = {  
-  red:[26.3,4,1.5,0.3,0.2,0.3,1.5,4,26.3],  
-  yellow:[10.5,3,1.3,0.7,0.4,0.7,1.3,3,10.5],  
-  green:[5.4,1.8,1.1,1,0.5,1,1.1,1.8,5.4]  
-};  
-  
-/* LOAD WALLET */  
-async function loadWallet(){  
-  const q = query(collection(db,"users"),where("email","==",userEmail));  
-  const snap = await getDocs(q);  
-  snap.forEach(d=>{  
-    uid=d.id;  
-    wallet=d.data().balance||0;  
-  });  
-  render();  
-}  
-  
-/* SAVE */  
-async function saveWallet(){  
-  if(!uid) return;  
-  await updateDoc(doc(db,"users",uid),{balance:wallet});  
-}  
-  
-/* HOUSE EDGE */  
-async function getChance(){  
-  const ref = doc(db,"settings","houseEdge");  
-  const snap = await getDoc(ref);  
-  
-  let chance = 50;  
-  if(snap.exists()){  
-    chance = Number(snap.data().plinko ?? 50);  
-  }  
-  
-  console.log("PLINKO CHANCE:", chance);  
-  return chance;  
-}  
-  
-/* UI */  
-const $=id=>document.getElementById(id);  
-function render(){  
-  $("wallet").innerText=wallet;  
-  $("bet").innerText=bet;  
-}  
-  
-/* BET */  
-$("plus").onclick=()=>{ if(bet+10<=wallet) bet+=10; render(); }  
-$("minus").onclick=()=>{ if(bet>10) bet-=10; render(); }  
-  
-/* COLOR */  
-function setColor(c){  
-  color=c;  
-  document.querySelectorAll(".box").forEach(b=>b.classList.remove("active"));  
-  document.querySelectorAll("."+c).forEach(b=>b.classList.add("active"));  
-}  
-$("r").onclick=()=>setColor("red");  
-$("y").onclick=()=>setColor("yellow");  
-$("g").onclick=()=>setColor("green");  
-  
-/* BOARD */  
-const board=$("board");  
-const rows=8,sx=34,sy=32,start=3;  
-  
-for(let r=0;r<rows;r++){  
-  for(let c=0;c<start+r;c++){  
-    const p=document.createElement("div");  
-    p.className="pin";  
-    p.style.top=50+r*sy+"px";  
-    p.style.left=160-((start+r-1)*sx)/2+c*sx+"px";  
-    board.appendChild(p);  
-  }  
-}  
-  
-/* DROP */  
-$("drop").onclick=async ()=>{  
-  if(bet>wallet) return alert("Low balance");  
-  
-  wallet-=bet;  
-  await saveWallet();  
-  render();  
-  
-  const ball=document.createElement("div");  
-  ball.className="ball";  
-  board.appendChild(ball);  
-  
-  let chance = await getChance();  
-  let multipliers = M[color];  
-  let selectedIndex;  
-  
-  // 🔴 LOSS MODE  
-  if(chance <= 0){  
-    selectedIndex = [3,4,5][Math.floor(Math.random()*3)];  
-  }  
-  
-  // 🟢 WIN MODE  
-  else if(chance >= 100){  
-    selectedIndex = [0,1,2,6,7,8][Math.floor(Math.random()*6)];  
-  }  
-  
-  // 🎲 RANDOM CONTROL  
-  else{  
-    let rand = Math.random()*100;  
-  
-    if(rand < chance){  
-      selectedIndex = [0,1,2,6,7,8][Math.floor(Math.random()*6)];  
-    }else{  
-      selectedIndex = [3,4,5][Math.floor(Math.random()*3)];  
-    }  
-  }  
-  
-  /* 🎯 ANIMATION TARGET BASED */  
-  let row = 0;  
-  let col = 4;  
-  
-  ball.style.top = "20px";  
-  ball.style.left = (col * sx + 20) + "px";  
-  
-  function stepFall(){  
-    if(row >= rows){  
-      finish(selectedIndex, ball);  
-      setTimeout(()=>ball.remove(),400);  
-      return;  
-    }  
-  
-    // target ki taraf move  
-    if(col < selectedIndex) col++;  
-    else if(col > selectedIndex) col--;  
-  
-    row++;  
-  
-    ball.style.transition="top 0.25s ease-out, left 0.25s ease-in-out";  
-    ball.style.top=(40+row*sy)+"px";  
-    ball.style.left=(col*sx+20)+"px";  
-  
-    setTimeout(stepFall,260);  
-  }  
-  
-  stepFall();  
-};  
-  
-/* RESULT */  
-function finish(index, ball){  
-  
-  let multi = M[color][index];  
-  let win = Math.floor(bet * multi);  
-  
-  wallet += win;  
-  saveWallet();  
-  render();  
-  
-  $("history").innerHTML += ` | ${color.toUpperCase()} ${multi}x`;  
-}  
-  
-/* INIT */  
-loadWallet();  
-</script>  </body>  
+</div> 
+  <script type="module">  
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, getDocs, collection, query, where, doc, updateDoc, getDoc } 
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+/* FIREBASE */
+const app = initializeApp({
+  apiKey:"AIzaSyBx3J9aGn_98rTPgurMMKw_GR3puIMj4Ms",
+  authDomain:"colourcash-ea60e.firebaseapp.com",
+  projectId:"colourcash-ea60e"
+});
+const db = getFirestore(app);
+const userEmail = localStorage.getItem("userEmail");
+
+/* STATE */
+let wallet = 0;
+let bet = 100;
+let color = "green";
+let uid = "";
+
+/* MULTIPLIERS */
+const M = {
+  red:[26.3,4,1.5,0.3,0.2,0.3,1.5,4,26.3],
+  yellow:[10.5,3,1.3,0.7,0.4,0.7,1.3,3,10.5],
+  green:[5.4,1.8,1.1,1,0.5,1,1.1,1.8,5.4]
+};
+
+/* LOAD WALLET */
+async function loadWallet(){
+  const q = query(collection(db,"users"),where("email","==",userEmail));
+  const snap = await getDocs(q);
+  snap.forEach(d=>{
+    uid=d.id;
+    wallet=d.data().balance||0;
+  });
+  render();
+}
+
+/* SAVE */
+async function saveWallet(){
+  if(!uid) return;
+  await updateDoc(doc(db,"users",uid),{balance:wallet});
+}
+
+/* HOUSE EDGE */
+async function getChance(){
+  const ref = doc(db,"settings","houseEdge");
+  const snap = await getDoc(ref);
+
+  let chance = 50;
+  if(snap.exists()){
+    chance = Number(snap.data().plinko ?? 50);
+  }
+
+  return chance;
+}
+
+/* UI */
+const $=id=>document.getElementById(id);
+function render(){
+  $("wallet").innerText=wallet;
+  $("bet").innerText=bet;
+}
+
+/* BET */
+$("plus").onclick=()=>{ if(bet+10<=wallet) bet+=10; render(); }
+$("minus").onclick=()=>{ if(bet>10) bet-=10; render(); }
+
+/* COLOR */
+function setColor(c){
+  color=c;
+  document.querySelectorAll(".box").forEach(b=>b.classList.remove("active"));
+  document.querySelectorAll("."+c).forEach(b=>b.classList.add("active"));
+}
+$("r").onclick=()=>setColor("red");
+$("y").onclick=()=>setColor("yellow");
+$("g").onclick=()=>setColor("green");
+
+/* BOARD */
+const board=$("board");
+const rows=8,sx=34,sy=32,start=3;
+
+for(let r=0;r<rows;r++){
+  for(let c=0;c<start+r;c++){
+    const p=document.createElement("div");
+    p.className="pin";
+    p.style.top=50+r*sy+"px";
+    p.style.left=160-((start+r-1)*sx)/2+c*sx+"px";
+    board.appendChild(p);
+  }
+}
+
+/* DROP */
+$("drop").onclick=async ()=>{
+  if(bet>wallet) return alert("Low balance");
+
+  wallet-=bet;
+  await saveWallet();
+  render();
+
+  const ball=document.createElement("div");
+  ball.className="ball";
+  board.appendChild(ball);
+
+  let chance = await getChance();
+  let selectedIndex;
+
+  // 🔴 LOSS MODE
+  if(chance <= 0){
+    selectedIndex = [3,4,5][Math.floor(Math.random()*3)];
+  }
+
+  // 🟢 WIN MODE
+  else if(chance >= 100){
+    selectedIndex = [0,1,2,6,7,8][Math.floor(Math.random()*6)];
+  }
+
+  // 🎲 MIX MODE
+  else{
+    let rand = Math.random()*100;
+
+    if(rand < chance){
+      selectedIndex = [0,1,2,6,7,8][Math.floor(Math.random()*6)];
+    }else{
+      selectedIndex = [3,4,5][Math.floor(Math.random()*3)];
+    }
+  }
+
+  /* 🎯 START EXACT CENTER */
+  let row = 0;
+  let col = 4; // center column
+
+  let centerX = board.offsetWidth / 2 - 7;
+  ball.style.top = "20px";
+  ball.style.left = centerX + "px";
+
+  function stepFall(){
+    if(row >= rows){
+      finish(selectedIndex, ball);
+      setTimeout(()=>ball.remove(),400);
+      return;
+    }
+
+    // 🎲 realistic bounce
+    if (Math.random() < 0.5) col--;
+    else col++;
+
+    // limit
+    col = Math.max(0, Math.min(8, col));
+
+    row++;
+
+    ball.style.transition="top 0.25s ease-out, left 0.25s ease-in-out";
+    ball.style.top=(40+row*sy)+"px";
+    ball.style.left=(col*sx+20)+"px";
+
+    setTimeout(stepFall,260);
+  }
+
+  stepFall();
+};
+
+/* RESULT */
+function finish(index, ball){
+  let multi = M[color][index];
+  let win = Math.floor(bet * multi);
+
+  wallet += win;
+  saveWallet();
+  render();
+
+  $("history").innerHTML += ` | ${color.toUpperCase()} ${multi}x`;
+}
+
+/* INIT */
+loadWallet();
+</script> 
+
+</body>  
 </html>
