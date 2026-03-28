@@ -345,6 +345,7 @@ if(winChance < HOUSE_EDGE){
 
   index = loseIndexes[Math.floor(Math.random() * loseIndexes.length)];
 }
+  index = (index + 2) % 8;
 
   let result = wheelMap[index];
 
