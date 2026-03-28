@@ -152,7 +152,8 @@ body{
   </div>  
   <button class="drop" id="drop">DROP BALL</button>  
 </div> 
-  <script type="module">  
+
+  <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, getDocs, collection, query, where, doc, updateDoc, getDoc } 
@@ -260,20 +261,14 @@ $("drop").onclick=async ()=>{
   let chance = await getChance();
   let selectedIndex;
 
-  // 🔴 LOSS MODE
   if(chance <= 0){
     selectedIndex = [3,4,5][Math.floor(Math.random()*3)];
   }
-
-  // 🟢 WIN MODE
   else if(chance >= 100){
     selectedIndex = [0,1,2,6,7,8][Math.floor(Math.random()*6)];
   }
-
-  // 🎲 MIX MODE
   else{
     let rand = Math.random()*100;
-
     if(rand < chance){
       selectedIndex = [0,1,2,6,7,8][Math.floor(Math.random()*6)];
     }else{
@@ -281,13 +276,20 @@ $("drop").onclick=async ()=>{
     }
   }
 
-  /* 🎯 START EXACT CENTER */
+  /* 🔥 PERFECT DROP FIX (ONLY CHANGE) */
   let row = 0;
-  let col = 4; // center column
 
-  let centerX = board.offsetWidth / 2 - 7;
-  ball.style.top = "20px";
-  ball.style.left = centerX + "px";
+  let topPins = 3;
+  let totalWidth = (topPins - 1) * sx;
+  let startX = (board.offsetWidth / 2) - (totalWidth / 2);
+
+  let gapIndex = 1; // middle gap
+  let gapX = startX + (gapIndex + 0.5) * sx;
+
+  let col = Math.round(gapX / sx);
+
+  ball.style.top = "10px";
+  ball.style.left = gapX + "px";
 
   function stepFall(){
     if(row >= rows){
@@ -296,13 +298,10 @@ $("drop").onclick=async ()=>{
       return;
     }
 
-    // 🎲 realistic bounce
     if (Math.random() < 0.5) col--;
     else col++;
 
-    // limit
     col = Math.max(0, Math.min(8, col));
-
     row++;
 
     ball.style.transition="top 0.25s ease-out, left 0.25s ease-in-out";
@@ -329,7 +328,8 @@ function finish(index, ball){
 
 /* INIT */
 loadWallet();
-</script> 
 
+  </script>
+  
 </body>  
 </html>
