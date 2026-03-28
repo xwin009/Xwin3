@@ -255,30 +255,30 @@ $("drop").onclick=async ()=>{
   render();
 
   const ball=document.createElement("div");
-ball.className="ball";
+  ball.className="ball";
+  ball.style.opacity="0";
 
-// 🔥 पहले invisible
-ball.style.opacity = "0";
+  /* 🎯 PERFECT START POSITION */
+  let topPins = 3;
+  let totalWidth = (topPins - 1) * sx;
+  let startX = (board.offsetWidth / 2) - (totalWidth / 2);
 
-// 🔥 position पहले ही set
-let topPins = 3;
-let totalWidth = (topPins - 1) * sx;
-let startX = (board.offsetWidth / 2) - (totalWidth / 2);
+  let gapIndex = 1;
+  let gapX = startX + (gapIndex + 0.5) * sx;
 
-let gapIndex = 1;
-let gapX = startX + (gapIndex + 0.5) * sx;
+  let row = 0;
+  let col = Math.round(gapX / sx);
 
-ball.style.top = "10px";
-ball.style.left = gapX + "px";
+  ball.style.top = "10px";
+  ball.style.left = gapX + "px";
 
-// 🔥 अब add कर
-board.appendChild(ball);
+  board.appendChild(ball);
 
-// 🔥 show after render
-requestAnimationFrame(()=>{
-  ball.style.opacity = "1";
-});
+  requestAnimationFrame(()=>{
+    ball.style.opacity="1";
+  });
 
+  /* 🎯 RESULT LOGIC */
   let chance = await getChance();
   let selectedIndex;
 
@@ -296,21 +296,6 @@ requestAnimationFrame(()=>{
       selectedIndex = [3,4,5][Math.floor(Math.random()*3)];
     }
   }
-
-  /* 🔥 PERFECT DROP FIX (ONLY CHANGE) */
-  let row = 0;
-
-  let topPins = 3;
-  let totalWidth = (topPins - 1) * sx;
-  let startX = (board.offsetWidth / 2) - (totalWidth / 2);
-
-  let gapIndex = 1; // middle gap
-  let gapX = startX + (gapIndex + 0.5) * sx;
-
-  let col = Math.round(gapX / sx);
-
-  ball.style.top = "10px";
-  ball.style.left = gapX + "px";
 
   function stepFall(){
     if(row >= rows){
@@ -334,7 +319,6 @@ requestAnimationFrame(()=>{
 
   stepFall();
 };
-
 /* RESULT */
 function finish(index, ball){
   let multi = M[color][index];
