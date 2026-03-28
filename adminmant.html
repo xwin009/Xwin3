@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Admin Panel</title>
+
+<style>
+body{
+  background:#000;
+  color:#fff;
+  font-family:Arial;
+  padding:20px;
+}
+
+h2{text-align:center}
+
+.game{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:12px;
+  margin:10px 0;
+  background:#111;
+  border-radius:10px;
+}
+
+button{
+  padding:8px 14px;
+  border:none;
+  border-radius:8px;
+  font-weight:bold;
+}
+
+.on{background:#00c853;color:#000}
+.off{background:#ff1744;color:#fff}
+</style>
+
+</head>
+
+<body>
+
+<h2>⚙️ Admin Panel</h2>
+
+<div class="game">
+  <span>Plinko</span>
+  <button onclick="toggleGame('plinko')" id="plinkoBtn">...</button>
+</div>
+
+<div class="game">
+  <span>Aviator</span>
+  <button onclick="toggleGame('aviator')" id="aviatorBtn">...</button>
+</div>
+
+<div class="game">
+  <span>Mines</span>
+  <button onclick="toggleGame('mines')" id="minesBtn">...</button>
+</div>
+
+<div class="game">
+  <span>Spin Stop</span>
+  <button onclick="toggleGame('spin-stop')" id="spinstopBtn">...</button>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, doc, getDoc, updateDoc } 
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const app = initializeApp({
+  apiKey:"AIzaSyBx3J9aGn_98rTPgurMMKw_GR3puIMj4Ms",
+  authDomain:"colourcash-ea60e.firebaseapp.com",
+  projectId:"colourcash-ea60e"
+});
+
+const db = getFirestore(app);
+
+/* LOAD STATUS */
+async function loadGame(name){
+  const ref = doc(db,"gameStatus",name);
+  const snap = await getDoc(ref);
+
+  let active = true;
+
+  if(snap.exists()){
+    active = snap.data().active;
+  }
+
+  const btn = document.getElementById(name+"Btn");
+
+  if(active){
+    btn.innerText = "ON";
+    btn.className = "on";
+  }else{
+    btn.innerText = "OFF";
+    btn.className = "off";
+  }
+}
+
+/* TOGGLE */
+window.toggleGame = async function(name){
+
+  const ref = doc(db,"gameStatus",name);
+  const snap = await getDoc(ref);
+
+  let current = true;
+
+  if(snap.exists()){
+    current = snap.data().active;
+  }
+
+  await updateDoc(ref,{
+    active: !current
+  });
+
+  loadGame(name);
+}
+
+/* INIT LOAD */
+loadGame("plinko");
+loadGame("aviator");
+loadGame("mines");
+loadGame("spin-stop");
+
+</script>
+
+</body>
+</html>
