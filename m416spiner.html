@@ -152,6 +152,20 @@ button{
   padding:10px;
   border-radius:10px;
 }
+  .ball{
+  position:absolute;
+  top:50%;
+  left:50%;
+  width:14px;
+  height:14px;
+  background:#fff;
+  border-radius:50%;
+  box-shadow:0 0 10px #fff;
+
+  transform:rotate(0deg) translate(140px) rotate(0deg);
+  transform-origin:center;
+}
+  
 </style>
 </head>
 
@@ -167,6 +181,7 @@ M416 Spiner 💫
   <img src="images/33752-removebg-preview.png" alt="arrow">
 </div>
   <img src="images/33724-removebg-preview.png" id="spinner" class="spinner">
+  <div class="ball" id="ball"></div>
 </div>
 
 <!-- BOXES -->
@@ -280,6 +295,8 @@ window.selectBox = function(i){
 }
 
 /* 🔥 FINAL SPIN */
+let ballDeg = 0;
+
 window.spin = async function(){
 
   if(selected === -1){
@@ -299,7 +316,7 @@ window.spin = async function(){
   document.getElementById("wallet").innerText = wallet;
   await updateDoc(doc(db,"users",userDocId),{ balance: wallet });
 
-  let spinner = document.getElementById("spinner");
+  let ball = document.getElementById("ball");
 
   // 🎯 RESULT FIX
   let winChance = Math.random();
@@ -325,21 +342,20 @@ window.spin = async function(){
 
   let result = wheelMap[index];
 
-  // 🎯 ANGLE CALC (PERFECT)
   let slice = 360 / 8;
 
+  // 🎯 target angle
   let target = index * slice + (slice / 2);
 
-  // 🔥 ARROW TOP FIX (adjust if needed -20 / -24)
-  let finalAngle = 360 - target - 22;
+  // 🔥 reverse (top ke liye)
+  let finalAngle = target - 90;
 
   let spins = 5;
 
-  // 🔥 SMOOTH SAME DIRECTION
-  spinDeg += (360 * spins) + finalAngle;
+  ballDeg += (360 * spins) + finalAngle;
 
-  spinner.style.transition = "4s cubic-bezier(0.22, 1, 0.36, 1)";
-  spinner.style.transform = `rotate(${spinDeg}deg)`;
+  ball.style.transition = "4s cubic-bezier(0.22, 1, 0.36, 1)";
+  ball.style.transform = `rotate(${ballDeg}deg) translate(140px) rotate(-${ballDeg}deg)`;
 
   // 🎯 RESULT AFTER STOP
   setTimeout(async ()=>{
