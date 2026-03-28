@@ -277,24 +277,24 @@ let history = [];
 const multipliers = [5,4,2,2];
 
 const wheelMap = [
-  {type:"win", box:0},
+  {type:"lose"},           // top
+  {type:"win", box:0},     // 5x
   {type:"lose"},
-  {type:"win", box:1},
+  {type:"win", box:1},     // 4x
   {type:"lose"},
-  {type:"win", box:2},
+  {type:"win", box:3},     // 2x (right bottom)
   {type:"lose"},
-  {type:"win", box:3},
-  {type:"lose"}
+  {type:"win", box:2}      // 2x (left bottom)
 ];
 const slotAngles = [
-  337.5, // 0 → 5x ✅
-  292.5,
-  247.5, // 2 → 4x ✅
-  202.5,
-  157.5 - 6, // 🔥 FIX 2x (3rd box)
-  112.5,
-  67.5,  // 2x (4th box)
-  22.5
+  0,
+  45,
+  90,
+  135,
+  180,
+  225,
+  270,
+  315
 ];
 /* SELECT */
 window.selectBox = function(i){
@@ -354,7 +354,7 @@ let slice = 360 / 8;
 let target = slotAngles[index];
 
 // 🔥 top arrow adjust
-let finalAngle = target - 90 - 8;
+let finalAngle = target - 90;
 
 // spins
 let spins = 5;
