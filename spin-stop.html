@@ -232,7 +232,6 @@ let HOUSE_EDGE = 50;
 onSnapshot(doc(db,"settings","houseEdge"), (snap)=>{
   if(snap.exists()){
     HOUSE_EDGE = Number(snap.data().spinStop ?? 50);
-    console.log("🔥 SpinStop Edge:", HOUSE_EDGE);
   }
 });
 
@@ -265,14 +264,14 @@ function renderWallet(){
   document.getElementById("wallet").innerText = wallet;
 }
 
-/* 🔥 GAME STATE */
+/* GAME STATE */
 let angle = 0;
 let spinInt = null;
 let spinning = false;
 let isStopping = false;
 let selectedColor = "";
 
-/* 🎯 COLOR SELECT */
+/* SELECT */
 window.selectColor = (color, el)=>{
   selectedColor = color;
 
@@ -310,7 +309,7 @@ startBtn.onclick = async ()=>{
   },50);
 };
 
-/* 🔥 STOP */
+/* STOP */
 stopBtn.onclick = async ()=>{
   if(!spinning || isStopping) return;
 
@@ -320,7 +319,7 @@ stopBtn.onclick = async ()=>{
 
   let win;
 
-  // 🔥 FORCE LOSS SYSTEM
+  // 🔥 FORCE LOSS
   if(bet >= 300){
     win = false;
   }else if(HOUSE_EDGE >= 100){
@@ -335,17 +334,18 @@ stopBtn.onclick = async ()=>{
     ? selectedColor 
     : (selectedColor === "green" ? "red" : "green");
 
-  let finalAngle;
+  /* 🔥 PERFECT ANGLE FIX */
+  let offset = (Math.random() * 6) - 3; // small randomness
+
+  let baseAngle;
 
   if(resultColor === "green"){
-    finalAngle = Math.random()<0.5 
-      ? 45 + Math.random()*40
-      : 225 + Math.random()*40;
+    baseAngle = Math.random()<0.5 ? 45 : 225;
   }else{
-    finalAngle = Math.random()<0.5
-      ? 135 + Math.random()*40
-      : 315 + Math.random()*40;
+    baseAngle = Math.random()<0.5 ? 135 : 315;
   }
+
+  let finalAngle = baseAngle + offset;
 
   /* STOP ANIMATION */
   clearInterval(spinInt);
@@ -359,7 +359,7 @@ stopBtn.onclick = async ()=>{
   startBtn.disabled = false;
   stopBtn.disabled = true;
 
-  /* RESULT AFTER STOP */
+  /* RESULT */
   setTimeout(async ()=>{
 
     let resultText;
