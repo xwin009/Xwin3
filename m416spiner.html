@@ -329,11 +329,7 @@ window.spin = async function(){
 
   index = possible[Math.floor(Math.random() * possible.length)];
 }
-    let red = [1,3,5,7];
-    let wrong = [0,2,4,6].filter(i => i !== selected*2);
-    let mix = [...red, ...wrong];
-    index = mix[Math.floor(Math.random() * mix.length)];
-  }
+    
 
   let result = wheelMap[index];
 
