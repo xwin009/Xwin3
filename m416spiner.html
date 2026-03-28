@@ -345,9 +345,11 @@ if(winChance < HOUSE_EDGE){
 
   index = loseIndexes[Math.floor(Math.random() * loseIndexes.length)];
 }
-  index = (index + 2) % 8;
+  let originalIndex = index;   // 🔥 पहले save कर
 
-  let result = wheelMap[index];
+index = (index + 2) % 8;    // animation shift
+
+let result = wheelMap[originalIndex];  // 🔥 RESULT FIX
 
 
 let target = slotAngles[index];
