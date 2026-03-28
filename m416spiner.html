@@ -320,25 +320,22 @@ window.spin = async function(){
 
   // 🎯 RESULT FIX
   let winChance = Math.random();
-  let index;
+let index;
 
-  if(winChance < HOUSE_EDGE){
-    let possible = [];
-    wheelMap.forEach((item,i)=>{
-      if(item.type==="win" && item.box===selected){
-        possible.push(i);
-      }
-    });
-    index = possible[Math.floor(Math.random()*possible.length)];
-  }else{
-    let possible = [];
-    wheelMap.forEach((item,i)=>{
-      if(item.type==="lose" || item.box!==selected){
-        possible.push(i);
-      }
-    });
-    index = possible[Math.floor(Math.random()*possible.length)];
-  }
+if(winChance < HOUSE_EDGE){
+
+  // ✅ EXACT WIN
+  index = wheelMap.findIndex(item => item.type === "win" && item.box === selected);
+
+}else{
+
+  // ❌ ONLY LOSE
+  let loseIndexes = wheelMap
+    .map((item,i)=> item.type==="lose" ? i : null)
+    .filter(i=> i !== null);
+
+  index = loseIndexes[Math.floor(Math.random() * loseIndexes.length)];
+}
 
   let result = wheelMap[index];
 
