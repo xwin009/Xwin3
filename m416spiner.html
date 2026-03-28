@@ -319,12 +319,16 @@ window.spin = async function(){
   // 🎯 STEP 2: EXACT ANGLE CALC
   let slice = 360 / 8;
 
-  // 🔥 reverse angle (IMPORTANT)
-  let target = 360 - (index * slice) - (slice / 2);
+// 🔥 reverse angle
+let target = 360 - (index * slice) - (slice / 2);
 
-  let extraSpins = Math.floor(Math.random() * 2) + 5;
+// spins
+let extraSpins = Math.floor(Math.random() * 2) + 5;
 
-  let finalDeg = (360 * extraSpins) + target;
+// ✅ MAIN FIX (accumulate)
+currentRotation += (360 * extraSpins) + target;
+
+let finalDeg = currentRotation;
 
   // 🎯 SPIN START
   spinner.style.transition = "4s cubic-bezier(0.22, 1, 0.36, 1)";
