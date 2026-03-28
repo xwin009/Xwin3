@@ -277,24 +277,24 @@ let history = [];
 const multipliers = [5,4,2,2];
 
 const wheelMap = [
-  {type:"lose"},           // top
-  {type:"win", box:0},     // 5x
-  {type:"lose"},
-  {type:"win", box:1},     // 4x
-  {type:"lose"},
-  {type:"win", box:3},     // 2x (right bottom)
-  {type:"lose"},
-  {type:"win", box:2}      // 2x (left bottom)
+  {type:"lose"},        // 0 top
+  {type:"win", box:0},  // 1 → 5x
+  {type:"lose"},        // 2
+  {type:"win", box:1},  // 3 → 4x
+  {type:"lose"},        // 4
+  {type:"win", box:3},  // 5 → 2x (right)
+  {type:"lose"},        // 6
+  {type:"win", box:2}   // 7 → 2x (left)
 ];
 const slotAngles = [
-  22.5,   // 0
-  67.5,   // 1
-  112.5,  // 2
-  157.5,  // 3
-  202.5,  // 4
-  247.5,  // 5
-  292.5,  // 6
-  337.5   // 7
+  0,    // lose (top)
+  45,   // 5x
+  90,
+  135,  // 4x
+  180,
+  225,  // 2x right
+  270,
+  315   // 2x left
 ];
 /* SELECT */
 window.selectBox = function(i){
@@ -348,15 +348,12 @@ if(winChance < HOUSE_EDGE){
 
   let result = wheelMap[index];
 
-let slice = 360 / 8;
 
-// 🎯 center of slice
-let target = (index * slice) + (slice / 2);
+let target = slotAngles[index];
 
-// 🔥 arrow top fix (FINAL PERFECT)
+// 🔥 IMAGE PERFECT ALIGN
 let finalAngle = target - 90;
 
-// spins
 let spins = 5;
 
 let finalDeg = (360 * spins) + finalAngle;
@@ -370,6 +367,7 @@ setTimeout(()=>{
   ball.style.transition = "4s cubic-bezier(0.22, 1, 0.36, 1)";
   ball.style.transform = `rotate(${finalDeg}deg) translate(110px) rotate(-${finalDeg}deg)`;
 },50);
+
   // 🎯 RESULT AFTER STOP
   setTimeout(async ()=>{
 
