@@ -233,8 +233,8 @@ let wallet = 0;
 /* 🔥 HOUSE EDGE */
 let HOUSE_EDGE = 0.5;
 
-/* 🔥 ROTATION FIX */
-let currentDeg = 0;
+/* 🔥 ROTATION CONTROL */
+let spinDeg = 0;
 
 /* LOAD WALLET */
 async function loadWallet(){
@@ -301,7 +301,7 @@ window.spin = async function(){
 
   let spinner = document.getElementById("spinner");
 
-  // 🎯 RESULT PEHLE FIX
+  // 🎯 RESULT FIX
   let winChance = Math.random();
   let index;
 
@@ -325,20 +325,23 @@ window.spin = async function(){
 
   let result = wheelMap[index];
 
+  // 🎯 ANGLE CALC (PERFECT)
   let slice = 360 / 8;
 
-// 🎯 arrow rotation
-let arrowAngle = index * slice;
+  let target = index * slice + (slice / 2);
 
-let arrow = document.querySelector(".arrow");
+  // 🔥 ARROW TOP FIX (adjust if needed -20 / -24)
+  let finalAngle = 360 - target - 22;
 
-arrow.style.transition = "4s cubic-bezier(0.22, 1, 0.36, 1)";
-arrow.style.transform = `translate(-50%,-50%) rotate(${arrowAngle + (360*5)}deg)`;
+  let spins = 5;
 
-// 🎡 spinner simple spin (sirf animation)
-spinner.style.transition = "4s cubic-bezier(0.22, 1, 0.36, 1)";
-spinner.style.transform = `rotate(${360 * 5}deg)`;
-  // 🎯 AFTER STOP
+  // 🔥 SMOOTH SAME DIRECTION
+  spinDeg += (360 * spins) + finalAngle;
+
+  spinner.style.transition = "4s cubic-bezier(0.22, 1, 0.36, 1)";
+  spinner.style.transform = `rotate(${spinDeg}deg)`;
+
+  // 🎯 RESULT AFTER STOP
   setTimeout(async ()=>{
 
     if(result.type === "lose"){
