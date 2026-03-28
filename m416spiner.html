@@ -286,7 +286,16 @@ const wheelMap = [
   {type:"win", box:3},
   {type:"lose"}
 ];
-
+const slotAngles = [
+  22.5,   // box 0
+  67.5,
+  112.5,
+  157.5,
+  202.5,
+  247.5,
+  292.5,
+  337.5
+];
 /* SELECT */
 window.selectBox = function(i){
   document.querySelectorAll(".box").forEach(b=>b.classList.remove("active"));
