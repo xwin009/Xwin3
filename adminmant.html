@@ -41,25 +41,8 @@ button{
 
 <h2>⚙️ Admin Panel</h2>
 
-<div class="game">
-  <span>Plinko</span>
-  <button onclick="toggleGame('plinko')" id="plinkoBtn">...</button>
-</div>
-
-<div class="game">
-  <span>Aviator</span>
-  <button onclick="toggleGame('aviator')" id="aviatorBtn">...</button>
-</div>
-
-<div class="game">
-  <span>Mines</span>
-  <button onclick="toggleGame('mines')" id="minesBtn">...</button>
-</div>
-
-<div class="game">
-  <span>Spin Stop</span>
-  <button onclick="toggleGame('spin-stop')" id="spinstopBtn">...</button>
-</div>
+<!-- 🔥 ALL GAMES -->
+<div id="games"></div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -73,6 +56,47 @@ const app = initializeApp({
 });
 
 const db = getFirestore(app);
+
+/* 🔥 ALL GAME LIST */
+const games = [
+"wingo",
+"mines",
+"aviator",
+"dragon-tiger",
+"roulette",
+"m416spiner",
+"coinflip",
+"treasure",
+"chicken-road",
+"dice",
+"plinko",
+"drax-turbo-drive",
+"spin-stop",
+"horse-race",
+"ganesh-slots",
+"keno",
+"fate-shift",
+"hilo",
+"dragon-tower",
+"balloon-crash",
+"7updown",
+"draxbet-invest"
+];
+
+/* UI CREATE */
+const container = document.getElementById("games");
+
+games.forEach(name=>{
+  const div = document.createElement("div");
+  div.className="game";
+
+  div.innerHTML = `
+    <span>${name}</span>
+    <button onclick="toggleGame('${name}')" id="${name}Btn">...</button>
+  `;
+
+  container.appendChild(div);
+});
 
 /* LOAD STATUS */
 async function loadGame(name){
@@ -116,10 +140,7 @@ window.toggleGame = async function(name){
 }
 
 /* INIT LOAD */
-loadGame("plinko");
-loadGame("aviator");
-loadGame("mines");
-loadGame("spin-stop");
+games.forEach(loadGame);
 
 </script>
 
