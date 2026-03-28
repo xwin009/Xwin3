@@ -350,10 +350,10 @@ if(winChance < HOUSE_EDGE){
 
 let slice = 360 / 8;
 
-// 🎯 target (center of slice)
-let target = slotAngles[index];
+// 🎯 center of slice
+let target = (index * slice) + (slice / 2);
 
-// 🔥 top arrow adjust
+// 🔥 arrow top fix (FINAL PERFECT)
 let finalAngle = target - 90;
 
 // spins
