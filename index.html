@@ -579,8 +579,27 @@ function openSupportMail(){
 window.location.href="mailto:supirtx4@gmail.com?subject=DraxBet Support";
 }
 
-function openGame(url){
+async function openGame(url){
 
+const gameName = url.replace(".html","");
+
+// 🔥 FIREBASE CHECK
+const ref = doc(db,"gameStatus",gameName);
+const snap = await getDoc(ref);
+
+// ❌ agar doc nahi mila
+if(!snap.exists()){
+  location.href = url;
+  return;
+}
+
+// 🔴 GAME OFF
+if(snap.data().active === false){
+  location.href = "coming-soon.html";
+  return;
+}
+
+// 🟢 GAME ON (tera original system)
 let walletAmt =
 +localStorage.getItem("wallet") ||
 +localStorage.getItem("coin_wallet") ||
@@ -604,9 +623,9 @@ document.getElementById("giftPopup").style.display="flex";
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
-import { getFirestore, collection, getDocs, query, where, updateDoc, doc }
+import { getFirestore, collection, getDocs, query, where, updateDoc, doc, getDoc }
 from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
+  
 const firebaseConfig = {
 apiKey: "AIzaSyBx3J9aGn_98rTPgurMMKw_GR3puIMj4Ms",
 authDomain: "colourcash-ea60e.firebaseapp.com",
