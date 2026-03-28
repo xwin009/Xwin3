@@ -46,6 +46,8 @@ body{
   height:100%;
   border-radius:50%;
   transition:4s cubic-bezier(.17,.67,.83,.67);
+  position:relative;
+  z-index:1;
 }
 
 .arrow{
@@ -54,6 +56,7 @@ body{
   left:50%;
   transform:translate(-50%,-50%) rotate(0deg);
   transform-origin:center -120px; /* 🔥 radius adjust */
+  z-index:4;
 }
 
 .arrow img{
@@ -163,8 +166,19 @@ button{
   border-radius:50%;
   box-shadow:0 0 10px #fff;
 
-  transform:rotate(0deg) translate(110px) rotate(0deg);
+  transform: rotate(0deg) translate(90px) rotate(0deg);
   transform-origin:center;
+    z-index:4;
+}
+  .ring{
+  position:absolute;
+  top:50%;
+  left:50%;
+  width:240px;
+  height:240px;
+  transform:translate(-50%,-50%);
+  pointer-events:none;
+  z-index:2;
 }
   
 </style>
@@ -182,6 +196,7 @@ M416 Spiner 💫
   <img src="images/33752-removebg-preview.png" alt="arrow">
 </div>
   <img src="images/33724-removebg-preview.png" id="spinner" class="spinner">
+  <img src="images/34084-removebg-preview.png" class="ring">
   <div class="ball" id="ball"></div>
 </div>
 
@@ -374,12 +389,12 @@ let finalDeg = (360 * spins) + finalAngle;
 
 // reset
 ball.style.transition = "none";
-ball.style.transform = `rotate(0deg) translate(110px) rotate(0deg)`;
+ball.style.transform = `rotate(0deg) translate(90px) rotate(0deg)`;
 
 // animate
 setTimeout(()=>{
   ball.style.transition = "4s cubic-bezier(0.22, 1, 0.36, 1)";
-  ball.style.transform = `rotate(${finalDeg}deg) translate(110px) rotate(-${finalDeg}deg)`;
+  ball.style.transform = `rotate(${finalDeg}deg) translate(90px) rotate(-${finalDeg}deg)`;
 },50);
 
   // 🎯 RESULT AFTER STOP
