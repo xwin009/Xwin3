@@ -162,7 +162,7 @@ button{
   border-radius:50%;
   box-shadow:0 0 10px #fff;
 
-  transform:rotate(0deg) translate(140px) rotate(0deg);
+  transform:rotate(0deg) translate(110px) rotate(0deg);
   transform-origin:center;
 }
   
@@ -344,19 +344,19 @@ window.spin = async function(){
 
   let slice = 360 / 8;
 
-  // 🎯 target angle
-  let target = index * slice + (slice / 2);
+// 🎯 target (center of slice)
+let target = index * slice + (slice / 2);
 
-  // 🔥 reverse (top ke liye)
-  let finalAngle = target - 90;
+// 🔥 arrow top (IMPORTANT FIX)
+let finalAngle = target - 90;
 
-  let spins = 5;
+// 🔥 smooth spin
+let spins = 5;
 
-  ballDeg += (360 * spins) + finalAngle;
+ballDeg += (360 * spins) + finalAngle;
 
-  ball.style.transition = "4s cubic-bezier(0.22, 1, 0.36, 1)";
-  ball.style.transform = `rotate(${ballDeg}deg) translate(140px) rotate(-${ballDeg}deg)`;
-
+ball.style.transition = "4s cubic-bezier(0.22, 1, 0.36, 1)";
+ball.style.transform = `rotate(${ballDeg}deg) translate(110px) rotate(-${ballDeg}deg)`;
   // 🎯 RESULT AFTER STOP
   setTimeout(async ()=>{
 
