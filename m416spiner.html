@@ -351,12 +351,16 @@ let index;
 // 🔥 FORCE LOSS IF BET >= 300
 if(bet >= 300){
 
-  let loseIndexes = wheelMap
-    .map((item,i)=> item.type==="lose" ? i : null)
-    .filter(i=> i !== null);
+  // ❌ LOSS → kisi bhi galat slot pe bhejo
+let possibleIndexes = wheelMap
+  .map((item,i)=> {
+    if(item.type === "win" && item.box !== selected) return i;
+    if(item.type === "lose") return i;
+    return null;
+  })
+  .filter(i => i !== null);
 
-  index = loseIndexes[Math.floor(Math.random() * loseIndexes.length)];
-
+index = possibleIndexes[Math.floor(Math.random() * possibleIndexes.length)];
 }else if(winChance < HOUSE_EDGE){
 
   // ✅ NORMAL WIN
