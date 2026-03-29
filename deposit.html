@@ -170,7 +170,13 @@ input{
   <button class="submit" onclick="submitUTR()">Submit UTR</button>
   
 </div>
-
+<div id="popup" style="position:fixed;inset:0;display:none;justify-content:center;align-items:center;background:rgba(0,0,0,0.7);z-index:9999;">
+  <div style="background:#1c1c1c;padding:20px;border-radius:12px;text-align:center;width:80%;">
+    <h3 id="popupText">Success</h3>
+    <button onclick="closePopup()" style="margin-top:10px;padding:10px;width:100%;background:#4caf50;border:none;border-radius:10px;color:#fff;">OK</button>
+  </div>
+</div>
+  
 <script>
 
 /* 🔥 CHANNEL DATA */
@@ -218,34 +224,34 @@ function setAmount(a){
   document.getElementById("amount").value = a;
 }
 
-/* 🔥 PAY */
+/* 🔥 PAY BUTTON */
 function payNow(){
   let amt = document.getElementById("amount").value;
-  let utr = document.getElementById("utr").value.trim();
 
   if(amt < 100){
-    alert("Minimum ₹100");
+    showPopup("Minimum ₹100");
     return;
   }
 
-  if(utr.length < 10){
-    alert("Enter valid UTR");
-    return;
-  }
+  let upi = channels[current].upi;
 
-  function submitUTR(){
+  location.href = `upi://pay?pa=${upi}&pn=ColourCash&am=${amt}&cu=INR`;
+}
+
+/* 🔥 SUBMIT UTR */
+function submitUTR(){
 
   let amt = document.getElementById("amount").value;
   let utr = document.getElementById("utr").value.trim();
   let upi = channels[current].upi;
 
   if(amt < 100){
-    alert("Minimum ₹100");
+    showPopup("Minimum ₹100");
     return;
   }
 
   if(utr.length < 10){
-    alert("Enter valid UTR");
+    showPopup("Enter valid UTR");
     return;
   }
 
@@ -261,28 +267,21 @@ function payNow(){
 
   localStorage.setItem("deposits", JSON.stringify(deposits));
 
-  alert("Deposit Submitted ✅");
+  showPopup("Deposit Submitted Successfully ✅");
 
-  document.getElementById("amount").value="";
-  document.getElementById("utr").value="";
+  // 🔥 RESET
+  document.getElementById("amount").value = "";
+  document.getElementById("utr").value = "";
 }
-  let upi = channels[current].upi;
 
-  // 🔥 SAVE LOCAL (optional)
-  let deposits = JSON.parse(localStorage.getItem("deposits")) || [];
+/* 🔥 POPUP */
+function showPopup(msg){
+  document.getElementById("popupText").innerText = msg;
+  document.getElementById("popup").style.display = "flex";
+}
 
-  deposits.push({
-    amount: amt,
-    utr: utr,
-    upi: upi,
-    status: "PENDING",
-    time: new Date().toLocaleString()
-  });
-
-  localStorage.setItem("deposits", JSON.stringify(deposits));
-
-  // 🔥 OPEN PAYMENT APP
-  location.href = `upi://pay?pa=${upi}&pn=ColourCash&am=${amt}&cu=INR`;
+function closePopup(){
+  document.getElementById("popup").style.display = "none";
 }
 
 /* INIT */
