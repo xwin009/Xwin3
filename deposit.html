@@ -254,7 +254,6 @@ window.submitUTR = async function(){
 
   let amt = document.getElementById("amount").value;
   let utr = document.getElementById("utr").value.trim();
-  let file = document.getElementById("screenshot").files[0];
 
   if(amt < 100){
     showPopup("Minimum ₹100");
@@ -266,27 +265,12 @@ window.submitUTR = async function(){
     return;
   }
 
-  if(!file){
-    showPopup("Upload Screenshot");
-    return;
-  }
-
   try{
 
-    // 🔥 STORAGE
-    const storage = getStorage(app);
-    const storageRef = ref(storage, "screenshots/" + Date.now());
-
-    await uploadBytes(storageRef, file);
-
-    const imageUrl = await getDownloadURL(storageRef);
-
-    // 🔥 FIRESTORE SAVE
     await addDoc(collection(db,"deposits"),{
       email: localStorage.getItem("userEmail") || "test@gmail.com",
       amount: Number(amt),
       utr: utr,
-      screenshot: imageUrl, // 🔥 NEW FIELD
       status: "PENDING",
       time: Date.now()
     });
@@ -295,7 +279,6 @@ window.submitUTR = async function(){
 
     document.getElementById("amount").value="";
     document.getElementById("utr").value="";
-    document.getElementById("screenshot").value="";
 
   }catch(e){
     showPopup("Error: "+e.message);
