@@ -114,6 +114,17 @@ input{
   font-size:16px;
   color:#fff;
 }
+  .submit{
+  width:100%;
+  padding:14px;
+  margin-top:10px;
+  background:#ff9800;
+  border:none;
+  border-radius:10px;
+  font-size:16px;
+  color:#fff;
+}
+  
 </style>
 </head>
 
@@ -156,6 +167,8 @@ input{
 
 <button class="pay" onclick="payNow()">PAY NOW</button>
 
+  <button class="submit" onclick="submitUTR()">Submit UTR</button>
+  
 </div>
 
 <script>
@@ -220,6 +233,39 @@ function payNow(){
     return;
   }
 
+  function submitUTR(){
+
+  let amt = document.getElementById("amount").value;
+  let utr = document.getElementById("utr").value.trim();
+  let upi = channels[current].upi;
+
+  if(amt < 100){
+    alert("Minimum ₹100");
+    return;
+  }
+
+  if(utr.length < 10){
+    alert("Enter valid UTR");
+    return;
+  }
+
+  let deposits = JSON.parse(localStorage.getItem("deposits")) || [];
+
+  deposits.push({
+    amount: amt,
+    utr: utr,
+    upi: upi,
+    status: "PENDING",
+    time: new Date().toLocaleString()
+  });
+
+  localStorage.setItem("deposits", JSON.stringify(deposits));
+
+  alert("Deposit Submitted ✅");
+
+  document.getElementById("amount").value="";
+  document.getElementById("utr").value="";
+}
   let upi = channels[current].upi;
 
   // 🔥 SAVE LOCAL (optional)
