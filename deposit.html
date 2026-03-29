@@ -151,6 +151,8 @@ input{
 </div>
 
 <input type="number" id="amount" placeholder="Enter Amount (Min ₹100)">
+ 
+  <input type="text" id="utr" placeholder="Enter UTR Number (12 digit)">
 
 <button class="pay" onclick="payNow()">PAY NOW</button>
 
@@ -206,14 +208,34 @@ function setAmount(a){
 /* 🔥 PAY */
 function payNow(){
   let amt = document.getElementById("amount").value;
+  let utr = document.getElementById("utr").value.trim();
 
   if(amt < 100){
     alert("Minimum ₹100");
     return;
   }
 
+  if(utr.length < 10){
+    alert("Enter valid UTR");
+    return;
+  }
+
   let upi = channels[current].upi;
 
+  // 🔥 SAVE LOCAL (optional)
+  let deposits = JSON.parse(localStorage.getItem("deposits")) || [];
+
+  deposits.push({
+    amount: amt,
+    utr: utr,
+    upi: upi,
+    status: "PENDING",
+    time: new Date().toLocaleString()
+  });
+
+  localStorage.setItem("deposits", JSON.stringify(deposits));
+
+  // 🔥 OPEN PAYMENT APP
   location.href = `upi://pay?pa=${upi}&pn=ColourCash&am=${amt}&cu=INR`;
 }
 
