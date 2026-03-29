@@ -2,31 +2,118 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Deposit – Colour Cash</title>
+<title>Deposit</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-body{margin:0;font-family:Arial,sans-serif;background:#0f0f0f;color:#fff}
-.header{padding:15px;font-size:22px;font-weight:bold;text-align:center}
-.card{background:#1b1b1b;margin:15px;border-radius:16px;padding:18px}
-label{font-size:14px;color:#ccc}
-input{width:100%;padding:14px;border-radius:10px;border:none;margin-top:8px;font-size:16px}
-.upi-box{background:#000;padding:14px;border-radius:12px;text-align:center;font-size:18px;margin-top:12px}
-.copy-btn{width:100%;margin-top:10px;padding:14px;background:#2196f3;border:none;border-radius:10px;color:#fff;font-size:16px;font-weight:bold}
-.note{margin-top:10px;font-size:13px;color:#fbc02d;text-align:center}
-.submit{width:100%;margin-top:15px;padding:14px;background:#4caf50;border:none;border-radius:10px;color:#fff;font-size:17px;font-weight:bold}
-.qr-box{background:#fff;border-radius:12px;padding:12px;text-align:center;margin-top:12px}
-.qr-box img{width:180px}
-.apps{display:flex;gap:10px;margin-top:15px}
-.app-btn{flex:1;padding:12px;border-radius:10px;font-weight:bold;border:none}
-.gpay{background:#fff;color:#000}
-.phonepe{background:#6739b7;color:#fff}
-.paytm{background:#00baf2;color:#000}
-.popup-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:9999}
-.popup{background:#1c1c1c;padding:22px;border-radius:16px;width:85%;text-align:center}
-.popup h3{margin:0 0 8px;color:#4caf50}
-.popup p{font-size:14px;color:#ccc}
-.popup button{margin-top:15px;padding:12px;width:100%;background:#4caf50;border:none;border-radius:10px;color:#fff;font-size:16px}
+body{
+  margin:0;
+  font-family:Arial;
+  background:#111;
+  color:#fff;
+}
+
+.header{
+  padding:15px;
+  font-size:22px;
+  text-align:center;
+  font-weight:bold;
+}
+
+.card{
+  background:#1c1c1c;
+  margin:15px;
+  border-radius:16px;
+  padding:15px;
+}
+
+/* CHANNELS */
+.channels{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+}
+
+.channel{
+  background:#2a2a2a;
+  padding:10px;
+  border-radius:10px;
+  text-align:center;
+  font-size:12px;
+  cursor:pointer;
+}
+
+.channel.active{
+  background:#ff5f5f;
+}
+
+/* QR */
+.qr-box{
+  background:#fff;
+  padding:10px;
+  border-radius:12px;
+  text-align:center;
+  margin-top:12px;
+}
+
+.qr-box img{
+  width:180px;
+}
+
+/* UPI */
+.upi{
+  background:#000;
+  padding:12px;
+  border-radius:10px;
+  margin-top:10px;
+  text-align:center;
+}
+
+.copy{
+  width:100%;
+  margin-top:8px;
+  padding:12px;
+  background:#2196f3;
+  border:none;
+  border-radius:10px;
+  color:#fff;
+}
+
+/* AMOUNT */
+.amounts{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+  margin-top:10px;
+}
+
+.amounts button{
+  padding:12px;
+  border:none;
+  border-radius:10px;
+  background:#2a2a2a;
+  color:#fff;
+}
+
+input{
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:10px;
+  margin-top:10px;
+}
+
+/* BUTTON */
+.pay{
+  width:100%;
+  padding:14px;
+  margin-top:15px;
+  background:#4caf50;
+  border:none;
+  border-radius:10px;
+  font-size:16px;
+  color:#fff;
+}
 </style>
 </head>
 
@@ -35,103 +122,104 @@ input{width:100%;padding:14px;border-radius:10px;border:none;margin-top:8px;font
 <div class="header">💰 Deposit</div>
 
 <div class="card">
-<label>Enter Amount (₹)</label>
-<input type="number" id="amount" placeholder="Minimum ₹100" min="100">
 
-<div class="upi-box">muskan0897@ybl</div>
-<button class="copy-btn" onclick="copyUPI()">Copy UPI ID</button>
+<!-- CHANNEL SELECT -->
+<div class="channels">
+  <div class="channel active" onclick="selectChannel(0)">UPI QR</div>
+  <div class="channel" onclick="selectChannel(1)">Innote QR</div>
+  <div class="channel" onclick="selectChannel(2)">Paytm QR</div>
+  <div class="channel" onclick="selectChannel(3)">PhonePe QR</div>
+</div>
 
+<!-- QR -->
 <div class="qr-box">
-<img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=upi://pay?pa=muskan0897@ybl&pn=ColourCash">
+  <img id="qrImg">
 </div>
 
-<div class="note">Pay to above UPI ID or scan QR, then enter UTR number below</div>
+<!-- UPI -->
+<div class="upi" id="upiBox"></div>
+<button class="copy" onclick="copyUPI()">Copy UPI</button>
 
-<div class="apps">
-<button class="app-btn gpay" onclick="pay()">GPay</button>
-<button class="app-btn phonepe" onclick="pay()">PhonePe</button>
-<button class="app-btn paytm" onclick="pay()">Paytm</button>
+<!-- AMOUNT -->
+<div class="amounts">
+  <button onclick="setAmount(100)">100</button>
+  <button onclick="setAmount(200)">200</button>
+  <button onclick="setAmount(300)">300</button>
+  <button onclick="setAmount(500)">500</button>
+  <button onclick="setAmount(1000)">1000</button>
+  <button onclick="setAmount(5000)">5000</button>
 </div>
 
-<label style="margin-top:14px;display:block">Enter UTR Number</label>
-<input type="number" id="utr" placeholder="12 digit UTR number">
+<input type="number" id="amount" placeholder="Enter Amount (Min ₹100)">
 
-<button class="submit" onclick="submitDeposit()">Submit Deposit</button>
+<button class="pay" onclick="payNow()">PAY NOW</button>
+
 </div>
 
-<div class="popup-bg" id="popupBg">
-  <div class="popup">
-    <h3 id="popupTitle"></h3>
-    <p id="popupMsg"></p>
-    <button onclick="closePopup()">OK</button>
-  </div>
-</div>
-
-<!-- UI SCRIPT -->
 <script>
-const UPI="muskan0897@ybl";
-const popupBg=document.getElementById("popupBg");
-const popupTitle=document.getElementById("popupTitle");
-const popupMsg=document.getElementById("popupMsg");
-const amount=document.getElementById("amount");
-const utr=document.getElementById("utr");
 
-function showPopup(t,m){popupTitle.innerText=t;popupMsg.innerText=m;popupBg.style.display="flex"}
-function closePopup(){popupBg.style.display="none"}
-function copyUPI(){navigator.clipboard.writeText(UPI);showPopup("Copied","UPI ID copied")}
-function pay(){
-  const amt=Number(amount.value);
-  if(amt<100){showPopup("Error","Minimum deposit ₹100");return;}
-  location.href=`upi://pay?pa=${UPI}&pn=ColourCash&am=${amt}&cu=INR`;
+/* 🔥 CHANNEL DATA */
+const channels = [
+  { upi:"muskan0897@ybl" },
+  { upi:"rahul@upi" },
+  { upi:"paytm@upi" },
+  { upi:"phonepe@upi" }
+];
+
+let current = 0;
+
+/* 🔥 SELECT CHANNEL */
+function selectChannel(i){
+  current = i;
+
+  document.querySelectorAll(".channel").forEach(c=>c.classList.remove("active"));
+  document.querySelectorAll(".channel")[i].classList.add("active");
+
+  let upi = channels[i].upi;
+
+  document.getElementById("upiBox").innerText = upi;
+
+  generateQR(upi);
 }
-</script>
 
-<!-- FIREBASE SCRIPT -->
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+/* 🔥 QR GENERATE */
+function generateQR(upi){
+  let url = `upi://pay?pa=${upi}&pn=ColourCash`;
 
-const app=initializeApp({
-  apiKey:"AIzaSyBx3J9aGn_98rTPgurMMKw_GR3puIMj4Ms",
-  authDomain:"colourcash-ea60e.firebaseapp.com",
-  projectId:"colourcash-ea60e"
-});
-const db=getFirestore(app);
+  let qr = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(url)}`;
 
-/* 🔥 MAIN FIX HERE */
-window.submitDeposit = async function(){
-  const amt=Number(amount.value);
-  const utrVal=utr.value.trim();
+  document.getElementById("qrImg").src = qr;
+}
 
-  if(amt<100||utrVal.length<10){
-    showPopup("Error","Enter valid amount & UTR");
+/* 🔥 COPY */
+function copyUPI(){
+  let upi = channels[current].upi;
+  navigator.clipboard.writeText(upi);
+  alert("UPI Copied");
+}
+
+/* 🔥 SET AMOUNT */
+function setAmount(a){
+  document.getElementById("amount").value = a;
+}
+
+/* 🔥 PAY */
+function payNow(){
+  let amt = document.getElementById("amount").value;
+
+  if(amt < 100){
+    alert("Minimum ₹100");
     return;
   }
 
-  const orderId="ORD"+Date.now();
+  let upi = channels[current].upi;
 
-  let deposits=JSON.parse(localStorage.getItem("deposits"))||[];
-  deposits.push({
-    orderId,
-    amount:amt,
-    utr:utrVal,
-    status:"PENDING",
-    time:new Date().toLocaleString()
-  });
-  localStorage.setItem("deposits",JSON.stringify(deposits));
+  location.href = `upi://pay?pa=${upi}&pn=ColourCash&am=${amt}&cu=INR`;
+}
 
-  await addDoc(collection(db,"deposits"),{
-  email:localStorage.getItem("userEmail"),
-  amount:amt,
-  utr:utrVal,
-  status:"PENDING",
-  time:Date.now()
-});
+/* INIT */
+selectChannel(0);
 
-  showPopup("Success","Deposit submitted\nOrder ID: "+orderId);
-  amount.value="";
-  utr.value="";
-};
 </script>
 
 </body>
