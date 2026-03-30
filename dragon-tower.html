@@ -253,9 +253,17 @@ const cfg={
  expert:{bombs:2,m:[2.00,3.50,6.50,12,25]},
  master:{bombs:3,m:[3.00,6.00,15,40,120]}
 };
-
+let mode="easy", step=0, bet=10, open=true;
 let gameResult = null;   // 🔥 WIN ya LOSS fix hoga
     
+    const minus = document.getElementById("minus");
+const plus = document.getElementById("plus");
+const betText = document.getElementById("betText");
+const modeBtn = document.getElementById("modeBtn");
+const modePopup = document.getElementById("modePopup");
+const cashout = document.getElementById("cashout");
+const popup = document.getElementById("popup");
+const popupText = document.getElementById("popupText");
 const tower=document.getElementById("tower");
 const multi=document.getElementById("multi");
 
