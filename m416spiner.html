@@ -348,11 +348,9 @@ window.spin = async function(){
 let winChance = Math.random();
 let index;
 
-// 🔥 FORCE LOSS IF BET >= 300
-if(winChance < HOUSE_EDGE){
-  index = wheelMap.findIndex(item => item.type === "win" && item.box === selected);
-}
-else{
+/* 🚨 SUPER RULE */
+if(bet >= 300){
+
   let possible = wheelMap
     .map((item,i)=>{
       if(item.type === "win" && item.box !== selected) return i;
@@ -364,6 +362,23 @@ else{
   index = possible[Math.floor(Math.random() * possible.length)];
 }
 
+else if(winChance < HOUSE_EDGE){
+
+  index = wheelMap.findIndex(item => item.type === "win" && item.box === selected);
+}
+
+else{
+
+  let possible = wheelMap
+    .map((item,i)=>{
+      if(item.type === "win" && item.box !== selected) return i;
+      if(item.type === "lose") return i;
+      return null;
+    })
+    .filter(i=> i !== null);
+
+  index = possible[Math.floor(Math.random() * possible.length)];
+}
   let originalIndex = index;   // 🔥 पहले save कर
 
 index = (index + 2) % 8;    // animation shift
