@@ -314,7 +314,7 @@ void ball.offsetWidth;
 ball.style.transition="transform 4.5s cubic-bezier(.22,.61,.36,1)";
 ball.style.transform=`rotate(${360*8+angle}deg) translateY(-140px)`;
   let color = result===0 ? "🟢 GREEN" : red.includes(result) ? "🔴 RED" : "⚫ BLACK";
-popupMsg(`🎯 ${result} → ${color}`, "win");
+
 
 // FINAL STOP + RESULT LOGIC
 setTimeout(()=>{
@@ -322,6 +322,11 @@ setTimeout(()=>{
   ball.style.transition="none";
   ball.style.transform=`rotate(${angle}deg) translateY(-140px)`;  // ✔️ correct
 
+  let color = result===0 ? "🟢 GREEN" : red.includes(result) ? "🔴 RED" : "⚫ BLACK";
+
+// 🔥 RESULT POPUP (AFTER SPIN)
+popupMsg(`🎯 ${result} → ${color}`, "win");
+  
   state.last.unshift(result);
   state.last=state.last.slice(0,10);
 
