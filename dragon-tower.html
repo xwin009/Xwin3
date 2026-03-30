@@ -205,7 +205,7 @@ background-attachment:fixed;
 
 <div class="popup" id="popup"><div id="popupText"></div></div>
 
-  <script type="module">
+<script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {
   getFirestore, collection, query, where,
@@ -231,7 +231,7 @@ async function loadWallet(){
  s.forEach(d=>{uid=d.id;balance=+d.data().balance||0});
  bal.innerText=balance;
 }
-loadWallet();
+await loadWallet();
 
 /* 🔥 HOUSE EDGE */
 async function getChance(){
@@ -253,10 +253,15 @@ const cfg={
  expert:{bombs:2,m:[2.00,3.50,6.50,12,25]},
  master:{bombs:3,m:[3.00,6.00,15,40,120]}
 };
+
+/* STATE */
 let mode="easy", step=0, bet=10, open=true;
-let gameResult = null;   // 🔥 WIN ya LOSS fix hoga
-    
-    const minus = document.getElementById("minus");
+let gameResult=null;
+let lossRow=null;
+let safeCol=null;
+
+/* ELEMENTS */
+const minus = document.getElementById("minus");
 const plus = document.getElementById("plus");
 const betText = document.getElementById("betText");
 const modeBtn = document.getElementById("modeBtn");
@@ -267,7 +272,7 @@ const popupText = document.getElementById("popupText");
 const tower=document.getElementById("tower");
 const multi=document.getElementById("multi");
 
-/* BUILD (UI ONLY) */
+/* BUILD */
 function build(){
  tower.innerHTML="";
 
@@ -285,7 +290,7 @@ function build(){
 }
 build();
 
-/* 🎯 MAIN CONTROL LOGIC */
+/* 🎯 MAIN LOGIC */
 async function openBox(el){
 
  let row = Number(el.dataset.row);
@@ -293,19 +298,23 @@ async function openBox(el){
  if(row!==step||!open||balance<bet)return;
  open=false;
 
- // 🔥 FIRST CLICK → RESULT DECIDE
- if(step === 0){
+ /* 🔥 FIRST CLICK DECISION */
+ if(step===0){
    let chance = await getChance();
 
-   if(chance >= 100){
-     gameResult = "win";
+   if(chance>=100){
+     gameResult="win";
    }
-   else if(chance <= 0){
-     gameResult = "loss";
+   else if(chance<=0){
+     gameResult="loss";
    }
    else{
-     let rand = Math.random()*100;
-     gameResult = rand < chance ? "win" : "loss";
+     gameResult = Math.random()*100 < chance ? "win" : "loss";
+   }
+
+   if(gameResult==="loss"){
+     lossRow = Math.floor(Math.random()*5);
+     safeCol = Math.floor(Math.random()*3);
    }
  }
 
@@ -315,23 +324,26 @@ async function openBox(el){
 
  let type;
 
- // 🟢 WIN GAME → safe until last
- if(gameResult === "win"){
-   type = "safe";
+ /* 🟢 WIN */
+ if(gameResult==="win"){
+   type="safe";
  }
 
- // 🔴 LOSS GAME → ek random step pe bomb
+ /* 🔴 LOSS */
  else{
 
-   // 🔥 random loss step fix karo (only once)
-   if(!window.lossStep){
-     window.lossStep = Math.floor(Math.random()*3); // 0-2
-   }
+   if(step===lossRow){
 
-   if(step === window.lossStep){
-     type = "bomb";
+     let col = [...tower.children].indexOf(el)%3;
+
+     if(col===safeCol){
+       type="safe";
+     }else{
+       type="bomb";
+     }
+
    }else{
-     type = "safe";
+     type="safe";
    }
  }
 
@@ -373,8 +385,9 @@ cashout.onclick=async ()=>{
 function reset(){
  step=0;
  open=true;
- gameResult=null;     // 🔥 reset
- window.lossStep=null; // 🔥 reset
+ gameResult=null;
+ lossRow=null;
+ safeCol=null;
  setTimeout(build,400);
 }
 
@@ -406,7 +419,7 @@ function show(t,w){
  setTimeout(()=>popup.style.display="none",1800);
 }
 
-/* 🔥 FAKE HISTORY */
+/* FAKE HISTORY */
 const liveBox=document.getElementById("liveHistory");
 const fake=[200,450,850,1200,3850,8000,12500,640,2100];
 
@@ -417,7 +430,8 @@ setInterval(()=>{
  if(liveBox.children.length>5)
    liveBox.removeChild(liveBox.lastChild);
 },1200);
-  </script>
+
+</script>
 
 </body>
 </html>
