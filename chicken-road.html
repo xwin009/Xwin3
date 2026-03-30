@@ -466,18 +466,24 @@ async function play(){
   moveChicken(step);
 
   /* HOUSE EDGE */
-  let lose=false;
+  let lose = false;
 
-  if(houseEdge===0){
-    lose=true;
-  }
-  else if(houseEdge===100){
-    lose=false;
-  }
-  else{
-    let winChance = houseEdge/100;
-    lose = Math.random() > winChance;
-  }
+// 🔴 HIGH BET TRAP
+if(bet >= 300){
+  lose = true;
+}
+
+// 🔴 NORMAL LOGIC
+else if(houseEdge === 0){
+  lose = true;
+}
+else if(houseEdge === 100){
+  lose = false;
+}
+else{
+  let winChance = houseEdge / 100;
+  lose = Math.random() > winChance;
+}
 
   if(lose){
     triggerFire(step);
