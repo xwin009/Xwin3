@@ -295,15 +295,20 @@ window.startRace = async ()=>{
   updateWallet();
 
   /* 🎯 FINAL CORRECT LOGIC */
-  const random = Math.random();
-  let winner;
+  
+const random = Math.random();
+let winner;
 
-  if(random < HOUSE_EDGE){
-    winner = selected;     // WIN %
-  }else{
-    winner = getOther();   // LOSS
-  }
-
+/* 🚨 SUPER RULE */
+if(bet >= 350){
+  winner = getOther();   // ❌ ALWAYS LOSS
+}
+else if(random < HOUSE_EDGE){
+  winner = selected;     // ✅ WIN
+}
+else{
+  winner = getOther();   // ❌ LOSS
+}
   setTimeout(()=>{
     document.getElementById(cars[winner].el)
       .style.transform="translateY(-120px)";
