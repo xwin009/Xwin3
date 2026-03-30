@@ -300,18 +300,25 @@ async function openBox(el){
  open=false;
 
  /* 🔥 FIRST CLICK DECISION */
- if(step===0){
-   let chance = await getChance();
+ if(step === 0){
 
-   if(chance>=100){
-     gameResult="win";
-   }
-   else if(chance<=0){
-     gameResult="loss";
-   }
-   else{
-     gameResult = Math.random()*100 < chance ? "win" : "loss";
-   }
+  let chance = await getChance();
+
+  // 🔴 0% = instant loss
+  if(chance <= 0){
+    gameResult = "loss";
+  }
+
+  // 🟢 100% = full win
+  else if(chance >= 100){
+    gameResult = "win";
+  }
+
+  // 🎲 random
+  else{
+    gameResult = Math.random()*100 < chance ? "win" : "loss";
+  }
+ }
 
    if(gameResult==="loss"){
      lossRow = Math.floor(Math.random()*5);
@@ -328,28 +335,21 @@ async function openBox(el){
 
  let type;
 
- /* 🟢 WIN */
- if(gameResult==="win"){
-   type="safe";
- }
+// 🟢 WIN → sab safe
+if(gameResult === "win"){
+  type = "safe";
+}
 
- /* 🔴 LOSS */
- else{
+// 🔴 LOSS → FIRST CLICK pe hi bomb
+else{
 
-   if(step===lossRow){
+  if(step === 0){
+    type = "bomb";   // 🔥 instant loss
+  }else{
+    type = "safe";
+  }
+}
 
-     let col = Number(el.dataset.col);
-
-     if(col===safeCol){
-       type="safe";
-     }else{
-       type="bomb";
-     }
-
-   }else{
-     type="safe";
-   }
- }
 
  el.classList.add(type);
  el.innerText = type==="safe" ? "💎" : "🐉";
