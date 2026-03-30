@@ -254,8 +254,8 @@ const cfg={
  master:{bombs:3,m:[3.00,6.00,15,40,120]}
 };
 
-let mode="easy", step=0, bet=10, open=true;
-
+let gameResult = null;   // 🔥 WIN ya LOSS fix hoga
+    
 const tower=document.getElementById("tower");
 const multi=document.getElementById("multi");
 
@@ -285,27 +285,46 @@ async function openBox(el){
  if(row!==step||!open||balance<bet)return;
  open=false;
 
+ // 🔥 FIRST CLICK → RESULT DECIDE
+ if(step === 0){
+   let chance = await getChance();
+
+   if(chance >= 100){
+     gameResult = "win";
+   }
+   else if(chance <= 0){
+     gameResult = "loss";
+   }
+   else{
+     let rand = Math.random()*100;
+     gameResult = rand < chance ? "win" : "loss";
+   }
+ }
+
  balance-=bet;
  bal.innerText=balance;
  await updateDoc(doc(db,"users",uid),{balance});
 
- let chance = await getChance();
  let type;
 
- // 🟢 ALWAYS WIN
- if(chance >= 100){
+ // 🟢 WIN GAME → safe until last
+ if(gameResult === "win"){
    type = "safe";
  }
 
- // 🔴 ALWAYS LOSS
- else if(chance <= 0){
-   type = "bomb";
- }
-
- // 🎲 CONTROLLED RANDOM
+ // 🔴 LOSS GAME → ek random step pe bomb
  else{
-   let rand = Math.random()*100;
-   type = rand < chance ? "safe" : "bomb";
+
+   // 🔥 random loss step fix karo (only once)
+   if(!window.lossStep){
+     window.lossStep = Math.floor(Math.random()*3); // 0-2
+   }
+
+   if(step === window.lossStep){
+     type = "bomb";
+   }else{
+     type = "safe";
+   }
  }
 
  el.classList.add(type);
@@ -346,6 +365,8 @@ cashout.onclick=async ()=>{
 function reset(){
  step=0;
  open=true;
+ gameResult=null;     // 🔥 reset
+ window.lossStep=null; // 🔥 reset
  setTimeout(build,400);
 }
 
