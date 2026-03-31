@@ -97,7 +97,7 @@ font-size:14px;
 
 <input id="limit" type="number" placeholder="User Limit">
 
-<button id="createBtn">Create Code</button>
+<button onclick="createCode()">Create Code</button>
 
 <div class="code-list" id="codeList"></div>
 
@@ -107,8 +107,7 @@ font-size:14px;
 
 <input id="userEmail" placeholder="Enter User Email">
 
-<button id="checkBtn">Check User</button>
-
+<button onclick="checkUser()">Check User</button>
 <div id="userData"></div>
   <hr>
 
@@ -127,6 +126,7 @@ Loading deposits...
 
 </div>
 
+
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -138,6 +138,7 @@ getDocs,
 query,
 where
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
 /* FIREBASE */
 const firebaseConfig = {
 apiKey: "AIzaSyBx3J9aGn_98rTPgurMMKw_GR3puIMj4Ms",
@@ -152,9 +153,9 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 /* =========================
-   CREATE CODE
+   CREATE CODE (FIXED)
 ========================= */
-async function createCode(){
+window.createCode = async function(){
 
 const code = document.getElementById("code").value;
 const amount = document.getElementById("amount").value;
@@ -207,9 +208,9 @@ alert("Code Copied");
 }
 
 /* =========================
-   CHECK USER
+   CHECK USER (FIXED)
 ========================= */
-async function checkUser(){
+window.checkUser = async function(){
 
 const email = document.getElementById("userEmail").value;
 
@@ -304,11 +305,6 @@ document.getElementById("depositList").innerHTML = html;
 loadTodayDeposits();
 setInterval(loadTodayDeposits,5000);
 
-/* 🔥 BUTTON CONNECT (FINAL FIX) */
-window.onload = () => {
-  document.getElementById("createBtn").onclick = createCode;
-  document.getElementById("checkBtn").onclick = checkUser;
-};
 </script>
   
 </body>
