@@ -188,15 +188,20 @@ window.register = () => {
     }
     localStorage.setItem("users", JSON.stringify(users));
 
-    /* 🔥 FIRESTORE USER */
-    await setDoc(doc(db, "users", user.uid), {
-      email: user.email,
-      password: pass,
-      balance: 51,            // 🎁 Signup bonus
-  signupBonus: true,      // ✅ repeat na ho
-      role: "user",
-      createdAt: Date.now()
-    });
+    // 🔥 GET REF FROM URL
+const urlParams = new URLSearchParams(window.location.search);
+const ref = urlParams.get("ref");
+
+await setDoc(doc(db, "users", user.uid), {
+  email: user.email,
+  password: pass,
+  balance: 51,
+  signupBonus: true,
+  role: "user",
+  createdAt: Date.now(),
+
+  referredBy: ref || null   // 🔥 ADD THIS
+});
 
     showPopup("Registration Successful 🎉");
     localStorage.setItem("newUser","true");
