@@ -97,7 +97,7 @@ font-size:14px;
 
 <input id="limit" type="number" placeholder="User Limit">
 
-<button onclick="createCode()">Create Code</button>
+<button id="createBtn">Create Code</button>
 
 <div class="code-list" id="codeList"></div>
 
@@ -107,7 +107,7 @@ font-size:14px;
 
 <input id="userEmail" placeholder="Enter User Email">
 
-<button onclick="checkUser()">Check User</button>
+<button id="checkBtn">Check User</button>
 
 <div id="userData"></div>
   <hr>
@@ -306,7 +306,9 @@ loadTodayDeposits();
 
 /* AUTO REFRESH */
 setInterval(loadTodayDeposits,5000);
-
+  
+document.getElementById("createBtn").addEventListener("click", createCode);
+document.getElementById("checkBtn").addEventListener("click", checkUser);
 </script>
 
 </body>
