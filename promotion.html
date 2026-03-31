@@ -128,8 +128,8 @@ body{
     <li>✅ Friend must open register page from your link</li>
     <li>✅ bonus system is only for agents</li>
     <li>✅ contact for agent work </li>
-    
-  </ul>
+     </ul>
+  <div id="refList" style="margin-top:20px;"></div>
 </div>
 
 <!-- POPUP -->
@@ -153,33 +153,71 @@ body{
   </div>
 </div>
 
-<script>
-/* SIMPLE LOCAL REF CODE */
-let ref = localStorage.getItem("refCode");
-if(!ref){
-  ref = Math.floor(1000000 + Math.random()*9000000);
-  localStorage.setItem("refCode", ref);
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import {
+getFirestore,
+collection,
+getDocs,
+query,
+where
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const app = initializeApp({
+  apiKey:"AIzaSyBx3J9aGn_98rTPgurMMKw_GR3puIMj4Ms",
+  authDomain:"colourcash-ea60e.firebaseapp.com",
+  projectId:"colourcash-ea60e"
+});
+
+const db = getFirestore(app);
+
+/* 🔥 LOAD REFERRALS */
+async function loadReferrals(){
+
+  const myCode = localStorage.getItem("refCode");
+  let html = "";
+
+  const usersSnap = await getDocs(collection(db,"users"));
+
+  for(const u of usersSnap.docs){
+
+    const user = u.data();
+
+    if(user.referredBy == myCode){
+
+      let total = 0;
+
+      const depSnap = await getDocs(
+        query(collection(db,"deposits"),
+        where("email","==",user.email))
+      );
+
+      depSnap.forEach(d=>{
+        if(d.data().status === "APPROVED"){
+          total += Number(d.data().amount);
+        }
+      });
+
+      // 🔥 EMAIL HIDE
+      let email = user.email;
+      let hidden = email.slice(0,2) + "****@" + email.split("@")[1];
+
+      html += `
+      <div style="background:#fff;padding:10px;margin-top:10px;border-radius:10px;">
+        📧 ${hidden}<br>
+        💰 Total Deposit: ₹${total}
+      </div>
+      `;
+    }
+  }
+
+  document.getElementById("refList").innerHTML =
+    html || "No referrals yet";
 }
-document.getElementById("refCode").innerText = ref;
 
-/* ✅ FIXED REFERRAL LINK */
-const refLink = `${window.location.origin}/register.html?ref=${ref}`;
+loadReferrals();
 
-/* POPUP */
-const popup = document.getElementById("popup");
-const popupText = document.getElementById("popupText");
-
-function showPopup(msg){
-  popupText.innerText = msg;
-  popup.style.display = "flex";
-  setTimeout(()=>popup.style.display="none",1200);
-}
-
-/* COPY */
-function copyLink(){
-  navigator.clipboard.writeText(refLink);
-  showPopup("Referral link copied ✅");
-}
 </script>
 
 </body>
