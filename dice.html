@@ -9,9 +9,23 @@
 body{
   margin:0;
   font-family:Arial, sans-serif;
-  background:radial-gradient(circle at top,#0b1c2d,#030b14);
+
+  background:url("images/file_0000000023bc71faade15b20862c7b4a.png") no-repeat center;
+  background-size:cover;
+  background-attachment:fixed;
+
   color:#fff;
   text-align:center;
+  position:relative;
+}
+
+/* 🔥 DARK OVERLAY (PRO LOOK) */
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.6); /* darkness adjust kar sakta h */
+  z-index:-1;
 }
 .header{
   display:flex;
