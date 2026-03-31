@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <title>2xwin</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>
+if(localStorage.getItem("newUser") === "true"){
+  localStorage.removeItem("newUser"); // 🔥 important
+  window.location.href = "animation.html";
+}
+  </script>
 <script src="game-control.js"></script>
   
 <style>
