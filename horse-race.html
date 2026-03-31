@@ -98,7 +98,27 @@ body{margin:0;font-family:Arial;background:#1b5e20;color:#fff}
  <span id="time">0</span>s
 </div>
 <div class="bet-close" id="betClose"></div>
+<div style="text-align:center;margin-top:6px;">
+  <button onclick="toggleHistory()" style="
+    padding:8px 16px;
+    border:none;
+    border-radius:20px;
+    background:#00e676;
+    color:#000;
+    font-weight:bold;
+    box-shadow:0 0 10px #00e676;
+  ">📜 History</button>
+</div>
 
+<div id="historyBox" style="
+  display:none;
+  margin:10px;
+  background:rgba(0,0,0,0.7);
+  border-radius:12px;
+  padding:10px;
+  max-height:200px;
+  overflow:auto;
+"></div>
 <div class="bet-panel" id="betPanel"></div>
 <div class="track" id="track"></div>
 
@@ -144,7 +164,50 @@ const track = document.getElementById("track");
 const overlay = document.getElementById("overlay");
 const popup = document.getElementById("popup");
 const popupText = document.getElementById("popupText");
+    function toggleHistory(){
+  const box = document.getElementById("historyBox");
+  box.style.display = box.style.display === "none" ? "block" : "none";
+}
+    
+async function loadBetHistory(){
 
+  const snap = await getDoc(userRef());
+  let list = snap.data().betHistory || [];
+
+  let html = "";
+
+  list.forEach(item=>{
+
+    if(item.win){
+      html += `
+      <div style="
+        background:#1b5e20;
+        padding:8px;
+        border-radius:8px;
+        margin-bottom:6px;
+      ">
+        🟢 WIN +₹${item.amount.toFixed(2)}<br>
+        ⏰ ${item.time}
+      </div>`;
+    }else{
+      html += `
+      <div style="
+        background:#b71c1c;
+        padding:8px;
+        border-radius:8px;
+        margin-bottom:6px;
+      ">
+        🔴 LOSS -₹${item.loseAmount}<br>
+        ⏰ ${item.time}
+      </div>`;
+    }
+
+  });
+
+  document.getElementById("historyBox").innerHTML =
+    html || "No history yet";
+}
+    
 /* GAME DATA */
 const horses=[
  {id:1,odds:8.6},{id:2,odds:6.5},{id:3,odds:4.7},
@@ -316,6 +379,23 @@ async function finish(win){
   popup.className="popup lose";
   popupText.innerText="❌ You Lose";
  }
+  /* 🔥 SAVE BET HISTORY */
+let betResult = {
+  win: bet > 0,
+  amount: bet ? (bet*horses.find(h=>h.id===win).odds) : 0,
+  loseAmount: bet || 0,
+  time: new Date().toLocaleTimeString()
+};
+
+const snap2 = await getDoc(userRef());
+let fullHistory = snap2.data().betHistory || [];
+
+fullHistory.unshift(betResult);
+fullHistory = fullHistory.slice(0,20);
+
+await updateDoc(userRef(),{
+  betHistory: fullHistory
+});
 
  const snap=await getDoc(userRef());
  let h=snap.data().horseHistory||[];
@@ -334,6 +414,7 @@ async function finish(win){
   overlay.style.display="none";
   buildUI();
   syncTimer();
+   loadBetHistory();
  },2000);
 }
 
