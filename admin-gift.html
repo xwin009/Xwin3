@@ -153,9 +153,9 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 /* =========================
-   CREATE GIFT CODE
+   CREATE CODE
 ========================= */
-window.createCode = async function(){
+async function createCode(){
 
 const code = document.getElementById("code").value;
 const amount = document.getElementById("amount").value;
@@ -167,7 +167,7 @@ if(!code || !amount || !limit){
 }
 
 await addDoc(collection(db,"giftcodes"),{
-code:code,
+code,
 amount:Number(amount),
 usedCount:0,
 maxUse:Number(limit)
@@ -181,9 +181,9 @@ document.getElementById("limit").value="";
 }
 
 /* =========================
-   SHOW CREATED CODE
+   SHOW CODE
 ========================= */
-window.addToList = function(code){
+function addToList(code){
 
 const list=document.getElementById("codeList");
 
@@ -193,14 +193,16 @@ div.className="code-item";
 
 div.innerHTML=`
 <span>${code}</span>
-<button class="copy-btn" onclick="copyCode('${code}')">Copy</button>
+<button class="copy-btn">Copy</button>
 `;
+
+div.querySelector("button").onclick = ()=>copyCode(code);
 
 list.prepend(div);
 }
 
 /* COPY */
-window.copyCode = function(code){
+function copyCode(code){
 navigator.clipboard.writeText(code);
 alert("Code Copied");
 }
@@ -208,7 +210,7 @@ alert("Code Copied");
 /* =========================
    CHECK USER
 ========================= */
-window.checkUser = async function(){
+async function checkUser(){
 
 const email = document.getElementById("userEmail").value;
 
@@ -223,7 +225,7 @@ let totalWithdraw = 0;
 let depositHistory="";
 let withdrawHistory="";
 
-/* DEPOSITS */
+/* DEPOSIT */
 const depSnap = await getDocs(
 query(collection(db,"deposits"), where("email","==",email))
 );
@@ -238,7 +240,7 @@ totalDeposit += Number(data.amount);
 }
 });
 
-/* WITHDRAWS */
+/* WITHDRAW */
 const wdSnap = await getDocs(
 query(collection(db,"withdraws"), where("email","==",email))
 );
@@ -257,10 +259,8 @@ totalWithdraw += Number(data.amount);
 document.getElementById("userData").innerHTML = `
 <h3>Total Deposit: ₹${totalDeposit}</h3>
 <h3>Total Withdraw: ₹${totalWithdraw}</h3>
-
 <h4>Deposit History</h4>
 ${depositHistory}
-
 <h4>Withdraw History</h4>
 ${withdrawHistory}
 `;
@@ -303,13 +303,13 @@ document.getElementById("depositList").innerHTML = html;
 
 /* LOAD */
 loadTodayDeposits();
-
-/* AUTO REFRESH */
 setInterval(loadTodayDeposits,5000);
-  
-document.getElementById("createBtn").addEventListener("click", createCode);
-document.getElementById("checkBtn").addEventListener("click", checkUser);
-</script>
 
+/* 🔥 BUTTON CONNECT (FINAL FIX) */
+document.getElementById("createBtn").onclick = createCode;
+document.getElementById("checkBtn").onclick = checkUser;
+
+</script>
+  
 </body>
 </html>
