@@ -220,5 +220,31 @@ loadReferrals();
 
 </script>
 
+  <script>
+
+/* 🔥 REF CODE GENERATE */
+let ref = localStorage.getItem("refCode");
+
+if(!ref){
+  ref = Math.floor(1000000 + Math.random()*9000000);
+  localStorage.setItem("refCode", ref);
+}
+
+/* SHOW CODE */
+window.onload = function(){
+  document.getElementById("refCode").innerText = ref;
+};
+
+/* LINK */
+const refLink = `${window.location.origin}/register.html?ref=${ref}`;
+
+/* COPY */
+window.copyLink = function(){
+  navigator.clipboard.writeText(refLink);
+  alert("Referral link copied ✅");
+};
+
+</script>
+  
 </body>
 </html>
