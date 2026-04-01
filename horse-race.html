@@ -372,9 +372,14 @@ async function startRace(){
 
 /* FINISH */
 async function finish(win){
+  let totalBet = 0;
+
+for(let id in horseBets){
+  totalBet += horseBets[id];
+}
 
  overlay.style.display="flex";
- const bet=horseBets[win]||0;
+ const bet = horseBets[win] || 0; // win ke liye same rehne de
 
  let winAmt = bet ? bet*horses.find(h=>h.id===win).odds : 0;
 
@@ -391,9 +396,9 @@ async function finish(win){
  let betResult = {
   win: bet > 0,
   amount: winAmt,
-  loseAmount: bet || 0,
+  loseAmount: bet > 0 ? 0 : totalBet, // 🔥 FIX
   time: new Date().toLocaleTimeString()
- };
+};
 
  const snap2 = await getDoc(userRef());
  let fullHistory = snap2.data()?.betHistory || [];
