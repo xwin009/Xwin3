@@ -6,17 +6,22 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
+html, body{
+  height:100%;
+}
+
 body{
   margin:0;
   font-family:Arial, sans-serif;
 
-  /* 🔥 NEW BACKGROUND */
   background:
     url("images/file_00000000b9fc71fa9313f38f00df7e20.png") center/cover no-repeat,
     radial-gradient(circle,#1a1a1a,#000);
 
   color:#fff;
   text-align:center;
+
+  min-height:100vh;   /* 🔥 IMPORTANT */
 }
 .header{
   display:flex;
