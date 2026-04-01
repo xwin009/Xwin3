@@ -247,6 +247,14 @@ async function startGame(){
  if(bet>wallet) return showPopup("Low Balance","#ff5252");
 
  wallet-=bet;
+  // 🔥 WAGER CUT (YAHI DALNA HAI)
+let wager = Number(localStorage.getItem("wager")) || 0;
+
+if(wager > 0){
+  wager -= bet;
+  if(wager < 0) wager = 0;
+  localStorage.setItem("wager", wager);
+}
  await updateDoc(doc(db,"users",userDocId),{balance:wallet});
  document.getElementById("wallet").innerText=wallet;
 
