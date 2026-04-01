@@ -389,12 +389,12 @@ else{
 
  let type;
 
- if(gameResult==="win"){
+ if(gameResult==="win" && step < maxWinStep){
    type="safe";
- }else{
-   if(step===0) type="bomb";
-   else type="safe";
- }
+}
+else{
+   type="bomb";
+}
 
  el.classList.add(type);
  el.innerText = type==="safe" ? "💎" : "🐉";
@@ -419,8 +419,7 @@ else{
  step++;
 
  if(step >= maxWinStep){
-  cashout.click();
-  return;
+  gameResult = "loss"; // 🔥 aage sab bomb
  }
 
  multi.innerText=cfg[mode].m[step].toFixed(2)+"x";
