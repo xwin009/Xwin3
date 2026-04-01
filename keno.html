@@ -60,9 +60,31 @@ body{
   padding:12px 0;
   cursor:pointer;
   font-weight:bold;
+
+  /* 🔥 GREEN BORDER */
+  border:2px solid #00e676;
+
+  /* 🔥 SOFT GLOW */
+  box-shadow: 0 0 6px rgba(0,230,118,0.5);
 }
-.num.active{background:#4caf50;color:#000}
-.num.hit{background:#ffeb3b;color:#000}
+.num.active{
+  background:#4caf50;
+  color:#000;
+
+  border:2px solid #00ff95;
+  box-shadow:
+    0 0 8px #00ff95,
+    0 0 16px rgba(0,255,149,0.7);
+}
+.num.hit{
+  background:#ffeb3b;
+  color:#000;
+
+  border:2px solid #00e676;
+  box-shadow:
+    0 0 8px #00e676,
+    0 0 14px rgba(0,230,118,0.6);
+}
 
 /* BET */
 .bet-box{
