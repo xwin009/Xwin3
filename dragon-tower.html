@@ -229,54 +229,45 @@ background-attachment:fixed;
 
 <div class="popup" id="popup"><div id="popupText"></div></div>
 
+ 
 <script type="module">
-  function toggleHistory(){
-  const box = document.getElementById("historyBox");
-  box.style.display = box.style.display === "none" ? "block" : "none";
-}
-  function loadHistory(){
 
-  let list = JSON.parse(localStorage.getItem("dragonHistory")) || [];
-  let html = "";
-
-  list.forEach(item=>{
-
-    if(item.win){
-      html += `
-      <div style="
-        background:#14532d;
-        padding:8px;
-        border-radius:8px;
-        margin-bottom:6px;
-        box-shadow:0 0 10px #22c55e;
-      ">
-        🟢 WIN +₹${item.amount}<br>
-        ⏰ ${item.time}
-      </div>`;
-    }else{
-      html += `
-      <div style="
-        background:#7f1d1d;
-        padding:8px;
-        border-radius:8px;
-        margin-bottom:6px;
-        box-shadow:0 0 10px #ef4444;
-      ">
-        🔴 LOSS -₹${item.amount}<br>
-        ⏰ ${item.time}
-      </div>`;
-    }
-
-  });
-
-  document.getElementById("historyBox").innerHTML =
-    html || "No history yet";
-}
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {
   getFirestore, collection, query, where,
   getDocs, doc, updateDoc, getDoc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+/* 🔥 HISTORY FUNCTIONS */
+function toggleHistory(){
+  const box = document.getElementById("historyBox");
+  box.style.display = box.style.display === "none" ? "block" : "none";
+  loadHistory();
+}
+
+function loadHistory(){
+  let list = JSON.parse(localStorage.getItem("dragonHistory")) || [];
+  let html = "";
+
+  list.forEach(item=>{
+    if(item.win){
+      html += `
+      <div style="background:#14532d;padding:8px;border-radius:8px;margin-bottom:6px;box-shadow:0 0 10px #22c55e;">
+        🟢 WIN +₹${item.amount}<br>
+        ⏰ ${item.time}
+      </div>`;
+    }else{
+      html += `
+      <div style="background:#7f1d1d;padding:8px;border-radius:8px;margin-bottom:6px;box-shadow:0 0 10px #ef4444;">
+        🔴 LOSS -₹${item.amount}<br>
+        ⏰ ${item.time}
+      </div>`;
+    }
+  });
+
+  document.getElementById("historyBox").innerHTML =
+    html || "No history yet";
+}
 
 /* FIREBASE */
 const app=initializeApp({
@@ -286,7 +277,7 @@ const app=initializeApp({
 });
 const db=getFirestore(app);
 
-/* WALLET */
+/* USER */
 const email=localStorage.getItem("userEmail");
 let uid="", balance=0;
 const bal=document.getElementById("bal");
@@ -299,7 +290,7 @@ async function loadWallet(){
 }
 await loadWallet();
 
-/* 🔥 HOUSE EDGE */
+/* 🔥 FIXED HOUSE EDGE (ALL MODE SAME CONTROL) */
 async function getChance(){
  try{
    const ref = doc(db,"settings","houseEdge");
@@ -353,7 +344,7 @@ function build(){
 }
 build();
 
-/* 🎯 GAME LOGIC */
+/* 🎯 MAIN GAME FIXED */
 async function openBox(el){
 
  let row = Number(el.dataset.row);
@@ -361,7 +352,7 @@ async function openBox(el){
 
  open=false;
 
- /* 🔥 FIRST CLICK DECISION */
+ /* 🔥 GLOBAL RESULT (ALL MODES SAME CONTROL) */
  if(step===0){
    let chance = await getChance();
 
@@ -370,7 +361,7 @@ async function openBox(el){
    else gameResult = Math.random()*100 < chance ? "win":"loss";
  }
 
- /* 💰 BET CUT ONLY ONCE */
+ /* 💰 CUT ONCE */
  if(!betPlaced){
    balance -= bet;
    bal.innerText = balance;
@@ -380,44 +371,57 @@ async function openBox(el){
 
  let type;
 
- // 🟢 WIN → sab safe
  if(gameResult==="win"){
    type="safe";
+ }else{
+   if(step===0) type="bomb";
+   else type="safe";
  }
 
- // 🔴 LOSS → first click bomb
- else{
+ el.classList.add(type);
+ el.innerText = type==="safe" ? "💎" : "🐉";
 
-   /* 🔥 SAVE LOSS HISTORY (YAHAN DAL) */
+ /* 🔴 LOSS */
+ if(type==="bomb"){
+
    let history = JSON.parse(localStorage.getItem("dragonHistory")) || [];
-
    history.unshift({
      win:false,
      amount:bet,
      time:new Date().toLocaleTimeString()
    });
-
    localStorage.setItem("dragonHistory", JSON.stringify(history));
 
    show("YOU LOSE",false);
    reset();
+   return;
  }
+
+ /* 🟢 SAFE */
+ step++;
+
+ if(step>=5){
+   cashout.click();
+   return;
  }
+
+ multi.innerText=cfg[mode].m[step].toFixed(2)+"x";
+ open=true;
+}
+
 /* CASHOUT */
 cashout.onclick=async ()=>{
-  if(step===0)return;
+ if(step===0)return;
 
  const win=Math.floor(bet*cfg[mode].m[step-1]);
-  // 🔥 SAVE WIN HISTORY
-let history = JSON.parse(localStorage.getItem("dragonHistory")) || [];
 
-history.unshift({
+ let history = JSON.parse(localStorage.getItem("dragonHistory")) || [];
+ history.unshift({
   win:true,
   amount:win,
   time:new Date().toLocaleTimeString()
-});
-
-localStorage.setItem("dragonHistory", JSON.stringify(history));
+ });
+ localStorage.setItem("dragonHistory", JSON.stringify(history));
 
  balance+=win;
  bal.innerText=balance;
@@ -475,7 +479,9 @@ setInterval(()=>{
  if(liveBox.children.length>5)
    liveBox.removeChild(liveBox.lastChild);
 },1200);
-  loadHistory();
+
+/* 🔥 LOAD HISTORY */
+setTimeout(loadHistory,500);
 
 </script>
 
