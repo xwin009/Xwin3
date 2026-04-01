@@ -6,7 +6,6 @@
 <title>Create Gift Code</title>
 
 <style>
-
 body{
 background:#0e0e0e;
 font-family:Arial;
@@ -16,19 +15,13 @@ align-items:center;
 height:100vh;
 color:#fff;
 }
-
 .box{
 background:#1b1b1b;
 padding:25px;
 border-radius:15px;
 width:320px;
 }
-
-h2{
-text-align:center;
-margin-bottom:20px;
-}
-
+h2{text-align:center;margin-bottom:20px}
 input{
 width:100%;
 padding:12px;
@@ -37,7 +30,6 @@ border:none;
 margin-top:10px;
 font-size:16px;
 }
-
 button{
 width:100%;
 padding:12px;
@@ -49,11 +41,6 @@ color:#fff;
 font-size:16px;
 cursor:pointer;
 }
-
-.code-list{
-margin-top:20px;
-}
-
 .code-item{
 background:#2b2b2b;
 padding:10px;
@@ -63,7 +50,6 @@ display:flex;
 justify-content:space-between;
 align-items:center;
 }
-
 .copy-btn{
 background:#00c853;
 padding:5px 10px;
@@ -72,7 +58,6 @@ border-radius:5px;
 color:#fff;
 cursor:pointer;
 }
-
 .history{
 background:#2b2b2b;
 padding:10px;
@@ -80,7 +65,6 @@ border-radius:8px;
 margin-top:10px;
 font-size:14px;
 }
-
 </style>
 
 </head>
@@ -92,24 +76,23 @@ font-size:14px;
 <h2>🎁 Create Gift Code</h2>
 
 <input id="code" placeholder="Enter Code">
-
 <input id="amount" type="number" placeholder="Amount">
-
 <input id="limit" type="number" placeholder="User Limit">
 
 <button id="createBtn">Create Code</button>
 
-<div class="code-list" id="codeList"></div>
+<div id="codeList"></div>
 
 <hr style="margin-top:20px;border:1px solid #333;">
 
 <h2>👤 Check User</h2>
 
 <input id="userEmail" placeholder="Enter User Email">
-
 <button id="checkBtn">Check User</button>
+
 <div id="userData"></div>
-  <hr>
+
+<hr>
 
 <h3>💰 Today Deposits</h3>
 
@@ -119,76 +102,57 @@ padding:10px;
 border-radius:10px;
 max-height:200px;
 overflow:auto;
-font-size:14px;
-">
-Loading deposits...
+font-size:14px;">
+Loading...
 </div>
 
 </div>
-
 
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {
-getFirestore,
-collection,
-addDoc,
-getDocs,
-query,
-where
+getFirestore, collection, addDoc, getDocs, query, where
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 /* FIREBASE */
-const firebaseConfig = {
-apiKey: "AIzaSyBx3J9aGn_98rTPgurMMKw_GR3puIMj4Ms",
-authDomain: "colourcash-ea60e.firebaseapp.com",
-projectId: "colourcash-ea60e",
-storageBucket: "colourcash-ea60e.firebasestorage.app",
-messagingSenderId: "403688058646",
-appId: "1:403688058646:web:f1753360471528f275ea37"
-};
-
-const app = initializeApp(firebaseConfig);
+const app = initializeApp({
+apiKey:"AIzaSyBx3J9aGn_98rTPgurMMKw_GR3puIMj4Ms",
+authDomain:"colourcash-ea60e.firebaseapp.com",
+projectId:"colourcash-ea60e"
+});
 const db = getFirestore(app);
 
-/* =========================
-   CREATE CODE (FIXED)
-========================= */
-window.createCode = async function(){
+/* ================= CREATE CODE ================= */
+async function createCode(){
 
-const code = document.getElementById("code").value;
-const amount = document.getElementById("amount").value;
-const limit = document.getElementById("limit").value;
+const code = codeInput.value.trim();
+const amount = Number(amountInput.value);
+const limit = Number(limitInput.value);
 
 if(!code || !amount || !limit){
-  alert("Fill all fields");
-  return;
+ alert("Fill all fields");
+ return;
 }
 
 await addDoc(collection(db,"giftcodes"),{
-code,
-amount:Number(amount),
-usedCount:0,
-maxUse:Number(limit)
+ code,
+ amount,
+ usedCount:0,
+ maxUse:limit
 });
 
 addToList(code);
 
-document.getElementById("code").value="";
-document.getElementById("amount").value="";
-document.getElementById("limit").value="";
+codeInput.value="";
+amountInput.value="";
+limitInput.value="";
 }
 
-/* =========================
-   SHOW CODE
-========================= */
+/* SHOW CODE */
 function addToList(code){
 
-const list=document.getElementById("codeList");
-
 const div=document.createElement("div");
-
 div.className="code-item";
 
 div.innerHTML=`
@@ -196,117 +160,99 @@ div.innerHTML=`
 <button class="copy-btn">Copy</button>
 `;
 
-div.querySelector("button").addEventListener("click", ()=>copyCode(code));
-list.prepend(div);
+div.querySelector("button").addEventListener("click",()=>{
+ navigator.clipboard.writeText(code);
+ alert("Copied");
+});
+
+codeList.prepend(div);
 }
 
-/* COPY */
-function copyCode(code){
-navigator.clipboard.writeText(code);
-alert("Code Copied");
-}
+/* ================= CHECK USER ================= */
+async function checkUser(){
 
-/* =========================
-   CHECK USER (FIXED)
-========================= */
-window.checkUser = async function(){
-
-const email = document.getElementById("userEmail").value;
+const email = emailInput.value.trim();
 
 if(!email){
-  alert("Enter Email");
-  return;
+ alert("Enter Email");
+ return;
 }
 
-let totalDeposit = 0;
-let totalWithdraw = 0;
-
-let depositHistory="";
-let withdrawHistory="";
+let totalDeposit=0,totalWithdraw=0;
+let depositHTML="",withdrawHTML="";
 
 /* DEPOSIT */
-const depSnap = await getDocs(
-query(collection(db,"deposits"), where("email","==",email))
-);
+const depSnap = await getDocs(query(collection(db,"deposits"),where("email","==",email)));
 
 depSnap.forEach(d=>{
-const data = d.data();
-
-depositHistory += `<div class="history">₹${data.amount} - ${data.status}</div>`;
-
-if(data.status==="APPROVED"){
-totalDeposit += Number(data.amount);
-}
+ let data=d.data();
+ depositHTML+=`<div class="history">₹${data.amount} - ${data.status}</div>`;
+ if(data.status==="APPROVED") totalDeposit+=Number(data.amount);
 });
 
 /* WITHDRAW */
-const wdSnap = await getDocs(
-query(collection(db,"withdraws"), where("email","==",email))
-);
+const wdSnap = await getDocs(query(collection(db,"withdraws"),where("email","==",email)));
 
 wdSnap.forEach(d=>{
-const data = d.data();
-
-withdrawHistory += `<div class="history">₹${data.amount} - ${data.status}</div>`;
-
-if(data.status==="APPROVED"){
-totalWithdraw += Number(data.amount);
-}
+ let data=d.data();
+ withdrawHTML+=`<div class="history">₹${data.amount} - ${data.status}</div>`;
+ if(data.status==="APPROVED") totalWithdraw+=Number(data.amount);
 });
 
 /* SHOW */
-document.getElementById("userData").innerHTML = `
+userData.innerHTML=`
 <h3>Total Deposit: ₹${totalDeposit}</h3>
 <h3>Total Withdraw: ₹${totalWithdraw}</h3>
 <h4>Deposit History</h4>
-${depositHistory}
+${depositHTML || "No Data"}
 <h4>Withdraw History</h4>
-${withdrawHistory}
+${withdrawHTML || "No Data"}
 `;
-
 }
 
-/* =========================
-   TODAY DEPOSITS
-========================= */
-async function loadTodayDeposits(){
+/* ================= TODAY DEPOSITS ================= */
+async function loadDeposits(){
 
 const snap = await getDocs(collection(db,"deposits"));
-
 let today = new Date().toDateString();
 let html="";
 
 snap.forEach(d=>{
+ let data=d.data();
+ let date=new Date(data.time||Date.now());
 
-let data = d.data();
-let date = new Date(data.time || Date.now());
-
-if(date.toDateString() === today){
-
-html += `
-<div class="history">
-👤 ${data.email}<br>
-💰 ₹${data.amount}<br>
-⏰ ${date.toLocaleTimeString()}
-</div>
-`;
-
-}
-
+ if(date.toDateString()===today){
+   html+=`
+   <div class="history">
+   👤 ${data.email}<br>
+   💰 ₹${data.amount}<br>
+   ⏰ ${date.toLocaleTimeString()}
+   </div>`;
+ }
 });
 
-if(html==="") html="No Deposits Today";
-
-document.getElementById("depositList").innerHTML = html;
+depositList.innerHTML = html || "No Deposits Today";
 }
 
-/* LOAD */
-loadTodayDeposits();
-setInterval(loadTodayDeposits,5000);
-  document.getElementById("createBtn").addEventListener("click", createCode);
+/* ================= INIT ================= */
+const codeInput=document.getElementById("code");
+const amountInput=document.getElementById("amount");
+const limitInput=document.getElementById("limit");
+const emailInput=document.getElementById("userEmail");
+
+const codeList=document.getElementById("codeList");
+const userData=document.getElementById("userData");
+const depositList=document.getElementById("depositList");
+
+/* BUTTON EVENTS */
+document.getElementById("createBtn").addEventListener("click", createCode);
 document.getElementById("checkBtn").addEventListener("click", checkUser);
 
+/* AUTO LOAD */
+loadDeposits();
+setInterval(loadDeposits,5000);
+
 </script>
-  
+
 </body>
 </html>
