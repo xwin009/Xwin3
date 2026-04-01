@@ -257,26 +257,40 @@ board.appendChild(ball);
 let chance = await getChance();
 let selectedIndex;
 
-// 🔴 LOSS MODE
-if(chance <= 0){
-selectedIndex = [3,4,5][Math.floor(Math.random()*3)];
-}
-
-// 🟢 WIN MODE
-else if(chance >= 100){
-selectedIndex = [0,1,2,6,7,8][Math.floor(Math.random()*6)];
-}
-
-// 🎲 MIX MODE
-else{
 let rand = Math.random()*100;
 
-if(rand < chance){  
-  selectedIndex = [0,1,2,6,7,8][Math.floor(Math.random()*6)];  
-}else{  
-  selectedIndex = [3,4,5][Math.floor(Math.random()*3)];  
+// 🔴 LOSS ZONE (<1x)
+let lossIndexes = [];
+let winIndexes = [];
+
+// 🔥 dynamic filter based on multiplier
+M[color].forEach((val, i)=>{
+  if(val < 1){
+    lossIndexes.push(i);
+  }else if(val > 1){
+    winIndexes.push(i);
+  }
+});
+
+// 🎯 FINAL LOGIC
+if(chance <= 0){
+  // ❌ always loss
+  selectedIndex = lossIndexes[Math.floor(Math.random()*lossIndexes.length)];
 }
 
+else if(chance >= 100){
+  // 🟢 always win
+  selectedIndex = winIndexes[Math.floor(Math.random()*winIndexes.length)];
+}
+
+else{
+  if(rand < chance){
+    // 🟢 win
+    selectedIndex = winIndexes[Math.floor(Math.random()*winIndexes.length)];
+  }else{
+    // 🔴 loss
+    selectedIndex = lossIndexes[Math.floor(Math.random()*lossIndexes.length)];
+  }
 }
 
 /* 🎯 START EXACT CENTER */
