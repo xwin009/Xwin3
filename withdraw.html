@@ -62,6 +62,7 @@ input{width:100%;padding:12px;margin:8px 0 14px;border-radius:10px;border:none;f
       <div>🔴 Withdrawal amount range: <b>₹100 - ₹50,000</b></div>
       <div>🔴 Please confirm your beneficiary details carefully</div>
       <div>🔴 Wrong details may cause permanent loss</div>
+      <div>🟡 Bet Required: ₹<b id="wagerText">0</b></div>
     </div>
   </div>
 
@@ -153,7 +154,12 @@ async function loadBalance(){
   document.getElementById("balance").innerText = balance.toFixed(2);
 }
 loadBalance();
-
+  
+function loadWager(){
+  let wager = Number(localStorage.getItem("wager")) || 0;
+  document.getElementById("wagerText").innerText = wager;
+}
+loadWager();
 /* ===== DAILY LIMIT RESET ===== */
 const today = new Date().toDateString();
 if(localStorage.getItem("withdrawDate") !== today){
@@ -172,6 +178,11 @@ window.openTab = function(id,el){
 
 /* ===== SUBMIT WITHDRAW ===== */
 window.submitWithdraw = async function(){
+  let wager = Number(localStorage.getItem("wager")) || 0;
+
+if(wager > 0){
+  return showPopup("error","Bet Required","Complete betting ₹"+wager+" first");
+}
   const isUpi = document.getElementById("upi").classList.contains("active");
   const amt = Number(isUpi ? upiAmount.value : bankAmount.value);
 
