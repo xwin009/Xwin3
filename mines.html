@@ -157,6 +157,7 @@ let bet=0,mines=3,opened=0,multiplier=1,active=false;
 let minePositions=[];
 let safeLimit=0; // 🔥 NEW
 const HOUSE_EDGE=0.10;
+let streak = Number(localStorage.getItem("mineStreak")) || 0;
 
   const mineMultipliers = {
 
@@ -281,13 +282,31 @@ console.log("MINES VALUE:", chance);
 async function clickCell(i,el){
 
   if(!active || el.classList.contains("open")) return;
-// 🔥 FORCE LOSS FOR HIGH MINES (15–20)
-if(opened === 0 && mines >= 15){
-  el.classList.add("open","mine");
-  el.innerText="💣";
-  endGame(false);
-  return;
-}
+
+// 🔥 STREAK SYSTEM (14–20 MINES ONLY)
+if(opened === 0 && mines >= 14){
+
+  // 🎯 every 7th game → WIN
+  if(streak >= 6){
+    // SAFE CLICK
+    el.classList.add("safe");
+    el.innerText="💎";
+    opened++;
+    streak = 0; // reset
+    localStorage.setItem("mineStreak", streak);
+    calcMultiplier();
+    return;
+  }else{
+    // 💣 LOSS
+    el.classList.add("mine");
+    el.innerText="💣";
+    streak++;
+    localStorage.setItem("mineStreak", streak);
+    endGame(false);
+    return;
+  }
+
+  }
   el.classList.add("open");
 
   // 🔥 NEW CONTROL LOGIC
