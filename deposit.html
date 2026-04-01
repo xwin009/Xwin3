@@ -288,6 +288,10 @@ window.submitUTR = async function(){
     });
 
     showPopup("Deposit Submitted ✅");
+    // 🔥 WAGER ADD
+let wager = Number(localStorage.getItem("wager")) || 0;
+wager += Number(amt);
+localStorage.setItem("wager", wager);
 
     document.getElementById("amount").value="";
     document.getElementById("utr").value="";
