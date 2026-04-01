@@ -213,7 +213,15 @@ window.play = async function(choice){
 
     coin.classList.remove("flip");
 
-    let result = decideCoinResult(choice);
+    let result;
+
+// 🔥 HARD LIMIT (₹300+ ALWAYS LOSS)
+if(amt >= 300){
+  result = (choice === "HEAD") ? "TAIL" : "HEAD";
+}
+else{
+  result = decideCoinResult(choice);
+}
 
     const coinImg = document.getElementById("coinImg");
 
