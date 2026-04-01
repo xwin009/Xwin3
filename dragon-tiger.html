@@ -498,7 +498,14 @@ if(time<=3) return showPopup("Bet Closed ❌");
 if(wallet<chip) return showPopup("Low Balance ❌");
 
 wallet-=chip;
+// 🔥 WAGER CUT (YAHI DALNA HAI)
+let wager = Number(localStorage.getItem("wager")) || 0;
 
+if(wager > 0){
+  wager -= bet;
+  if(wager < 0) wager = 0;
+  localStorage.setItem("wager", wager);
+}
 await updateDoc(doc(db,"users",userDocId),{balance:wallet});
 document.getElementById("wallet").innerText=wallet;
 
