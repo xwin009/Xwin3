@@ -171,13 +171,25 @@ input{
   <button class="submit" onclick="submitUTR()">Submit UTR</button>
   
 </div>
-<div id="popup" style="position:fixed;inset:0;display:none;justify-content:center;align-items:center;background:rgba(0,0,0,0.7);z-index:9999;">
+
+<!-- 🔥 START POPUP -->
+<div id="startPopup" style="position:fixed;inset:0;display:none;justify-content:center;align-items:center;background:rgba(0,0,0,0.85);z-index:9999;">
+  
+  <div style="text-align:center;">
+    <img src="images/35106-removebg-preview.png" 
+         style="width:260px;max-width:90%;border-radius:20px;box-shadow:0 0 25px #00ffcc;">
+  </div>
+
+</div>
+
+
+<!-- 🔥 SUCCESS POPUP -->
+<div id="popup" style="position:fixed;inset:0;display:none;justify-content:center;align-items:center;background:rgba(0,0,0,0.7);z-index:9998;">
   <div style="background:#1c1c1c;padding:20px;border-radius:12px;text-align:center;width:80%;">
     <h3 id="popupText">Success</h3>
     <button onclick="closePopup()" style="margin-top:10px;padding:10px;width:100%;background:#4caf50;border:none;border-radius:10px;color:#fff;">OK</button>
   </div>
 </div>
-  
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -296,7 +308,23 @@ window.closePopup = function(){
 
 /* INIT */
 selectChannel(0);
+// 🔥 ONLY ONCE POPUP (FIRST LOAD)
+window.onload = function(){
 
+  let seen = sessionStorage.getItem("depositPopup");
+
+  if(!seen){
+    let popup = document.getElementById("startPopup");
+
+    popup.style.display = "flex";
+
+    setTimeout(()=>{
+      popup.style.display = "none";
+      sessionStorage.setItem("depositPopup","done");
+    },3000);
+  }
+
+}
 </script>
 
 </body>
