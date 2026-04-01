@@ -311,15 +311,15 @@ return;
 // 🎲 RANDOM MOVE (REAL FEEL)
 let move;
 
-// 70% random zig-zag
-if(Math.random() < 0.7){
-  move = Math.random() < 0.5 ? -1 : 1;
+// 🎯 STRONG CONTROL (house edge accurate)
+if(col < selectedIndex){
+  move = Math.random() < 0.8 ? 1 : -1;
 }
-// 30% control towards target (house edge)
+else if(col > selectedIndex){
+  move = Math.random() < 0.8 ? -1 : 1;
+}
 else{
-  if(col < selectedIndex) move = 1;
-  else if(col > selectedIndex) move = -1;
-  else move = 0;
+  move = Math.random() < 0.5 ? -1 : 1;
 }
 
 col += move;
