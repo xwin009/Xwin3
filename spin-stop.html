@@ -339,11 +339,20 @@ stopBtn.onclick = async ()=>{
 
   let baseAngle;
 
-  if(resultColor === "green"){
-    baseAngle = Math.random()<0.5 ? 45 : 225;
-  }else{
-    baseAngle = Math.random()<0.5 ? 135 : 315;
-  }
+  // 🎯 EXACT COLOR ALIGN FIX
+let offset = (Math.random() * 6) - 3;
+
+let baseAngle;
+
+if(resultColor === "green"){
+  // ✅ GREEN positions fix
+  baseAngle = Math.random() < 0.5 ? 0 : 180;
+}else{
+  // ✅ RED positions fix
+  baseAngle = Math.random() < 0.5 ? 90 : 270;
+}
+
+let finalAngle = baseAngle + offset;
 
   let finalAngle = baseAngle + offset;
 
