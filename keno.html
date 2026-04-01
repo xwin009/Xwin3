@@ -311,6 +311,13 @@ const walletEl=document.getElementById("wallet");
 const betEl=document.getElementById("bet");
 const grid=document.getElementById("grid");
 const historyBox=document.getElementById("history");
+  // 🔥 ADD THIS (INFO BUTTON FIX)
+const infoBtn = document.getElementById("infoBtn");
+const infoPopup = document.getElementById("infoPopup");
+const closeInfo = document.getElementById("closeInfo");
+
+infoBtn.onclick = () => infoPopup.style.display = "flex";
+closeInfo.onclick = () => infoPopup.style.display = "none";
 
 /* LOAD WALLET */
 async function loadWallet(){
