@@ -191,22 +191,18 @@ window.approveWithdraw=async id=>{
   loadWithdraws();loadDashboard();  
 };  
 window.rejectWithdraw = async (id) => {
-  const wRef = doc(db, "withdraws", id);
-  const wSnap = await getDocs(collection(db,"withdraws"));
 
-  let email="", amount=0;
+  const wRef = doc(db,"withdraws",id);
+  const wDoc = await getDoc(wRef);
+  const data = wDoc.data();
 
-  wSnap.forEach(d=>{
-    if(d.id === id){
-      email = d.data().email;
-      amount = Number(d.data().amount || 0);
-    }
-  });
+  let email = data.email;
+  let amount = Number(data.amount || 0);
 
-  // Withdraw status reject
+  // ❌ reject status
   await updateDoc(wRef,{status:"REJECTED"});
 
-  // User wallet refund
+  // 💰 refund user
   const users = await getDocs(collection(db,"users"));
   users.forEach(async u=>{
     if(u.data().email === email){
@@ -219,7 +215,6 @@ window.rejectWithdraw = async (id) => {
   loadWithdraws();
   loadDashboard();
 };
-  
 /* ---------- USERS ---------- */  
 async function loadUsers(){  
   sec2.innerHTML="";  
