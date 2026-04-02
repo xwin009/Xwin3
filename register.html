@@ -198,7 +198,7 @@ await setDoc(doc(db, "users", user.uid), {
   balance: 51,
   signupBonus: true,
   role: "user",
-  createdAt: Date.now(),
+  timeStamp: Date.now(),   // 🔥 YE CHANGE KAR
 
   referredBy: ref || null   // 🔥 ADD THIS
 });
