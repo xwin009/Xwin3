@@ -802,16 +802,24 @@ if(snap.data().active === false){
   return;
 }
 
-// game ON → original logic
-let walletAmt =
-+localStorage.getItem("wallet") ||
-+localStorage.getItem("coin_wallet") ||
-0;
 
-if(walletAmt < 100){
-document.getElementById("depositPopup").style.display="flex";
+// 🔥 FIREBASE CHECK (1 time deposit system)
+const userEmail = localStorage.getItem("userEmail");
+
+const userSnap = await getDocs(
+  query(collection(db,"users"), where("email","==",userEmail))
+);
+
+let hasDeposited = false;
+
+userSnap.forEach(d=>{
+  hasDeposited = d.data().hasDeposited || false;
+});
+
+if(!hasDeposited){
+  document.getElementById("depositPopup").style.display="flex";
 }else{
-location.href = url;
+  location.href = url;
 }
 
 }
