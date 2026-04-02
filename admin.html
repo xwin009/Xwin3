@@ -195,7 +195,9 @@ onSnapshot(collection(db,"withdraws"), (snap)=>{
     sec1.innerHTML+=`
     <div class="card">
       <div class="row"><span>${w.email}</span><span>₹${w.amount}</span></div>
-      <div class="row"><span>Time</span><span>${w.time || "N/A"}</span></div>
+      <div class="row"><span>Time</span><span>${
+  w.timeStamp ? new Date(w.timeStamp).toLocaleString() : "N/A"
+      }</span></div>
       ${extra}
       <div class="row">
         <button class="btn approve" onclick="approveWithdraw('${d.id}')">Approve</button>
