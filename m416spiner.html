@@ -340,6 +340,14 @@ window.spin = async function(){
 
   // 💰 BET CUT
   wallet -= bet;
+  // 🔥 WAGER CUT (YAHI DALNA HAI)
+let wager = Number(localStorage.getItem("wager")) || 0;
+
+if(wager > 0){
+  wager -= bet;
+  if(wager < 0) wager = 0;
+  localStorage.setItem("wager", wager);
+}
   document.getElementById("wallet").innerText = wallet;
   await updateDoc(doc(db,"users",userDocId),{ balance: wallet });
 
