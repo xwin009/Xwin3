@@ -382,6 +382,14 @@ else{
  /* 💰 CUT ONCE */
  if(!betPlaced){
    balance -= bet;
+   // 🔥 WAGER CUT (YAHI ADD KAR)
+  let wager = Number(localStorage.getItem("wager")) || 0;
+
+  if(wager > 0){
+    wager -= bet;
+    if(wager < 0) wager = 0;
+    localStorage.setItem("wager", wager);
+  }
    bal.innerText = balance;
    await updateDoc(doc(db,"users",uid),{balance});
    betPlaced = true;
