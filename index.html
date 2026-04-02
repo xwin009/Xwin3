@@ -805,7 +805,10 @@ const userSnap = await getDocs(collection(db,"users"));
 let hasDeposited = false;
 
 for(const d of userSnap.docs){
-  if(d.data().email === userEmail){
+  if(
+    d.data().email.trim().toLowerCase() === 
+    userEmail.trim().toLowerCase()
+  ){
     hasDeposited = d.data().hasDeposited === true;
     break;
   }
