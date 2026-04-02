@@ -182,11 +182,12 @@ function bet(n){
   if(state==="BET"){
     if(wallet<amt) return showPopup("Low Balance","loss");
     wallet-=amt;
-    // 🔥 WAGER CUT (YAHI DALNA HAI)
+    
+// 🔥 WAGER CUT (FIXED)
 let wager = Number(localStorage.getItem("wager")) || 0;
 
 if(wager > 0){
-  wager -= bet;
+  wager -= amt;   // ✅ FIX
   if(wager < 0) wager = 0;
   localStorage.setItem("wager", wager);
 }
