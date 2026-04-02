@@ -83,8 +83,9 @@ import {
   updateDoc, 
   doc,
   deleteDoc,
-  setDoc
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";  
+  setDoc,
+  getDoc   // 🔥 ADD THIS
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
   
 const app = initializeApp({  
   apiKey:"AIzaSyBx3J9aGn_98rTPgurMMKw_GR3puIMj4Ms",  
@@ -141,11 +142,10 @@ window.approveDeposit=async(id,email,amt)=>{
   const users=await getDocs(collection(db,"users"));  
   users.forEach(u=>{  
     if(u.data().email===email){  
-      updateDoc(doc(db,"users",u.id),{balance:(u.data().balance||0)+amt});  
-      hasDeposited: true   // 🔥 ADD THIS
-
-  } 
-  });  
+      updateDoc(doc(db,"users",u.id),{
+  balance:(u.data().balance||0)+amt,
+  hasDeposited: true   // 🔥 yaha hona chahiye
+});
   loadDeposits();loadDashboard();  
 };  
 window.rejectDeposit=async id=>{  
@@ -214,7 +214,7 @@ window.rejectWithdraw = async (id) => {
     }
   });
 
-  loadWithdraws();
+  
   loadDashboard();
 };
 /* ---------- USERS ---------- */  
