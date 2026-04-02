@@ -293,6 +293,14 @@ rollBtn.onclick = async ()=>{
   if(bet<=0 || bet>wallet) return alert("Low balance");
 
   wallet -= bet;
+  // 🔥 WAGER CUT
+let wager = Number(localStorage.getItem("wager")) || 0;
+
+if(wager > 0){
+  wager -= currentBet;
+  if(wager < 0) wager = 0;
+  localStorage.setItem("wager", wager);
+}
   await saveWallet();
   updateWallet();
 
