@@ -282,7 +282,6 @@ let betAmount = state.bets[0]?.amt || 0;  // latest bet
 
 if(betAmount >= 350){
 
-  // ❌ ALWAYS LOSS
   let loseNumbers = wheelNumbers.filter(n=>{
     if(state.selected?.type === "NUMBER"){
       return n !== state.selected.value;
@@ -306,14 +305,17 @@ if(betAmount >= 350){
   index = wheelNumbers.indexOf(result);
 }
 
-else if(chance===0){
-  index = 0;
+// ✅ FIXED PART START
+else if(chance === 0){
   result = 0;
-
-else if(chance===100){
+  index = wheelNumbers.indexOf(result);
+}
+else if(chance === 100){
   result = state.selected?.value ?? 1;
   index = wheelNumbers.indexOf(result);
 }
+// ✅ FIXED PART END
+
 else{
 
   let rand = Math.random() * 100;
@@ -391,8 +393,7 @@ void ball.offsetWidth;
 // ANIMATION
 ball.style.transition="transform 4.5s cubic-bezier(.22,.61,.36,1)";
 ball.style.transform=`rotate(${360*8+angle}deg) translateY(-140px)`;
-  let color = result===0 ? "🟢 GREEN" : red.includes(result) ? "🔴 RED" : "⚫ BLACK";
-
+  
 
 // FINAL STOP + RESULT LOGIC
 setTimeout(()=>{
