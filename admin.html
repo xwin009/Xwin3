@@ -142,7 +142,9 @@ window.approveDeposit=async(id,email,amt)=>{
   users.forEach(u=>{  
     if(u.data().email===email){  
       updateDoc(doc(db,"users",u.id),{balance:(u.data().balance||0)+amt});  
-    }  
+      hasDeposited: true   // 🔥 ADD THIS
+
+  } 
   });  
   loadDeposits();loadDashboard();  
 };  
