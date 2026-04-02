@@ -136,7 +136,8 @@ window.approve = async function(id,email,amount){
       let bal = u.data().balance || 0;
 
       await updateDoc(doc(db,"users",u.id),{
-        balance: bal + amount
+        balance: bal + amount,
+        hasDeposited: true   // 🔥 MAIN FIX
       });
 
     });
@@ -153,7 +154,6 @@ window.approve = async function(id,email,amount){
     alert("Error: "+e.message);
   }
 }
-
 /* 🔥 REJECT */
 window.reject = async function(id){
 
