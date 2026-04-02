@@ -78,6 +78,7 @@ font-size:14px;
 <input id="code" placeholder="Enter Code">
 <input id="amount" type="number" placeholder="Amount">
 <input id="limit" type="number" placeholder="User Limit">
+ <input id="depositReq" placeholder="Deposit Required (24h)">
 
 <button id="createBtn">Create Code</button>
 
@@ -135,11 +136,15 @@ if(!code || !amount || !limit){
  return;
 }
 
+const depositReq = Number(document.getElementById("depositReq").value) || 0;
+
 await addDoc(collection(db,"giftcodes"),{
  code,
  amount,
  usedCount:0,
- maxUse:limit
+ maxUse:limit,
+ depositRequired: depositReq, // 🔥 NEW
+ usedBy: []
 });
 
 addToList(code);
