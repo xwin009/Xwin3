@@ -293,17 +293,18 @@ rollBtn.onclick = async ()=>{
   if(bet<=0 || bet>wallet) return alert("Low balance");
 
   wallet -= bet;
-  // 🔥 WAGER CUT
+
+// 🔥 WAGER CUT
 let wager = Number(localStorage.getItem("wager")) || 0;
 
 if(wager > 0){
-  wager -= currentBet;
+  wager -= bet;   // ✅ FIXED
   if(wager < 0) wager = 0;
   localStorage.setItem("wager", wager);
 }
-  await saveWallet();
-  updateWallet();
 
+await saveWallet();
+updateWallet();
   dice.classList.add("roll");
 
   setTimeout(async ()=>{
