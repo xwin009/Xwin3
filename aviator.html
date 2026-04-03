@@ -182,12 +182,7 @@ function bet(n){
   if(state==="BET"){
     if(wallet<amt) return showPopup("Low Balance","loss");
     wallet-=amt;
-    // 🔥 NEW WAGER SYSTEM
-if(uid){
-  updateDoc(doc(db,"users",uid),{
-    wagerDone: increment(amt)
-  });
-}
+    
     wEl.innerText=wallet;
     active[i]=true;
     betAmt[i]=amt;
@@ -314,17 +309,23 @@ let lastBet = 0;
 /* 🔥 HOOK BET FUNCTION (WITHOUT TOUCHING ORIGINAL) */
 const originalBet = window.bet;
 
-window.bet = function(n){
+window.bet = async function(n){
 
   let amt = +document.getElementById("amt"+n).value;
 
   if(state === "BET"){
-    lastBet = amt; // 🔥 save bet
+    lastBet = amt;
+
+    // 🔥 WAGER ADD
+    if(uid){
+      await updateDoc(doc(db,"users",uid),{
+        wagerDone: increment(amt)
+      });
+    }
   }
 
-  originalBet(n);
+  return originalBet(n); // ✅ RETURN IMPORTANT
 };
-
 /* 🔥 OVERRIDE CRASH SYSTEM */
 window.randCrash = function(){
 
