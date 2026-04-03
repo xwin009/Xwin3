@@ -423,6 +423,7 @@ let userDocId = "";
 let wallet=0, chip=0;
 let pubg=0, free=0, tie=0;
 let gameInterval;
+  let selectedBet = null; // 🔥 NEW
 
 let myBets = JSON.parse(localStorage.getItem("pf_bets")) || [];
 
@@ -490,26 +491,44 @@ el.classList.add("active");
 };
 
 // 🔥 BET
-window.betPlace=async(type)=>{
+window.betPlace = async(type)=>{
 
-let time=getTime();
+let time = getTime();
 
 if(time<=3) return showPopup("Bet Closed ❌");
-if(wallet<chip) return showPopup("Low Balance ❌");
+if(wallet < chip) return showPopup("Low Balance ❌");
 
-wallet-=chip;
+// ❌ ALREADY BET CHECK
+if(selectedBet && selectedBet !== type){
+  return showPopup("Only 1 Bet Allowed ❌");
+}
 
-// 🔥 NEW WAGER SYSTEM
+// ✅ SET SELECTED
+selectedBet = type;
+
+wallet -= chip;
+
+// 🔥 WAGER SYSTEM
 await updateDoc(doc(db,"users",userDocId),{
   wagerDone: increment(chip)
 });
 await updateDoc(doc(db,"users",userDocId),{balance:wallet});
-document.getElementById("wallet").innerText=wallet;
 
-if(type=="PUBG"){ pubg+=chip; document.getElementById("pubgAmt").innerText=pubg; }
-if(type=="FREE"){ free+=chip; document.getElementById("freeAmt").innerText=free; }
-if(type=="TIE"){ tie+=chip; document.getElementById("tieAmt").innerText=tie; }
+document.getElementById("wallet").innerText = wallet;
 
+// ✅ ADD BET
+if(type=="PUBG"){ 
+  pubg += chip; 
+  document.getElementById("pubgAmt").innerText = pubg; 
+}
+if(type=="FREE"){ 
+  free += chip; 
+  document.getElementById("freeAmt").innerText = free; 
+}
+if(type=="TIE"){ 
+  tie += chip; 
+  document.getElementById("tieAmt").innerText = tie; 
+}
 };
 
 // 🎴 CARDS
@@ -690,7 +709,7 @@ await updateDoc(doc(db,"users",userDocId),{balance:wallet});
 
 // 🔄 RESET
 pubg=0; free=0; tie=0;
-
+selectedBet = null; // 🔥 RESET
 document.getElementById("pubgAmt").innerText=0;
 document.getElementById("freeAmt").innerText=0;
 document.getElementById("tieAmt").innerText=0;
