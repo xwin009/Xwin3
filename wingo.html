@@ -292,22 +292,24 @@ window.showTab=showTab;
 /* 🔥 FINAL TIMER FIX */
 setInterval(()=>{
 
- if(S.time > 0){
-   S.time--;
+ if(S.time <= 0){
+   if(!roundDone){
+     roundDone = true;
+     finish();
+   }
+   return; // 🔥 STOP HERE (IMPORTANT)
  }
 
- if(S.time <= 5) locked = true;
+ S.time--;
 
- if(S.time === 0 && !roundDone){
-   roundDone = true;
-   finish();
+ if(S.time <= 5){
+   locked = true;
  }
 
  save();
  render();
 
 },1000);
-
 loadMainWallet();
 render();
 draw();
