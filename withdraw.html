@@ -155,10 +155,27 @@ async function loadBalance(){
 }
 loadBalance();
   
-function loadWager(){
-  let wager = Number(localStorage.getItem("wager")) || 0;
-  document.getElementById("wagerText").innerText = wager;
+async function loadWager(){
+
+  const snap = await getDocs(
+    query(collection(db,"users"), where("email","==",userEmail))
+  );
+
+  snap.forEach(d=>{
+    let data = d.data();
+
+    let required = data.wagerRequired || 0;
+    let done = data.wagerDone || 0;
+
+    let remaining = required - done;
+
+    if(remaining < 0) remaining = 0;
+
+    document.getElementById("wagerText").innerText = remaining;
+  });
+
 }
+
 loadWager();
 /* ===== DAILY LIMIT RESET ===== */
 const today = new Date().toDateString();
@@ -178,7 +195,19 @@ window.openTab = function(id,el){
 
 /* ===== SUBMIT WITHDRAW ===== */
 window.submitWithdraw = async function(){
-  let wager = Number(localStorage.getItem("wager")) || 0;
+  const snap = await getDocs(
+  query(collection(db,"users"), where("email","==",userEmail))
+);
+
+let wager = 0;
+
+snap.forEach(d=>{
+  let data = d.data();
+  let required = data.wagerRequired || 0;
+  let done = data.wagerDone || 0;
+
+  wager = required - done;
+});
 
 if(wager > 0){
   return showPopup("error","Bet Required","Complete betting ₹"+wager+" first");
