@@ -186,7 +186,7 @@ body{margin:0;font-family:Arial;background:#1b5e20;color:#fff}
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {
   getFirestore, getDocs, collection, query, where,
-  doc, getDoc, updateDoc
+  doc, getDoc, updateDoc,increment
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 /* FIREBASE */
@@ -336,13 +336,11 @@ function buildUI(){
     selectedHorses.add(h.id);
 
     balance -= selectedChip;
-    // 🔥 WAGER CUT (YAHI ADD KAR)
-let wager = Number(localStorage.getItem("wager")) || 0;
-
-if(wager > 0){
-  wager -= selectedChip;
-  if(wager < 0) wager = 0;
-  localStorage.setItem("wager", wager);
+    // 🔥 NEW WAGER SYSTEM
+if(uid){
+  await updateDoc(userRef(),{
+    wagerDone: increment(selectedChip)
+  });
 }
     horseBets[h.id]+=selectedChip;
 
