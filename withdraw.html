@@ -155,23 +155,24 @@ async function loadBalance(){
 }
 loadBalance();
   
-async function loadWager(){
+import { onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-  const snap = await getDocs(
-    query(collection(db,"users"), where("email","==",userEmail))
-  );
+function loadWager(){
 
-  snap.forEach(d=>{
-    let data = d.data();
+  const q = query(collection(db,"users"), where("email","==",userEmail));
 
-    let required = data.wagerRequired || 0;
-    let done = data.wagerDone || 0;
+  onSnapshot(q,(snap)=>{
+    snap.forEach(d=>{
+      let data = d.data();
 
-    let remaining = required - done;
+      let required = data.wagerRequired || 0;
+      let done = data.wagerDone || 0;
 
-    if(remaining < 0) remaining = 0;
+      let remaining = required - done;
+      if(remaining < 0) remaining = 0;
 
-    document.getElementById("wagerText").innerText = remaining;
+      document.getElementById("wagerText").innerText = remaining;
+    });
   });
 
 }
