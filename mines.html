@@ -139,7 +139,7 @@ Cashout (x<span id="multi">1.00</span>)
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {
-  getFirestore,getDocs,getDoc,collection,query,where,doc,updateDoc
+  getFirestore,getDocs,getDoc,collection,query,where,doc,updateDoc,increment
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const app = initializeApp({
@@ -248,15 +248,11 @@ async function startGame(){
 
  wallet-=bet;
   // 🔥 WAGER CUT (YAHI DALNA HAI)
-let wager = Number(localStorage.getItem("wager")) || 0;
 
-if(wager > 0){
-  wager -= bet;
-  if(wager < 0) wager = 0;
-  localStorage.setItem("wager", wager);
-}
- await updateDoc(doc(db,"users",userDocId),{balance:wallet});
- document.getElementById("wallet").innerText=wallet;
+ await updateDoc(doc(db,"users",userDocId),{
+  balance: wallet,
+  wagerDone: increment(bet)
+});
 
  showPopup("🎯 Bet ₹"+bet,"#4caf50");
 
