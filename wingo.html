@@ -198,20 +198,7 @@ async function finish(){
 
  for(let i=0;i<=9;i++){
 
-  let c;
-
-if([1,3,7,9].includes(n)){
-  c = "GREEN";
-}
-else if([2,4,6,8].includes(n)){
-  c = "RED";
-}
-else if(n >= 0 && n <= 5){
-  c = "VIOLET";
-}
-else{
-  c = "VIOLET";
-}
+let c=n==0||n==5?'VIOLET':n%2?'GREEN':'RED';
   let bs=i>=5?'BIG':'SMALL';
 
   if(isWinRound){
