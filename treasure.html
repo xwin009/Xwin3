@@ -168,7 +168,7 @@ let gameActive = false;
 let currentWin = 0;
 let chestData = [];
 let uid = "";
-
+let opened = 0; // 🔥 NEW
 /* UI */
 const board = document.getElementById("board");
 const walletUI = document.getElementById("wallet");
@@ -224,6 +224,8 @@ if(uid){
 
   currentWin=bet;
   gameActive=true;
+  opened = 0; // 🔥 reset
+cashoutBtn.disabled = true; // 🔥 disable
 
   let chance = await getChance(); // 🔥 FIREBASE CONTROL
 
@@ -271,6 +273,8 @@ function openChest(i,el){
   el.classList.add("disabled");
 
   const type=chestData[i];
+  opened++; // 🔥 count open
+cashoutBtn.disabled = false; // 🔥 enable after 1 click
 
   if(type==="BOOM"){
     el.innerText="💣";
@@ -290,6 +294,9 @@ function openChest(i,el){
 
 /* CASHOUT */
 cashoutBtn.onclick=async()=>{
+  if(opened === 0){
+  return alert("Open at least 1 box first");
+}
   wallet+=currentWin;
   await saveWallet();
 
