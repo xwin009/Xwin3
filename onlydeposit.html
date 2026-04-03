@@ -136,9 +136,12 @@ window.approve = async function(id,email,amount){
       let bal = u.data().balance || 0;
 
       await updateDoc(doc(db,"users",u.id),{
-        balance: bal + amount,
-        hasDeposited: true   // 🔥 MAIN FIX
-      });
+  balance: bal + amount,
+  hasDeposited: true,
+
+  // 🔥 ADD THIS
+  wagerRequired: (u.data().wagerRequired || 0) + (amount * 2)
+});
 
     });
 
