@@ -282,7 +282,7 @@ body{
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, getDocs, collection, query, where, doc, updateDoc, onSnapshot }
+import { getFirestore, getDocs, collection, query, where, doc, updateDoc, onSnapshot,increment }
 from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 /* FIREBASE */
@@ -416,14 +416,13 @@ async function play(){
  if(balance<bet) return alert("Low balance");
 
  balance-=bet;
-  // 🔥 WAGER CUT (ADD HERE)
-let wager = Number(localStorage.getItem("wager")) || 0;
-
-if(wager > 0){
-  wager -= bet;
-  if(wager < 0) wager = 0;
-  localStorage.setItem("wager", wager);
+// 🔥 NEW WAGER SYSTEM
+if(uid){
+  await updateDoc(userRef(),{
+    wagerDone: increment(bet)
+  });
 }
+  
  await updateDoc(userRef(),{balance});
  walletEl.innerText=balance;
 
