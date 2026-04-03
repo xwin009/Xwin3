@@ -301,10 +301,18 @@ window.setMulti=setMulti;
 window.showTab=showTab;
 
 setInterval(()=>{
- S.time--;
- if(S.time<=5) locked=true;
- if(S.time<=0) finish();
- save();render();
+ if(S.time > 0){
+   S.time--;
+ }
+
+ if(S.time <= 5) locked = true;
+
+ if(S.time === 0){
+   finish();
+ }
+
+ save();
+ render();
 },1000);
 
 loadMainWallet();
