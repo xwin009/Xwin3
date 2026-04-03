@@ -543,6 +543,9 @@ function triggerFire(i){
 
 /* CASHOUT */
 async function cashout(){
+  if(step === 0){
+  return showPopup("Jump at least 1 time ❌");
+  }
   if(!playing) return;
 
   let arr=levels[currentLevel];
