@@ -273,11 +273,18 @@ function openChest(i,el){
   el.classList.add("disabled");
 
   const type=chestData[i];
-  opened++; // 🔥 count open
-cashoutBtn.disabled = false; // 🔥 enable after 1 click
+
+  if(type !== "BOOM"){
+    opened++;
+    cashoutBtn.disabled = false;
+  }
 
   if(type==="BOOM"){
     el.innerText="💣";
+
+    // 🔥 EXTRA SAFETY (instant disable)
+    cashoutBtn.disabled = true;
+
     setTimeout(endGame,600);
   }
 
