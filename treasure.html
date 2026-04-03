@@ -137,7 +137,7 @@ body{
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, getDocs, collection, query, where, doc, updateDoc, getDoc } 
+import { getFirestore, getDocs, collection, query, where, doc, updateDoc, getDoc,increment } 
 from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 /* FIREBASE */
@@ -213,14 +213,13 @@ startBtn.onclick=async()=>{
   if(bet>wallet) return alert("Low balance");
 
   wallet-=bet;
-  // 🔥 WAGER CUT (YAHI DALNA HAI)
-let wager = Number(localStorage.getItem("wager")) || 0;
-
-if(wager > 0){
-  wager -= bet;
-  if(wager < 0) wager = 0;
-  localStorage.setItem("wager", wager);
+  // 🔥 NEW WAGER SYSTEM
+if(uid){
+  await updateDoc(doc(db,"users",uid),{
+    wagerDone: increment(bet)
+  });
 }
+
   await saveWallet();
 
   currentWin=bet;
