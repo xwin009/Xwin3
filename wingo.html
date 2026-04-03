@@ -88,7 +88,7 @@ th{background:#ff6f6f}
   <div class="popup" id="popupBox"></div>  
 </div>   
 
-  <script type="module">
+    <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore,getDocs,collection,query,where,doc,updateDoc,onSnapshot,increment } 
@@ -104,14 +104,11 @@ const db = getFirestore(app);
 const userEmail = localStorage.getItem("userEmail");
 let userDocId="";
 
-/* 🔥 HOUSE EDGE */
 let HOUSE_EDGE = 50;
 
-// 🔥 LIVE CONTROL
 onSnapshot(doc(db,"settings","houseEdge"), (snap)=>{
   if(snap.exists()){
     HOUSE_EDGE = snap.data().wingo ?? 50;
-    console.log("🔥 WINGO EDGE:", HOUSE_EDGE);
   }
 });
 
@@ -121,8 +118,9 @@ let S=JSON.parse(localStorage.getItem("WG"))||{
 };
 
 let multi=1,tab="game",locked=false;
-let selectedBet = null; // 🔥 NEW
-let roundDone = false; // 🔥 NEW 
+let selectedBet=null;
+let roundDone=false;
+
 const save=()=>localStorage.setItem("WG",JSON.stringify(S));
 const $=i=>document.getElementById(i);
 
@@ -135,7 +133,10 @@ function showPopup(type,msg){
 
 async function loadMainWallet(){
  const snap=await getDocs(query(collection(db,"users"),where("email","==",userEmail)));
- snap.forEach(d=>{userDocId=d.id;S.wallet=d.data().balance||0});
+ snap.forEach(d=>{
+   userDocId=d.id;
+   S.wallet=d.data().balance||0;
+ });
  save();render();
 }
 
@@ -144,7 +145,6 @@ function setMulti(x,e){
  document.querySelectorAll('.multi').forEach(b=>b.classList.remove('active'));
  e.classList.add('active');
 }
-
 
 async function bet(type,val){
  if(locked) return;
@@ -155,83 +155,64 @@ async function bet(type,val){
  let total = amt * multi;
  if(total > S.wallet) return showPopup("loss","<h2>Low Balance</h2>");
 
- // 🔒 SINGLE BET SYSTEM
  if(selectedBet && (selectedBet.type !== type || selectedBet.val !== val)){
    return showPopup("loss","<h2>Only 1 Bet Allowed</h2>");
  }
 
- selectedBet = {type,val}; // 🔥 SAVE
+ selectedBet = {type,val};
 
- // ✅ WALLET CUT
  S.wallet -= total;
 
- // 🔥 FIREBASE
  await updateDoc(doc(db,"users",userDocId),{
-   balance: S.wallet,
-   wagerDone: increment(total)
+   balance:S.wallet,
+   wagerDone:increment(total)
  });
 
  S.bets.push({type,val,amt:total,p:S.period});
 
  showPopup("bet","<h2>Bet Placed</h2><p>₹"+total+"</p>");
 
- save();
- render();
+ save();render();
 }
-/* 🔥🔥🔥 NEW HOUSE EDGE SYSTEM 🔥🔥🔥 */
+
 async function finish(){
 
  let rand = Math.random()*100;
-
- let isWinRound = false;
-
- if(HOUSE_EDGE <= 0){
-   isWinRound = false;
- }
- else if(HOUSE_EDGE >= 100){
-   isWinRound = true;
- }
- else{
-   isWinRound = rand < HOUSE_EDGE;
- }
+ let isWinRound = HOUSE_EDGE>=100 ? true : HOUSE_EDGE<=0 ? false : rand < HOUSE_EDGE;
 
  let possible=[];
 
  for(let i=0;i<=9;i++){
 
-let c = i==0||i==5 ? 'VIOLET' : i%2 ? 'GREEN' : 'RED';
-  let bs=i>=5?'BIG':'SMALL';
+   let c;
+   if([1,3,7,9].includes(i)) c="GREEN";
+   else if([2,4,6,8].includes(i)) c="RED";
+   else c="VIOLET";
 
-  if(isWinRound){
-    if(
-      S.bets.some(b =>
-        (b.type=='number' && b.val==i) ||
-        (b.type=='color' && b.val==c) ||
-        (b.type=='bs' && b.val==bs)
-      )
-    ){
-      possible.push(i);
-    }
-  }else{
-    if(
-      S.bets.every(b =>
-        !(
-          (b.type=='number' && b.val==i) ||
-          (b.type=='color' && b.val==c) ||
-          (b.type=='bs' && b.val==bs)
-        )
-      )
-    ){
-      possible.push(i);
-    }
-  }
+   let bs=i>=5?'BIG':'SMALL';
+
+   if(isWinRound){
+     if(S.bets.some(b =>
+       (b.type=='number'&&b.val==i) ||
+       (b.type=='color'&&b.val==c) ||
+       (b.type=='bs'&&b.val==bs)
+     )) possible.push(i);
+   }else{
+     if(S.bets.every(b =>
+       !((b.type=='number'&&b.val==i) ||
+         (b.type=='color'&&b.val==c) ||
+         (b.type=='bs'&&b.val==bs))
+     )) possible.push(i);
+   }
  }
 
- let n = possible.length
-   ? possible[Math.floor(Math.random()*possible.length)]
-   : Math.floor(Math.random()*10);
+ let n = possible.length ? possible[Math.floor(Math.random()*possible.length)] : Math.floor(Math.random()*10);
 
- let c=n==0||n==5?'VIOLET':n%2?'GREEN':'RED';
+ let c;
+ if([1,3,7,9].includes(n)) c="GREEN";
+ else if([2,4,6,8].includes(n)) c="RED";
+ else c="VIOLET";
+
  let bs=n>=5?'BIG':'SMALL';
 
  S.history.unshift({p:S.period,n,bs,c});
@@ -265,13 +246,12 @@ let c = i==0||i==5 ? 'VIOLET' : i%2 ? 'GREEN' : 'RED';
  S.period++;
  S.time=30;
  locked=false;
-  selectedBet = null; // 🔥 RESET AFTER ROUND
-  roundDone = false; // 🔥 RESET
+ selectedBet=null;
+ roundDone=false;
 
  save();draw();render();
 }
 
-/* UI SAME */
 function render(){
  period.innerText=S.period;
  wallet.innerText=S.wallet;
@@ -284,7 +264,14 @@ function draw(){
  th.innerHTML=tb.innerHTML="";
  if(tab=="game"){
   th.innerHTML="<tr><th>Period</th><th>Number</th><th>Big/Small</th><th>Color</th></tr>";
-  S.history.forEach(r=>tb.innerHTML+=`<tr><td>${r.p}</td><td>${r.n}</td><td>${r.bs}</td><td>${r.c}</td></tr>`);
+  S.history.forEach(r=>{
+    tb.innerHTML+=`<tr>
+      <td>${r.p}</td>
+      <td>${r.n}</td>
+      <td>${r.bs}</td>
+      <td style="color:${r.c=='GREEN'?'#4caf50':r.c=='RED'?'#f44336':'#8e24aa'}">${r.c}</td>
+    </tr>`;
+  });
  }else{
   th.innerHTML="<tr><th>Period</th><th>Bet</th><th>Amount</th><th>Result</th></tr>";
   S.mybets.forEach(b=>tb.innerHTML+=`<tr><td>${b.p}</td><td>${b.b}</td><td>₹${b.a}</td><td class="${b.w?'win':'loss'}">${b.r}</td></tr>`);
@@ -302,27 +289,30 @@ window.bet=bet;
 window.setMulti=setMulti;
 window.showTab=showTab;
 
+/* 🔥 FINAL TIMER FIX */
 setInterval(()=>{
+
  if(S.time > 0){
    S.time--;
  }
 
  if(S.time <= 5) locked = true;
 
-if(S.time === 0 && !roundDone){
+ if(S.time === 0 && !roundDone){
    roundDone = true;
    finish();
-}
+ }
 
  save();
  render();
+
 },1000);
 
 loadMainWallet();
 render();
 draw();
 
-  </script>
+    </script>
   
   </body>  
 </html>  
