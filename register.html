@@ -119,6 +119,11 @@ a{
 
   <p style="margin-top:12px">
     Already registered? <a href="login.html">Login</a>
+    <p style="margin-top:6px">
+  <span onclick="openSupport()" 
+  style="color:#00ffcc; cursor:pointer; font-size:14px;">
+    Forgot Password?
+  </span>
   </p>
 </div>
 
@@ -210,6 +215,9 @@ await setDoc(doc(db, "users", user.uid), {
   .catch(err=>{
     showPopup(err.message);
   });
+};
+  window.openSupport = () => {
+  window.open("https://t.me/X2xwinxsupportk", "_blank");
 };
 </script>
 
