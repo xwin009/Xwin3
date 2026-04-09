@@ -479,8 +479,14 @@ font-size:16px;
 
 <div class="banner-slider">
 <div class="banner-track" id="bannerTrack">
+
 <img src="images/file_000000005f4c720bbba852b908a667a4.png">
+
 <img src="images/file_000000008b1471fabef74f625ab8d7dc.png">
+
+<!-- 🔥 NEW TELEGRAM BANNER -->
+<img src="images/36823-removebg-preview.png" onclick="openTelegram()">
+
 </div>
 </div>
 
@@ -642,7 +648,17 @@ window.openSupportMail = function(){
   },800);
 
 }
+window.openTelegram = function(){
 
+  // app open try
+  window.location.href = "tg://resolve?domain=2xwin_official";
+
+  // fallback browser
+  setTimeout(()=>{
+    window.open("https://t.me/2xwin_official","_blank");
+  },800);
+
+}
 window.openGiftBox = function(){
 document.getElementById("giftPopup").style.display="flex";
 }
