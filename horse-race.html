@@ -181,12 +181,12 @@ body{margin:0;font-family:Arial;background:#1b5e20;color:#fff}
  <div class="popup" id="popup"><h2 id="popupText"></h2></div>
 </div>
 
-
-    <script type="module">
+<script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {
   getFirestore, getDocs, collection, query, where,
-  doc, getDoc, updateDoc,increment
+  doc, getDoc, updateDoc, increment,
+  onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 /* FIREBASE */
@@ -196,6 +196,18 @@ const app = initializeApp({
   projectId:"colourcash-ea60e"
 });
 const db = getFirestore(app);
+
+/* 🔥 LIVE HORSE EDGE (NO REFRESH) */
+let HORSE_EDGE = 50;
+
+function liveHorseEdge(){
+  onSnapshot(doc(db,"settings","houseEdge"), (snap)=>{
+    if(snap.exists()){
+      HORSE_EDGE = Number(snap.data().horse ?? 50);
+      console.log("🔥 LIVE HORSE EDGE:", HORSE_EDGE);
+    }
+  });
+}
 
 /* USER */
 const userEmail = localStorage.getItem("userEmail");
@@ -212,13 +224,13 @@ const overlay = document.getElementById("overlay");
 const popup = document.getElementById("popup");
 const popupText = document.getElementById("popupText");
 
-/* 🔥 HISTORY TOGGLE */
+/* HISTORY TOGGLE */
 window.toggleHistory = function(){
   const box = document.getElementById("historyBox");
   box.style.display = box.style.display === "none" ? "block" : "none";
 };
 
-/* 🔥 LOAD BET HISTORY */
+/* LOAD BET HISTORY */
 async function loadBetHistory(){
   const snap = await getDoc(userRef());
   let list = snap.data()?.betHistory || [];
@@ -227,22 +239,15 @@ async function loadBetHistory(){
 
   list.forEach(item=>{
     if(item.win){
-      html += `
-      <div style="background:#1b5e20;padding:8px;border-radius:8px;margin-bottom:6px;">
-        🟢 WIN +₹${item.amount.toFixed(2)}<br>
-        ⏰ ${item.time}
-      </div>`;
+      html += `<div style="background:#1b5e20;padding:8px;border-radius:8px;margin-bottom:6px;">
+        🟢 WIN +₹${item.amount.toFixed(2)}<br>⏰ ${item.time}</div>`;
     }else{
-      html += `
-      <div style="background:#b71c1c;padding:8px;border-radius:8px;margin-bottom:6px;">
-        🔴 LOSS -₹${item.loseAmount}<br>
-        ⏰ ${item.time}
-      </div>`;
+      html += `<div style="background:#b71c1c;padding:8px;border-radius:8px;margin-bottom:6px;">
+        🔴 LOSS -₹${item.loseAmount}<br>⏰ ${item.time}</div>`;
     }
   });
 
-  document.getElementById("historyBox").innerHTML =
-    html || "No history yet";
+  document.getElementById("historyBox").innerHTML = html || "No history yet";
 }
 
 /* GAME DATA */
@@ -253,20 +258,8 @@ const horses=[
 
 let selectedChip=0, betting=true;
 let horseBets={}, timerInt=null;
-let selectedHorses = new Set(); // 🔥 LIMIT SYSTEM
+let selectedHorses = new Set();
 const ROUND_TIME=15000;
-
-/* HOUSE EDGE */
-async function getChance(){
-  try{
-    const ref = doc(db,"settings","houseEdge");
-    const snap = await getDoc(ref);
-    if(snap.exists()){
-      return Number(snap.data().horse ?? 50);
-    }
-  }catch(e){}
-  return 50;
-}
 
 /* WALLET */
 async function loadWallet(){
@@ -314,7 +307,7 @@ function buildUI(){
  horseBets={};
  betting=true;
  betCloseEl.innerText="";
- selectedHorses.clear(); // 🔥 RESET
+ selectedHorses.clear();
 
  horses.forEach(h=>{
   horseBets[h.id]=0;
@@ -327,7 +320,6 @@ function buildUI(){
   c.onclick=async()=>{
     if(!betting||!selectedChip||balance<selectedChip) return;
 
-    // 🔥 ONLY 2 HORSE LIMIT
     if(!selectedHorses.has(h.id) && selectedHorses.size >= 2){
       alert("❌ Only 2 horses allowed");
       return;
@@ -336,12 +328,13 @@ function buildUI(){
     selectedHorses.add(h.id);
 
     balance -= selectedChip;
-    // 🔥 NEW WAGER SYSTEM
-if(uid){
-  await updateDoc(userRef(),{
-    wagerDone: increment(selectedChip)
-  });
-}
+
+    if(uid){
+      await updateDoc(userRef(),{
+        wagerDone: increment(selectedChip)
+      });
+    }
+
     horseBets[h.id]+=selectedChip;
 
     walletEl.innerText=balance;
@@ -355,49 +348,42 @@ if(uid){
   betPanel.appendChild(c);
 
   const l = document.createElement("div");
-l.className = "lane";
+  l.className = "lane";
 
-l.innerHTML = `
-  <div class="finish-line"></div>
-  <img id="horse${h.id}" src="images/horses/horse${h.id}.png">
-`;
+  l.innerHTML = `
+    <div class="finish-line"></div>
+    <img id="horse${h.id}" src="images/horses/horse${h.id}.png">
+  `;
 
-track.appendChild(l);
+  track.appendChild(l);
  });
 }
 
-/* RACE */
+/* 🔥 RACE (LIVE EDGE USE) */
 async function startRace(){
 
- let chance = await getChance();
+ let chance = HORSE_EDGE; // 🔥 LIVE VALUE
 
  let totalBet = 0;
-let userHorses = [];
+ let userHorses = [];
 
-for(let id in horseBets){
+ for(let id in horseBets){
   if(horseBets[id] > 0){
     totalBet += horseBets[id];
     userHorses.push(Number(id));
   }
-}
+ }
 
  let winner;
 
-if(totalBet >= 300){
+ if(totalBet >= 300){
   let loseHorses = horses.filter(h=>!userHorses.includes(h.id));
   winner = loseHorses[Math.floor(Math.random()*loseHorses.length)].id;
-}
-else if(totalBet === 0){
+ }
+ else if(totalBet === 0){
   winner = horses[Math.floor(Math.random()*horses.length)].id;
-}
-else if(chance >= 100){
-  winner = userHorses[Math.floor(Math.random()*userHorses.length)];
-}
-else if(chance <= 0){
-  let loseHorses = horses.filter(h=>!userHorses.includes(h.id));
-  winner = loseHorses[Math.floor(Math.random()*loseHorses.length)].id;
-}
-else{
+ }
+ else{
   let rand = Math.random()*100;
 
   if(rand < chance){
@@ -406,7 +392,8 @@ else{
     let loseHorses = horses.filter(h=>!userHorses.includes(h.id));
     winner = loseHorses[Math.floor(Math.random()*loseHorses.length)].id;
   }
-}
+ }
+
  let pos={};horses.forEach(h=>pos[h.id]=0);
 
  const race=setInterval(()=>{
@@ -429,14 +416,14 @@ else{
 
 /* FINISH */
 async function finish(win){
-  let totalBet = 0;
+ let totalBet = 0;
 
-for(let id in horseBets){
+ for(let id in horseBets){
   totalBet += horseBets[id];
-}
+ }
 
  overlay.style.display="flex";
- const bet = horseBets[win] || 0; // win ke liye same rehne de
+ const bet = horseBets[win] || 0;
 
  let winAmt = bet ? bet*horses.find(h=>h.id===win).odds : 0;
 
@@ -449,11 +436,10 @@ for(let id in horseBets){
   popupText.innerText="❌ You Lose";
  }
 
- /* SAVE HISTORY */
  let betResult = {
   win: bet > 0,
   amount: winAmt,
-  loseAmount: bet > 0 ? 0 : totalBet, // 🔥 FIX
+  loseAmount: bet > 0 ? 0 : totalBet,
   time: new Date().toLocaleTimeString()
 };
 
@@ -504,8 +490,9 @@ await loadHistory();
 buildUI();
 syncTimer();
 loadBetHistory();
+liveHorseEdge(); // 🔥 IMPORTANT
 
-    </script>
+</script>
   
 </body>
 </html>
