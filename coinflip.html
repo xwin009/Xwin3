@@ -70,9 +70,47 @@ body{margin:0;font-family:Arial;background:#081c2f;color:#fff}
 .loss{color:#ff5252}
 
 /* NEW */
-.mybets{padding:12px;background:#041425}
-.mybets h3{margin:0 0 8px;font-size:16px}
-.mybets div{font-size:14px;padding:6px;border-bottom:1px solid #123}
+.mybets{
+  padding:14px;
+  background:#041425;
+}
+
+.mybets h3{
+  margin:0 0 10px;
+  font-size:16px;
+  color:#fff;
+}
+
+.bet-card{
+  background:#ffffff;
+  color:#000;
+  border-radius:12px;
+  padding:10px 12px;
+  margin-bottom:8px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  box-shadow:0 2px 8px rgba(0,0,0,0.2);
+}
+
+.bet-left{
+  display:flex;
+  flex-direction:column;
+  font-size:13px;
+}
+
+.bet-right{
+  text-align:right;
+  font-weight:bold;
+}
+
+.win-text{
+  color:#2ecc71;
+}
+
+.loss-text{
+  color:#ff3b3b;
+}
 </style>
 </head>
 
@@ -283,10 +321,28 @@ function renderHistory(){
 
 function renderBets(){
   betsEl.innerHTML="";
+
   bets.forEach(b=>{
-    let d=document.createElement("div");
-    d.innerText=`${b.time} | ${b.choice} | ₹${b.amt} | ${b.status}`;
-    betsEl.appendChild(d);
+
+    let div = document.createElement("div");
+    div.className = "bet-card";
+
+    let resultEmoji = b.result === "HEAD" ? "🙂" : "🪙";
+    let statusClass = b.status === "WIN" ? "win-text" : "loss-text";
+
+    div.innerHTML = `
+      <div class="bet-left">
+        <span>🕒 ${b.time}</span>
+        <span>${resultEmoji} ${b.choice}</span>
+      </div>
+
+      <div class="bet-right ${statusClass}">
+        ₹${b.amt} <br> ${b.status}
+      </div>
+    `;
+
+    betsEl.appendChild(div);
+
   });
 }
 
