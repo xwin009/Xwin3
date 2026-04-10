@@ -193,7 +193,7 @@ input{
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs, query, where, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
   
 /* 🔥 FIREBASE */
 const app = initializeApp({
@@ -295,18 +295,24 @@ await addDoc(collection(db,"deposits"),{
 });
 
     showPopup("Deposit Submitted ✅");
-    // 🔥 WAGER ADD
-let wager = Number(localStorage.getItem("wager")) || 0;
-wager += Number(amt);
-localStorage.setItem("wager", wager);
+    
+// 🔥 FIREBASE USER FETCH
+const userSnap = await getDocs(
+  query(collection(db,"users"), where("email","==",userEmail))
+);
 
-    document.getElementById("amount").value="";
-    document.getElementById("utr").value="";
+let userId = "";
+let currentRequired = 0;
 
-  }catch(e){
-    showPopup("Error: "+e.message);
-  }
-}
+userSnap.forEach(d=>{
+  userId = d.id;
+  currentRequired = Number(d.data().wagerRequired || 0);
+});
+
+// 🔥 UPDATE WAGER REQUIRED
+await updateDoc(doc(db,"users",userId),{
+  wagerRequired: currentRequired + Number(amt)
+});
 /* 🔥 POPUP */
 window.showPopup = function(msg){
   document.getElementById("popupText").innerText = msg;
